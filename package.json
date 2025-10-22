@@ -5,16 +5,6 @@
   "scripts": {
     "start": "start-simple.bat",
     "dev": "start-simple.bat",
-    "setup": "first-time-setup.bat",
-    "setup:backend": "setup-backend.bat",
-    "setup:database": "setup-database.bat",
-    "setup:database:first-time": "setup-database-first-time.bat",
-    "first-time": "first-time-setup.bat",
-    "deploy": "quick-deploy.bat",
-    "quick-deploy": "quick-deploy.bat",
-    "fix:dotnet": "fix-dotnet-version.bat",
-    "migrate": "cd backend/HospitalSystem.Api && dotnet ef database update",
-    "migration:add": "cd backend/HospitalSystem.Api && dotnet ef migrations add",
     "backend": "cd backend/HospitalSystem.Api && dotnet run",
     "frontend": "cd frontend && pnpm run dev",
     "install:frontend": "cd frontend && pnpm install",
@@ -24,15 +14,7 @@
     "clean:backend": "cd backend && dotnet clean",
     "test:frontend": "cd frontend && pnpm run test",
     "lint": "cd frontend && pnpm run lint:check",
-    "lint:fix": "cd frontend && pnpm run lint:fix",
-    "docker:up": "docker-compose up -d",
-    "docker:down": "docker-compose down",
-    "docker:build": "docker-compose build",
-    "docker:logs": "docker-compose logs -f",
-    "docker:restart": "docker-compose restart",
-    "docker:rebuild": "rebuild-docker.bat",
-    "docker:prod": "docker-compose -f docker-compose.prod.yml up -d",
-    "docker:prod:down": "docker-compose -f docker-compose.prod.yml down"
+    "lint:fix": "cd frontend && pnpm run lint:fix"
   },
   "keywords": [
     "hospital",

@@ -2858,11 +2858,7 @@
           "FluentValidation": "11.11.0",
           "HospitalSystem.Domain": "1.0.0",
           "MediatR": "12.4.1",
-          "Microsoft.Extensions.Configuration.Abstractions": "8.0.0",
-          "Microsoft.Extensions.DependencyInjection.Abstractions": "8.0.21",
-          "Microsoft.Extensions.Logging.Abstractions": "8.0.2",
-          "Microsoft.IdentityModel.Tokens": "7.3.1",
-          "System.IdentityModel.Tokens.Jwt": "7.3.1"
+          "Microsoft.Extensions.DependencyInjection.Abstractions": "8.0.21"
         },
         "compile": {
           "bin/placeholder/HospitalSystem.Application.dll": {}
@@ -2890,10 +2886,7 @@
           "Microsoft.EntityFrameworkCore": "8.0.21",
           "Microsoft.Extensions.Configuration.Abstractions": "8.0.21",
           "Microsoft.Extensions.DependencyInjection.Abstractions": "8.0.21",
-          "Microsoft.Extensions.Logging.Abstractions": "8.0.2",
-          "Microsoft.IdentityModel.Tokens": "7.3.1",
-          "Npgsql.EntityFrameworkCore.PostgreSQL": "8.0.11",
-          "System.IdentityModel.Tokens.Jwt": "7.3.1"
+          "Npgsql.EntityFrameworkCore.PostgreSQL": "8.0.11"
         },
         "compile": {
           "bin/placeholder/HospitalSystem.Infrastructure.dll": {}

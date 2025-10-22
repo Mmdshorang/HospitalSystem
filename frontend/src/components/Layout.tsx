@@ -106,36 +106,14 @@ const Layout = ({ children }: LayoutProps) => {
 
       {/* Main content */}
       <div className="lg:pr-64 flex flex-col flex-1">
-        {/* Header with user info and logout */}
-        <div className="sticky top-0 z-10 bg-white border-b border-gray-200">
-          <div className="flex items-center justify-between px-4 py-3">
-            <div className="flex items-center">
-              <button
-                type="button"
-                className="lg:hidden -mr-0.5 -mt-0.5 h-12 w-12 inline-flex items-center justify-center rounded-md text-gray-500 hover:text-gray-900 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-primary-500"
-                onClick={() => setSidebarOpen(true)}
-              >
-                <Menu className="h-6 w-6" />
-              </button>
-            </div>
-            
-            {/* User info and logout */}
-            <div className="flex items-center space-x-4">
-              <div className="flex items-center space-x-2">
-                <User className="h-5 w-5 text-gray-400" />
-                <span className="text-sm text-gray-700">
-                  {user?.firstName} {user?.lastName} ({user?.username})
-                </span>
-              </div>
-              <button
-                onClick={logout}
-                className="flex items-center space-x-1 text-sm text-gray-500 hover:text-gray-700"
-              >
-                <LogOut className="h-4 w-4" />
-                <span>خروج</span>
-              </button>
-            </div>
-          </div>
+        <div className="sticky top-0 z-10 lg:hidden pr-1 pt-1 sm:pr-3 sm:pt-3 bg-gray-100">
+          <button
+            type="button"
+            className="-mr-0.5 -mt-0.5 h-12 w-12 inline-flex items-center justify-center rounded-md text-gray-500 hover:text-gray-900 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-primary-500"
+            onClick={() => setSidebarOpen(true)}
+          >
+            <Menu className="h-6 w-6" />
+          </button>
         </div>
         <main className="flex-1">
           <div className="py-6">

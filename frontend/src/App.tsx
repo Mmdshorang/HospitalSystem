@@ -93,20 +93,20 @@ function App() {
               </ProtectedRoute>
             } />
           </Routes>
-          <ToastContainer
-            position="top-left"
-            autoClose={5000}
-            hideProgressBar={false}
-            newestOnTop={false}
-            closeOnClick
-            rtl={true}
-            pauseOnFocusLoss
-            draggable
-            pauseOnHover
-            theme="light"
-          />
-        </Router>
-      </AuthProvider>
+        </Layout>
+        <ToastContainer
+          position="top-left"
+          autoClose={5000}
+          hideProgressBar={false}
+          newestOnTop={false}
+          closeOnClick
+          rtl={true}
+          pauseOnFocusLoss
+          draggable
+          pauseOnHover
+          theme="light"
+        />
+      </Router>
       <ReactQueryDevtools initialIsOpen={false} />
     </QueryClientProvider>
   );
