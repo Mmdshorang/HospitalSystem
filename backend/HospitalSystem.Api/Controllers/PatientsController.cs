@@ -1,19 +1,26 @@
 using HospitalSystem.Application.Common.Interfaces;
 using HospitalSystem.Application.DTOs;
+using HospitalSystem.Application.Features.Patients.Queries.GetAllPatients;
+using HospitalSystem.Application.Features.Patients.Commands.CreatePatient;
 using HospitalSystem.Domain.Entities;
+using MediatR;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
 
 namespace HospitalSystem.Api.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
+[Authorize]
 public class PatientsController : ControllerBase
 {
+    private readonly IMediator _mediator;
     private readonly IUnitOfWork _unitOfWork;
     private readonly ILogger<PatientsController> _logger;
 
-    public PatientsController(IUnitOfWork unitOfWork, ILogger<PatientsController> logger)
+    public PatientsController(IMediator mediator, IUnitOfWork unitOfWork, ILogger<PatientsController> logger)
     {
+        _mediator = mediator;
         _unitOfWork = unitOfWork;
         _logger = logger;
     }
@@ -26,25 +33,9 @@ public class PatientsController : ControllerBase
     {
         try
         {
-            var patients = await _unitOfWork.Patients.GetAllAsync();
-            var patientDtos = patients.Select(p => new PatientDto
-            {
-                Id = p.Id,
-                FirstName = p.FirstName,
-                LastName = p.LastName,
-                NationalId = p.NationalId,
-                DateOfBirth = p.DateOfBirth,
-                PhoneNumber = p.PhoneNumber,
-                Email = p.Email,
-                Address = p.Address,
-                BloodType = p.BloodType,
-                EmergencyContact = p.EmergencyContact,
-                EmergencyPhone = p.EmergencyPhone,
-                CreatedAt = p.CreatedAt,
-                UpdatedAt = p.UpdatedAt
-            });
-
-            return Ok(patientDtos);
+            var query = new GetAllPatientsQuery();
+            var patients = await _mediator.Send(query);
+            return Ok(patients);
         }
         catch (Exception ex)
         {
@@ -101,41 +92,9 @@ public class PatientsController : ControllerBase
     {
         try
         {
-            var patient = new Patient
-            {
-                FirstName = createPatientDto.FirstName,
-                LastName = createPatientDto.LastName,
-                NationalId = createPatientDto.NationalId,
-                DateOfBirth = createPatientDto.DateOfBirth,
-                PhoneNumber = createPatientDto.PhoneNumber,
-                Email = createPatientDto.Email,
-                Address = createPatientDto.Address,
-                BloodType = createPatientDto.BloodType,
-                EmergencyContact = createPatientDto.EmergencyContact,
-                EmergencyPhone = createPatientDto.EmergencyPhone
-            };
-
-            await _unitOfWork.Patients.AddAsync(patient);
-            await _unitOfWork.SaveChangesAsync();
-
-            var patientDto = new PatientDto
-            {
-                Id = patient.Id,
-                FirstName = patient.FirstName,
-                LastName = patient.LastName,
-                NationalId = patient.NationalId,
-                DateOfBirth = patient.DateOfBirth,
-                PhoneNumber = patient.PhoneNumber,
-                Email = patient.Email,
-                Address = patient.Address,
-                BloodType = patient.BloodType,
-                EmergencyContact = patient.EmergencyContact,
-                EmergencyPhone = patient.EmergencyPhone,
-                CreatedAt = patient.CreatedAt,
-                UpdatedAt = patient.UpdatedAt
-            };
-
-            return CreatedAtAction(nameof(GetPatient), new { id = patient.Id }, patientDto);
+            var command = new CreatePatientCommand { Patient = createPatientDto };
+            var patient = await _mediator.Send(command);
+            return CreatedAtAction(nameof(GetPatient), new { id = patient.Id }, patient);
         }
         catch (Exception ex)
         {
