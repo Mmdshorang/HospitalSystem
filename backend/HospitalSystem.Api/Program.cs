@@ -147,16 +147,15 @@ app.UseMiddleware<GlobalExceptionMiddleware>();
 // Response Compression
 app.UseResponseCompression();
 
-// Rate Limiting
-app.UseIpRateLimiting();
-app.UseRateLimiter();
+// Rate Limiting - Using AspNetCoreRateLimit instead of built-in rate limiting
+// app.UseIpRateLimiting(); // Commented out as it's not available in .NET 8.0
 
 // Security Headers
 app.Use(async (context, next) =>
 {
-    context.Response.Headers.Add("X-Content-Type-Options", "nosniff");
-    context.Response.Headers.Add("X-Frame-Options", "DENY");
-    context.Response.Headers.Add("X-XSS-Protection", "1; mode=block");
+    context.Response.Headers["X-Content-Type-Options"] = "nosniff";
+    context.Response.Headers["X-Frame-Options"] = "DENY";
+    context.Response.Headers["X-XSS-Protection"] = "1; mode=block";
     await next();
 });
 

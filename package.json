@@ -1,0 +1,41 @@
+{
+  "name": "hospital-system",
+  "version": "1.0.0",
+  "description": "Hospital Management System - Full Stack Application",
+  "scripts": {
+    "start": "start-simple.bat",
+    "dev": "start-simple.bat",
+    "setup": "first-time-setup.bat",
+    "setup:backend": "setup-backend.bat",
+    "setup:database": "setup-database.bat",
+    "first-time": "first-time-setup.bat",
+    "migrate": "cd backend/HospitalSystem.Api && dotnet ef database update",
+    "migration:add": "cd backend/HospitalSystem.Api && dotnet ef migrations add",
+    "backend": "cd backend/HospitalSystem.Api && dotnet run",
+    "frontend": "cd frontend && pnpm run dev",
+    "install:frontend": "cd frontend && pnpm install",
+    "install:backend": "cd backend && dotnet restore",
+    "build:frontend": "cd frontend && pnpm run build",
+    "build:backend": "cd backend && dotnet build",
+    "clean:backend": "cd backend && dotnet clean",
+    "test:frontend": "cd frontend && pnpm run test",
+    "lint": "cd frontend && pnpm run lint:check",
+    "lint:fix": "cd frontend && pnpm run lint:fix"
+  },
+  "keywords": [
+    "hospital",
+    "management",
+    "system",
+    "aspnet",
+    "react",
+    "typescript",
+    "persian",
+    "rtl"
+  ],
+  "author": "Hospital System Team",
+  "license": "MIT",
+  "engines": {
+    "node": ">=18.0.0",
+    "pnpm": ">=8.0.0"
+  }
+}
