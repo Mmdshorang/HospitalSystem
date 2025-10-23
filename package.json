@@ -9,6 +9,9 @@
     "setup:backend": "setup-backend.bat",
     "setup:database": "setup-database.bat",
     "first-time": "first-time-setup.bat",
+    "deploy": "quick-deploy.bat",
+    "quick-deploy": "quick-deploy.bat",
+    "fix:dotnet": "fix-dotnet-version.bat",
     "migrate": "cd backend/HospitalSystem.Api && dotnet ef database update",
     "migration:add": "cd backend/HospitalSystem.Api && dotnet ef migrations add",
     "backend": "cd backend/HospitalSystem.Api && dotnet run",
@@ -20,7 +23,15 @@
     "clean:backend": "cd backend && dotnet clean",
     "test:frontend": "cd frontend && pnpm run test",
     "lint": "cd frontend && pnpm run lint:check",
-    "lint:fix": "cd frontend && pnpm run lint:fix"
+    "lint:fix": "cd frontend && pnpm run lint:fix",
+    "docker:up": "docker-compose up -d",
+    "docker:down": "docker-compose down",
+    "docker:build": "docker-compose build",
+    "docker:logs": "docker-compose logs -f",
+    "docker:restart": "docker-compose restart",
+    "docker:rebuild": "rebuild-docker.bat",
+    "docker:prod": "docker-compose -f docker-compose.prod.yml up -d",
+    "docker:prod:down": "docker-compose -f docker-compose.prod.yml down"
   },
   "keywords": [
     "hospital",

@@ -4,23 +4,28 @@ services:
   # PostgreSQL Database
   postgres:
     image: postgres:15-alpine
-    container_name: hospital-postgres
+    container_name: hospital-postgres-prod
     restart: unless-stopped
     environment:
       POSTGRES_DB: HospitalSystem
       POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: password
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-password}
     ports:
       - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
     networks:
       - hospital-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
 
   # Redis Cache
   redis:
     image: redis:7-alpine
-    container_name: hospital-redis
+    container_name: hospital-redis-prod
     restart: unless-stopped
     ports:
       - "6379:6379"
@@ -28,44 +33,63 @@ services:
       - redis_data:/data
     networks:
       - hospital-network
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
 
   # Backend API
   backend:
     build:
       context: ./backend
       dockerfile: Dockerfile
-    container_name: hospital-backend
+    container_name: hospital-backend-prod
     restart: unless-stopped
     environment:
-      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_ENVIRONMENT=Production
       - ASPNETCORE_URLS=http://+:80
-      - ConnectionStrings__DefaultConnection=Host=postgres;Database=HospitalSystem;Username=postgres;Password=password
+      - ConnectionStrings__DefaultConnection=Host=postgres;Database=HospitalSystem;Username=postgres;Password=${POSTGRES_PASSWORD:-password}
       - ConnectionStrings__Redis=redis:6379
     ports:
       - "5000:80"
     depends_on:
-      - postgres
-      - redis
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
     networks:
       - hospital-network
     volumes:
       - ./backend/logs:/app/logs
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:80/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
 
   # Frontend
   frontend:
     build:
       context: ./frontend
       dockerfile: Dockerfile.npm
-    container_name: hospital-frontend
+    container_name: hospital-frontend-prod
     restart: unless-stopped
     environment:
       - VITE_API_BASE_URL=http://localhost:5000
     ports:
       - "3000:80"
     depends_on:
-      - backend
+      backend:
+        condition: service_healthy
     networks:
       - hospital-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:80"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
 
 volumes:
   postgres_data:
