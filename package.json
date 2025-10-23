@@ -8,6 +8,7 @@
     "setup": "first-time-setup.bat",
     "setup:backend": "setup-backend.bat",
     "setup:database": "setup-database.bat",
+    "setup:database:first-time": "setup-database-first-time.bat",
     "first-time": "first-time-setup.bat",
     "deploy": "quick-deploy.bat",
     "quick-deploy": "quick-deploy.bat",
