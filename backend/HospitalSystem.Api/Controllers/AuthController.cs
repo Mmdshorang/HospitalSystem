@@ -1,9 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization;
-using System.IdentityModel.Tokens.Jwt;
-using System.Security.Claims;
-using System.Text;
-using Microsoft.IdentityModel.Tokens;
+using HospitalSystem.Application.Common.Interfaces;
+using HospitalSystem.Application.DTOs;
 
 namespace HospitalSystem.Api.Controllers;
 
@@ -12,12 +10,12 @@ namespace HospitalSystem.Api.Controllers;
 [AllowAnonymous]
 public class AuthController : ControllerBase
 {
-    private readonly IConfiguration _configuration;
+    private readonly IAuthService _authService;
     private readonly ILogger<AuthController> _logger;
 
-    public AuthController(IConfiguration configuration, ILogger<AuthController> logger)
+    public AuthController(IAuthService authService, ILogger<AuthController> logger)
     {
-        _configuration = configuration;
+        _authService = authService;
         _logger = logger;
     }
 
@@ -25,26 +23,15 @@ public class AuthController : ControllerBase
     /// Login endpoint for authentication
     /// </summary>
     [HttpPost("login")]
-    public IActionResult Login([FromBody] LoginRequest request)
+    public async Task<IActionResult> Login([FromBody] LoginRequest request)
     {
         try
         {
-            // This is a simple example - in production, you should validate against a database
-            if (request.Username == "admin" && request.Password == "admin123")
-            {
-                var token = GenerateJwtToken(request.Username, "Admin");
-                return Ok(new
-                {
-                    token = token,
-                    expires = DateTime.UtcNow.AddMinutes(60),
-                    user = new
-                    {
-                        username = request.Username,
-                        role = "Admin"
-                    }
-                });
-            }
-
+            var result = await _authService.LoginAsync(request);
+            return Ok(result);
+        }
+        catch (UnauthorizedAccessException)
+        {
             return Unauthorized(new { message = "Invalid credentials" });
         }
         catch (Exception ex)
@@ -55,55 +42,78 @@ public class AuthController : ControllerBase
     }
 
     /// <summary>
+    /// Register endpoint for new user registration
+    /// </summary>
+    [HttpPost("register")]
+    public async Task<IActionResult> Register([FromBody] RegisterRequest request)
+    {
+        try
+        {
+            var result = await _authService.RegisterAsync(request);
+            return Ok(result);
+        }
+        catch (InvalidOperationException ex)
+        {
+            return BadRequest(new { message = ex.Message });
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error during registration");
+            return StatusCode(500, "Internal server error");
+        }
+    }
+
+    /// <summary>
     /// Validate token endpoint
     /// </summary>
     [HttpPost("validate")]
     [Authorize]
-    public IActionResult ValidateToken()
+    public async Task<IActionResult> ValidateToken()
     {
-        var username = User.Identity?.Name;
-        var role = User.FindFirst(ClaimTypes.Role)?.Value;
-
-        return Ok(new
+        try
         {
-            valid = true,
-            username = username,
-            role = role,
-            expires = User.FindFirst("exp")?.Value
-        });
+            var userId = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+            if (string.IsNullOrEmpty(userId))
+            {
+                return Unauthorized(new { message = "Invalid token" });
+            }
+
+            var userInfo = await _authService.GetUserInfoAsync(userId);
+            return Ok(new
+            {
+                valid = true,
+                user = userInfo
+            });
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error validating token");
+            return Unauthorized(new { message = "Invalid token" });
+        }
     }
 
-    private string GenerateJwtToken(string username, string role)
+    /// <summary>
+    /// Get current user info
+    /// </summary>
+    [HttpGet("me")]
+    [Authorize]
+    public async Task<IActionResult> GetCurrentUser()
     {
-        var jwtSettings = _configuration.GetSection("JwtSettings");
-        var secretKey = jwtSettings["SecretKey"] ?? "YourSuperSecretKeyThatIsAtLeast32CharactersLong!";
-        var issuer = jwtSettings["Issuer"] ?? "HospitalSystem";
-        var audience = jwtSettings["Audience"] ?? "HospitalSystemUsers";
-
-        var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secretKey));
-        var credentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
-
-        var claims = new[]
+        try
         {
-            new Claim(ClaimTypes.Name, username),
-            new Claim(ClaimTypes.Role, role),
-            new Claim("exp", DateTimeOffset.UtcNow.AddMinutes(60).ToUnixTimeSeconds().ToString(), ClaimValueTypes.Integer64)
-        };
+            var userId = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+            if (string.IsNullOrEmpty(userId))
+            {
+                return Unauthorized(new { message = "Invalid token" });
+            }
 
-        var token = new JwtSecurityToken(
-            issuer: issuer,
-            audience: audience,
-            claims: claims,
-            expires: DateTime.UtcNow.AddMinutes(60),
-            signingCredentials: credentials
-        );
-
-        return new JwtSecurityTokenHandler().WriteToken(token);
+            var userInfo = await _authService.GetUserInfoAsync(userId);
+            return Ok(userInfo);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error getting current user");
+            return StatusCode(500, "Internal server error");
+        }
     }
-}
-
-public class LoginRequest
-{
-    public string Username { get; set; } = string.Empty;
-    public string Password { get; set; } = string.Empty;
 }

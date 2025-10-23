@@ -82,6 +82,9 @@ builder.Services.AddDbContext<HospitalDbContext>(options =>
 builder.Services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 
+// Authentication Service
+builder.Services.AddScoped<IAuthService, HospitalSystem.Infrastructure.Services.AuthService>();
+
 // AutoMapper
 builder.Services.AddAutoMapper(typeof(Program));
 
@@ -121,10 +124,9 @@ builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowFrontend", policy =>
     {
-        policy.WithOrigins("http://localhost:5173", "http://localhost:3000")
+        policy.AllowAnyOrigin()
               .AllowAnyHeader()
-              .AllowAnyMethod()
-              .AllowCredentials();
+              .AllowAnyMethod();
     });
 });
 
