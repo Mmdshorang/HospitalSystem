@@ -13,6 +13,7 @@ public class HospitalDbContext : DbContext
     public DbSet<Doctor> Doctors { get; set; }
     public DbSet<Appointment> Appointments { get; set; }
     public DbSet<MedicalRecord> MedicalRecords { get; set; }
+    public DbSet<User> Users { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -85,10 +86,26 @@ public class HospitalDbContext : DbContext
                 .OnDelete(DeleteBehavior.Cascade);
         });
 
+        // User configuration
+        modelBuilder.Entity<User>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.Username).IsRequired().HasMaxLength(50);
+            entity.Property(e => e.Email).IsRequired().HasMaxLength(100);
+            entity.Property(e => e.PasswordHash).IsRequired();
+            entity.Property(e => e.Role).IsRequired().HasMaxLength(20);
+            entity.Property(e => e.FirstName).HasMaxLength(100);
+            entity.Property(e => e.LastName).HasMaxLength(100);
+            entity.Property(e => e.PhoneNumber).HasMaxLength(20);
+            entity.HasIndex(e => e.Username).IsUnique();
+            entity.HasIndex(e => e.Email).IsUnique();
+        });
+
         // Global query filters for soft delete
         modelBuilder.Entity<Patient>().HasQueryFilter(e => !e.IsDeleted);
         modelBuilder.Entity<Doctor>().HasQueryFilter(e => !e.IsDeleted);
         modelBuilder.Entity<Appointment>().HasQueryFilter(e => !e.IsDeleted);
         modelBuilder.Entity<MedicalRecord>().HasQueryFilter(e => !e.IsDeleted);
+        modelBuilder.Entity<User>().HasQueryFilter(e => e.IsActive);
     }
 }

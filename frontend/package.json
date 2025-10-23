@@ -16,7 +16,8 @@
     "storybook": "storybook dev -p 6006",
     "build-storybook": "storybook build",
     "openapi:generate-types": "tsx scripts/generate_api_types.ts",
-    "gen:icons": "node scripts/generate-icon-types.mjs"
+    "gen:icons": "node scripts/generate-icon-types.mjs",
+    "gen:types": "node scripts/generate-types.js"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.2.1",

@@ -1,3 +1,37 @@
+// Generated types based on backend DTOs
+// This file should be regenerated when backend DTOs change
+
+export interface LoginRequest {
+  email: string;
+  password: string;
+}
+
+export interface RegisterRequest {
+  username: string;
+  email: string;
+  password: string;
+  confirmPassword: string;
+  firstName?: string;
+  lastName?: string;
+  phoneNumber?: string;
+}
+
+export interface AuthResponse {
+  token: string;
+  expires: string;
+  user: UserInfo;
+}
+
+export interface UserInfo {
+  id: string;
+  username: string;
+  email: string;
+  role: string;
+  firstName?: string;
+  lastName?: string;
+  phoneNumber?: string;
+}
+
 // Patient types
 export interface Patient {
   id: string;

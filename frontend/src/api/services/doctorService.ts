@@ -1,5 +1,5 @@
 import apiClient from '../client';
-import { Doctor, CreateDoctor, UpdateDoctor } from '../types';
+import type { Doctor  , CreateDoctor, UpdateDoctor } from '../generated-types';
 
 export const doctorService = {
   // Get all doctors
@@ -8,7 +8,7 @@ export const doctorService = {
     return response.data;
   },
 
-  // Get doctor by ID
+  // Get doctor by ID 
   getById: async (id: string): Promise<Doctor> => {
     const response = await apiClient.get<Doctor>(`/api/doctors/${id}`);
     return response.data;
