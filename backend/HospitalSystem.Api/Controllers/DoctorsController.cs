@@ -15,7 +15,18 @@ public class DoctorsController : ControllerBase
     public DoctorsController(IUnitOfWork unitOfWork, ILogger<DoctorsController> logger)
     {
         _unitOfWork = unitOfWork;
+       
+        
         _logger = logger;
+
+
+
+
+
+
+
+
+
     }
 
     /// <summary>

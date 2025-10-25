@@ -7400,19 +7400,30 @@
     ]
   },
   "packageFolders": {
-    "C:\\Users\\mmdsk\\.nuget\\packages\\": {}
+    "C:\\Users\\Hassan Fereydounfar\\.nuget\\packages\\": {},
+    "C:\\Program Files\\DevExpress 23.2\\Components\\Offline Packages": {},
+    "C:\\Program Files\\DevExpress 24.2\\Components\\Offline Packages": {},
+    "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\mmdsk\\Desktop\\hospital-system\\backend\\HospitalSystem.Api\\HospitalSystem.Api.csproj",
+      "projectUniqueName": "D:\\Hospitalsystem\\backend\\HospitalSystem.Api\\HospitalSystem.Api.csproj",
       "projectName": "HospitalSystem.Api",
-      "projectPath": "C:\\Users\\mmdsk\\Desktop\\hospital-system\\backend\\HospitalSystem.Api\\HospitalSystem.Api.csproj",
-      "packagesPath": "C:\\Users\\mmdsk\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\mmdsk\\Desktop\\hospital-system\\backend\\HospitalSystem.Api\\obj\\",
+      "projectPath": "D:\\Hospitalsystem\\backend\\HospitalSystem.Api\\HospitalSystem.Api.csproj",
+      "packagesPath": "C:\\Users\\Hassan Fereydounfar\\.nuget\\packages\\",
+      "outputPath": "D:\\Hospitalsystem\\backend\\HospitalSystem.Api\\obj\\",
       "projectStyle": "PackageReference",
+      "fallbackFolders": [
+        "C:\\Program Files\\DevExpress 23.2\\Components\\Offline Packages",
+        "C:\\Program Files\\DevExpress 24.2\\Components\\Offline Packages",
+        "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
+      ],
       "configFilePaths": [
-        "C:\\Users\\mmdsk\\AppData\\Roaming\\NuGet\\NuGet.Config",
+        "C:\\Users\\Hassan Fereydounfar\\AppData\\Roaming\\NuGet\\NuGet.Config",
+        "C:\\Program Files (x86)\\NuGet\\Config\\DevExpress 23.2.config",
+        "C:\\Program Files (x86)\\NuGet\\Config\\DevExpress 24.2.config",
+        "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
         "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
       ],
       "originalTargetFrameworks": [
@@ -7420,20 +7431,24 @@
       ],
       "sources": {
         "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
+        "C:\\Program Files\\DevExpress 23.2\\Components\\System\\Components\\Packages": {},
+        "C:\\Program Files\\DevExpress 24.2\\Components\\System\\Components\\Packages": {},
+        "C:\\Program Files\\dotnet\\library-packs": {},
+        "H:\\": {},
         "https://api.nuget.org/v3/index.json": {}
       },
       "frameworks": {
         "net8.0": {
           "targetAlias": "net8.0",
           "projectReferences": {
-            "C:\\Users\\mmdsk\\Desktop\\hospital-system\\backend\\HospitalSystem.Application\\HospitalSystem.Application.csproj": {
-              "projectPath": "C:\\Users\\mmdsk\\Desktop\\hospital-system\\backend\\HospitalSystem.Application\\HospitalSystem.Application.csproj"
+            "D:\\Hospitalsystem\\backend\\HospitalSystem.Application\\HospitalSystem.Application.csproj": {
+              "projectPath": "D:\\Hospitalsystem\\backend\\HospitalSystem.Application\\HospitalSystem.Application.csproj"
             },
-            "C:\\Users\\mmdsk\\Desktop\\hospital-system\\backend\\HospitalSystem.Domain\\HospitalSystem.Domain.csproj": {
-              "projectPath": "C:\\Users\\mmdsk\\Desktop\\hospital-system\\backend\\HospitalSystem.Domain\\HospitalSystem.Domain.csproj"
+            "D:\\Hospitalsystem\\backend\\HospitalSystem.Domain\\HospitalSystem.Domain.csproj": {
+              "projectPath": "D:\\Hospitalsystem\\backend\\HospitalSystem.Domain\\HospitalSystem.Domain.csproj"
             },
-            "C:\\Users\\mmdsk\\Desktop\\hospital-system\\backend\\HospitalSystem.Infrastructure\\HospitalSystem.Infrastructure.csproj": {
-              "projectPath": "C:\\Users\\mmdsk\\Desktop\\hospital-system\\backend\\HospitalSystem.Infrastructure\\HospitalSystem.Infrastructure.csproj"
+            "D:\\Hospitalsystem\\backend\\HospitalSystem.Infrastructure\\HospitalSystem.Infrastructure.csproj": {
+              "projectPath": "D:\\Hospitalsystem\\backend\\HospitalSystem.Infrastructure\\HospitalSystem.Infrastructure.csproj"
             }
           }
         }
@@ -7442,6 +7457,11 @@
         "warnAsError": [
           "NU1605"
         ]
+      },
+      "restoreAuditProperties": {
+        "enableAudit": "true",
+        "auditLevel": "low",
+        "auditMode": "direct"
       }
     },
     "frameworks": {
@@ -7606,10 +7626,22 @@
   },
   "logs": [
     {
+      "code": "Undefined",
+      "level": "Warning",
+      "warningLevel": 1,
+      "message": "Access to the path 'H:\\System Volume Information' is denied."
+    },
+    {
+      "code": "Undefined",
+      "level": "Warning",
+      "warningLevel": 1,
+      "message": "Access to the path 'H:\\System Volume Information' is denied."
+    },
+    {
       "code": "NU1603",
       "level": "Warning",
       "warningLevel": 1,
-      "message": "HospitalSystem.Api depends on Microsoft.Extensions.Caching.Memory (>= 8.0.21) but Microsoft.Extensions.Caching.Memory 8.0.21 was not found. An approximate best match of Microsoft.Extensions.Caching.Memory 9.0.0 was resolved.",
+      "message": "HospitalSystem.Api depends on Microsoft.Extensions.Caching.Memory (>= 8.0.21) but Microsoft.Extensions.Caching.Memory 8.0.21 was not found. Microsoft.Extensions.Caching.Memory 9.0.0 was resolved instead.",
       "libraryId": "Microsoft.Extensions.Caching.Memory",
       "targetGraphs": [
         "net8.0"
@@ -7619,7 +7651,7 @@
       "code": "NU1603",
       "level": "Warning",
       "warningLevel": 1,
-      "message": "HospitalSystem.Infrastructure depends on Microsoft.Extensions.Configuration.Abstractions (>= 8.0.21) but Microsoft.Extensions.Configuration.Abstractions 8.0.21 was not found. An approximate best match of Microsoft.Extensions.Configuration.Abstractions 9.0.0 was resolved.",
+      "message": "Microsoft.AspNetCore.Cors 2.2.0 depends on Microsoft.Extensions.Configuration.Abstractions (>= 8.0.21) but Microsoft.Extensions.Configuration.Abstractions 8.0.21 was not found. Microsoft.Extensions.Configuration.Abstractions 9.0.0 was resolved instead.",
       "libraryId": "Microsoft.Extensions.Configuration.Abstractions",
       "targetGraphs": [
         "net8.0"
@@ -7629,27 +7661,7 @@
       "code": "NU1603",
       "level": "Warning",
       "warningLevel": 1,
-      "message": "HospitalSystem.Application depends on Microsoft.Extensions.DependencyInjection.Abstractions (>= 8.0.21) but Microsoft.Extensions.DependencyInjection.Abstractions 8.0.21 was not found. An approximate best match of Microsoft.Extensions.DependencyInjection.Abstractions 9.0.0 was resolved.",
-      "libraryId": "Microsoft.Extensions.DependencyInjection.Abstractions",
-      "targetGraphs": [
-        "net8.0"
-      ]
-    },
-    {
-      "code": "NU1603",
-      "level": "Warning",
-      "warningLevel": 1,
-      "message": "HospitalSystem.Infrastructure depends on Microsoft.Extensions.DependencyInjection.Abstractions (>= 8.0.21) but Microsoft.Extensions.DependencyInjection.Abstractions 8.0.21 was not found. An approximate best match of Microsoft.Extensions.DependencyInjection.Abstractions 9.0.0 was resolved.",
-      "libraryId": "Microsoft.Extensions.DependencyInjection.Abstractions",
-      "targetGraphs": [
-        "net8.0"
-      ]
-    },
-    {
-      "code": "NU1603",
-      "level": "Warning",
-      "warningLevel": 1,
-      "message": "HospitalSystem.Api depends on Microsoft.Extensions.Http.Resilience (>= 8.0.21) but Microsoft.Extensions.Http.Resilience 8.0.21 was not found. An approximate best match of Microsoft.Extensions.Http.Resilience 8.1.0 was resolved.",
+      "message": "HospitalSystem.Api depends on Microsoft.Extensions.Http.Resilience (>= 8.0.21) but Microsoft.Extensions.Http.Resilience 8.0.21 was not found. Microsoft.Extensions.Http.Resilience 8.1.0 was resolved instead.",
       "libraryId": "Microsoft.Extensions.Http.Resilience",
       "targetGraphs": [
         "net8.0"
