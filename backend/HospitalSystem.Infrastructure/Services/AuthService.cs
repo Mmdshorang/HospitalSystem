@@ -9,6 +9,8 @@ using HospitalSystem.Application.Common.Interfaces;
 using HospitalSystem.Application.DTOs;
 using HospitalSystem.Domain.Entities;
 using HospitalSystem.Infrastructure.Data;
+using Microsoft.EntityFrameworkCore;
+using HospitalSystem.Domain.Entities.Lookups;
 
 namespace HospitalSystem.Infrastructure.Services;
 
@@ -27,8 +29,11 @@ public class AuthService : IAuthService
 
     public async Task<AuthResponse> LoginAsync(LoginRequest request)
     {
-        var user = _context.Users.FirstOrDefault(u => u.Email == request.Email && u.IsActive);
-        
+        var user = _context.Users
+            .Include(u => u.Role)
+            .Include(u => u.Gender)
+            .FirstOrDefault(u => u.Email == request.Email && u.IsActive);
+
         if (user == null || !VerifyPassword(request.Password, user.PasswordHash))
         {
             throw new UnauthorizedAccessException("Invalid credentials");
@@ -47,7 +52,7 @@ public class AuthService : IAuthService
                 Id = user.Id.ToString(),
                 Username = user.Username,
                 Email = user.Email,
-                Role = user.Role,
+                Role = user.Role?.RoleName ?? "",
                 FirstName = user.FirstName,
                 LastName = user.LastName,
                 PhoneNumber = user.PhoneNumber
@@ -71,13 +76,16 @@ public class AuthService : IAuthService
             FirstName = request.FirstName,
             LastName = request.LastName,
             PhoneNumber = request.PhoneNumber,
-            Role = "User",
+            RoleId = 3, // مقدار پیش‌فرض patient یا مقدار مناسب
             IsActive = true,
             CreatedAt = DateTime.UtcNow
         };
 
         _context.Users.Add(user);
         await _context.SaveChangesAsync();
+
+        // Load Role navigation so we can include role name in token/response
+        await _context.Entry(user).Reference(u => u.Role).LoadAsync();
 
         var token = GenerateJwtToken(user);
         return new AuthResponse
@@ -89,7 +97,7 @@ public class AuthService : IAuthService
                 Id = user.Id.ToString(),
                 Username = user.Username,
                 Email = user.Email,
-                Role = user.Role,
+                Role = user.Role?.RoleName ?? "",
                 FirstName = user.FirstName,
                 LastName = user.LastName,
                 PhoneNumber = user.PhoneNumber
@@ -128,7 +136,10 @@ public class AuthService : IAuthService
 
     public async Task<UserInfo> GetUserInfoAsync(string userId)
     {
-        var user = await _context.Users.FindAsync(Guid.Parse(userId));
+        var user = await _context.Users
+            .Include(u => u.Role)
+            .Include(u => u.Gender)
+            .FirstOrDefaultAsync(u => u.Id == Guid.Parse(userId));
         if (user == null)
         {
             throw new KeyNotFoundException("User not found");
@@ -139,7 +150,7 @@ public class AuthService : IAuthService
             Id = user.Id.ToString(),
             Username = user.Username,
             Email = user.Email,
-            Role = user.Role,
+            Role = user.Role?.RoleName ?? "",
             FirstName = user.FirstName,
             LastName = user.LastName,
             PhoneNumber = user.PhoneNumber
@@ -161,7 +172,7 @@ public class AuthService : IAuthService
             new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
             new Claim(ClaimTypes.Name, user.Username),
             new Claim(ClaimTypes.Email, user.Email),
-            new Claim(ClaimTypes.Role, user.Role),
+            new Claim(ClaimTypes.Role, user.Role?.RoleName ?? ""),
             new Claim("exp", DateTimeOffset.UtcNow.AddMinutes(60).ToUnixTimeSeconds().ToString(), ClaimValueTypes.Integer64)
         };
 

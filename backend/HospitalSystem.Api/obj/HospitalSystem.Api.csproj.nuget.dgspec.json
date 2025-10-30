@@ -1,20 +1,24 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\mmdsk\\Desktop\\hospital-system\\backend\\HospitalSystem.Api\\HospitalSystem.Api.csproj": {}
+    "C:\\Users\\as\\Desktop\\HospitalSystem\\backend\\HospitalSystem.Api\\HospitalSystem.Api.csproj": {}
   },
   "projects": {
-    "C:\\Users\\mmdsk\\Desktop\\hospital-system\\backend\\HospitalSystem.Api\\HospitalSystem.Api.csproj": {
+    "C:\\Users\\as\\Desktop\\HospitalSystem\\backend\\HospitalSystem.Api\\HospitalSystem.Api.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\mmdsk\\Desktop\\hospital-system\\backend\\HospitalSystem.Api\\HospitalSystem.Api.csproj",
+        "projectUniqueName": "C:\\Users\\as\\Desktop\\HospitalSystem\\backend\\HospitalSystem.Api\\HospitalSystem.Api.csproj",
         "projectName": "HospitalSystem.Api",
-        "projectPath": "C:\\Users\\mmdsk\\Desktop\\hospital-system\\backend\\HospitalSystem.Api\\HospitalSystem.Api.csproj",
-        "packagesPath": "C:\\Users\\mmdsk\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\mmdsk\\Desktop\\hospital-system\\backend\\HospitalSystem.Api\\obj\\",
+        "projectPath": "C:\\Users\\as\\Desktop\\HospitalSystem\\backend\\HospitalSystem.Api\\HospitalSystem.Api.csproj",
+        "packagesPath": "C:\\Users\\as\\.nuget\\packages\\",
+        "outputPath": "C:\\Users\\as\\Desktop\\HospitalSystem\\backend\\HospitalSystem.Api\\obj\\",
         "projectStyle": "PackageReference",
+        "fallbackFolders": [
+          "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
+        ],
         "configFilePaths": [
-          "C:\\Users\\mmdsk\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Users\\as\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
         "originalTargetFrameworks": [
@@ -28,14 +32,14 @@
           "net8.0": {
             "targetAlias": "net8.0",
             "projectReferences": {
-              "C:\\Users\\mmdsk\\Desktop\\hospital-system\\backend\\HospitalSystem.Application\\HospitalSystem.Application.csproj": {
-                "projectPath": "C:\\Users\\mmdsk\\Desktop\\hospital-system\\backend\\HospitalSystem.Application\\HospitalSystem.Application.csproj"
+              "C:\\Users\\as\\Desktop\\HospitalSystem\\backend\\HospitalSystem.Application\\HospitalSystem.Application.csproj": {
+                "projectPath": "C:\\Users\\as\\Desktop\\HospitalSystem\\backend\\HospitalSystem.Application\\HospitalSystem.Application.csproj"
               },
-              "C:\\Users\\mmdsk\\Desktop\\hospital-system\\backend\\HospitalSystem.Domain\\HospitalSystem.Domain.csproj": {
-                "projectPath": "C:\\Users\\mmdsk\\Desktop\\hospital-system\\backend\\HospitalSystem.Domain\\HospitalSystem.Domain.csproj"
+              "C:\\Users\\as\\Desktop\\HospitalSystem\\backend\\HospitalSystem.Domain\\HospitalSystem.Domain.csproj": {
+                "projectPath": "C:\\Users\\as\\Desktop\\HospitalSystem\\backend\\HospitalSystem.Domain\\HospitalSystem.Domain.csproj"
               },
-              "C:\\Users\\mmdsk\\Desktop\\hospital-system\\backend\\HospitalSystem.Infrastructure\\HospitalSystem.Infrastructure.csproj": {
-                "projectPath": "C:\\Users\\mmdsk\\Desktop\\hospital-system\\backend\\HospitalSystem.Infrastructure\\HospitalSystem.Infrastructure.csproj"
+              "C:\\Users\\as\\Desktop\\HospitalSystem\\backend\\HospitalSystem.Infrastructure\\HospitalSystem.Infrastructure.csproj": {
+                "projectPath": "C:\\Users\\as\\Desktop\\HospitalSystem\\backend\\HospitalSystem.Infrastructure\\HospitalSystem.Infrastructure.csproj"
               }
             }
           }
@@ -146,6 +150,14 @@
               "target": "Package",
               "version": "[8.0.21, )"
             },
+            "Microsoft.IdentityModel.JsonWebTokens": {
+              "target": "Package",
+              "version": "[8.14.0, )"
+            },
+            "Microsoft.IdentityModel.Tokens": {
+              "target": "Package",
+              "version": "[8.14.0, )"
+            },
             "Npgsql.EntityFrameworkCore.PostgreSQL": {
               "target": "Package",
               "version": "[8.0.11, )"
@@ -180,7 +192,7 @@
             },
             "System.IdentityModel.Tokens.Jwt": {
               "target": "Package",
-              "version": "[8.2.1, )"
+              "version": "[8.14.0, )"
             }
           },
           "imports": [
@@ -206,17 +218,21 @@
         }
       }
     },
-    "C:\\Users\\mmdsk\\Desktop\\hospital-system\\backend\\HospitalSystem.Application\\HospitalSystem.Application.csproj": {
+    "C:\\Users\\as\\Desktop\\HospitalSystem\\backend\\HospitalSystem.Application\\HospitalSystem.Application.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\mmdsk\\Desktop\\hospital-system\\backend\\HospitalSystem.Application\\HospitalSystem.Application.csproj",
+        "projectUniqueName": "C:\\Users\\as\\Desktop\\HospitalSystem\\backend\\HospitalSystem.Application\\HospitalSystem.Application.csproj",
         "projectName": "HospitalSystem.Application",
-        "projectPath": "C:\\Users\\mmdsk\\Desktop\\hospital-system\\backend\\HospitalSystem.Application\\HospitalSystem.Application.csproj",
-        "packagesPath": "C:\\Users\\mmdsk\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\mmdsk\\Desktop\\hospital-system\\backend\\HospitalSystem.Application\\obj\\",
+        "projectPath": "C:\\Users\\as\\Desktop\\HospitalSystem\\backend\\HospitalSystem.Application\\HospitalSystem.Application.csproj",
+        "packagesPath": "C:\\Users\\as\\.nuget\\packages\\",
+        "outputPath": "C:\\Users\\as\\Desktop\\HospitalSystem\\backend\\HospitalSystem.Application\\obj\\",
         "projectStyle": "PackageReference",
+        "fallbackFolders": [
+          "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
+        ],
         "configFilePaths": [
-          "C:\\Users\\mmdsk\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Users\\as\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
         "originalTargetFrameworks": [
@@ -230,8 +246,8 @@
           "net8.0": {
             "targetAlias": "net8.0",
             "projectReferences": {
-              "C:\\Users\\mmdsk\\Desktop\\hospital-system\\backend\\HospitalSystem.Domain\\HospitalSystem.Domain.csproj": {
-                "projectPath": "C:\\Users\\mmdsk\\Desktop\\hospital-system\\backend\\HospitalSystem.Domain\\HospitalSystem.Domain.csproj"
+              "C:\\Users\\as\\Desktop\\HospitalSystem\\backend\\HospitalSystem.Domain\\HospitalSystem.Domain.csproj": {
+                "projectPath": "C:\\Users\\as\\Desktop\\HospitalSystem\\backend\\HospitalSystem.Domain\\HospitalSystem.Domain.csproj"
               }
             }
           }
@@ -283,17 +299,21 @@
         }
       }
     },
-    "C:\\Users\\mmdsk\\Desktop\\hospital-system\\backend\\HospitalSystem.Domain\\HospitalSystem.Domain.csproj": {
+    "C:\\Users\\as\\Desktop\\HospitalSystem\\backend\\HospitalSystem.Domain\\HospitalSystem.Domain.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\mmdsk\\Desktop\\hospital-system\\backend\\HospitalSystem.Domain\\HospitalSystem.Domain.csproj",
+        "projectUniqueName": "C:\\Users\\as\\Desktop\\HospitalSystem\\backend\\HospitalSystem.Domain\\HospitalSystem.Domain.csproj",
         "projectName": "HospitalSystem.Domain",
-        "projectPath": "C:\\Users\\mmdsk\\Desktop\\hospital-system\\backend\\HospitalSystem.Domain\\HospitalSystem.Domain.csproj",
-        "packagesPath": "C:\\Users\\mmdsk\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\mmdsk\\Desktop\\hospital-system\\backend\\HospitalSystem.Domain\\obj\\",
+        "projectPath": "C:\\Users\\as\\Desktop\\HospitalSystem\\backend\\HospitalSystem.Domain\\HospitalSystem.Domain.csproj",
+        "packagesPath": "C:\\Users\\as\\.nuget\\packages\\",
+        "outputPath": "C:\\Users\\as\\Desktop\\HospitalSystem\\backend\\HospitalSystem.Domain\\obj\\",
         "projectStyle": "PackageReference",
+        "fallbackFolders": [
+          "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
+        ],
         "configFilePaths": [
-          "C:\\Users\\mmdsk\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Users\\as\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
         "originalTargetFrameworks": [
@@ -338,17 +358,21 @@
         }
       }
     },
-    "C:\\Users\\mmdsk\\Desktop\\hospital-system\\backend\\HospitalSystem.Infrastructure\\HospitalSystem.Infrastructure.csproj": {
+    "C:\\Users\\as\\Desktop\\HospitalSystem\\backend\\HospitalSystem.Infrastructure\\HospitalSystem.Infrastructure.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\mmdsk\\Desktop\\hospital-system\\backend\\HospitalSystem.Infrastructure\\HospitalSystem.Infrastructure.csproj",
+        "projectUniqueName": "C:\\Users\\as\\Desktop\\HospitalSystem\\backend\\HospitalSystem.Infrastructure\\HospitalSystem.Infrastructure.csproj",
         "projectName": "HospitalSystem.Infrastructure",
-        "projectPath": "C:\\Users\\mmdsk\\Desktop\\hospital-system\\backend\\HospitalSystem.Infrastructure\\HospitalSystem.Infrastructure.csproj",
-        "packagesPath": "C:\\Users\\mmdsk\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\mmdsk\\Desktop\\hospital-system\\backend\\HospitalSystem.Infrastructure\\obj\\",
+        "projectPath": "C:\\Users\\as\\Desktop\\HospitalSystem\\backend\\HospitalSystem.Infrastructure\\HospitalSystem.Infrastructure.csproj",
+        "packagesPath": "C:\\Users\\as\\.nuget\\packages\\",
+        "outputPath": "C:\\Users\\as\\Desktop\\HospitalSystem\\backend\\HospitalSystem.Infrastructure\\obj\\",
         "projectStyle": "PackageReference",
+        "fallbackFolders": [
+          "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
+        ],
         "configFilePaths": [
-          "C:\\Users\\mmdsk\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Users\\as\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
         "originalTargetFrameworks": [
@@ -362,11 +386,11 @@
           "net8.0": {
             "targetAlias": "net8.0",
             "projectReferences": {
-              "C:\\Users\\mmdsk\\Desktop\\hospital-system\\backend\\HospitalSystem.Application\\HospitalSystem.Application.csproj": {
-                "projectPath": "C:\\Users\\mmdsk\\Desktop\\hospital-system\\backend\\HospitalSystem.Application\\HospitalSystem.Application.csproj"
+              "C:\\Users\\as\\Desktop\\HospitalSystem\\backend\\HospitalSystem.Application\\HospitalSystem.Application.csproj": {
+                "projectPath": "C:\\Users\\as\\Desktop\\HospitalSystem\\backend\\HospitalSystem.Application\\HospitalSystem.Application.csproj"
               },
-              "C:\\Users\\mmdsk\\Desktop\\hospital-system\\backend\\HospitalSystem.Domain\\HospitalSystem.Domain.csproj": {
-                "projectPath": "C:\\Users\\mmdsk\\Desktop\\hospital-system\\backend\\HospitalSystem.Domain\\HospitalSystem.Domain.csproj"
+              "C:\\Users\\as\\Desktop\\HospitalSystem\\backend\\HospitalSystem.Domain\\HospitalSystem.Domain.csproj": {
+                "projectPath": "C:\\Users\\as\\Desktop\\HospitalSystem\\backend\\HospitalSystem.Domain\\HospitalSystem.Domain.csproj"
               }
             }
           }
@@ -405,9 +429,21 @@
               "target": "Package",
               "version": "[8.0.21, )"
             },
+            "Microsoft.Extensions.Logging.Abstractions": {
+              "target": "Package",
+              "version": "[8.0.21, )"
+            },
+            "Microsoft.IdentityModel.Tokens": {
+              "target": "Package",
+              "version": "[8.3.1, )"
+            },
             "Npgsql.EntityFrameworkCore.PostgreSQL": {
               "target": "Package",
               "version": "[8.0.11, )"
+            },
+            "System.IdentityModel.Tokens.Jwt": {
+              "target": "Package",
+              "version": "[8.3.1, )"
             }
           },
           "imports": [

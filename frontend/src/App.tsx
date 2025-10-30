@@ -30,84 +30,110 @@ function App() {
     <QueryClientProvider client={queryClient}>
       <AuthProvider>
         <Router>
-          <Routes>
-            {/* Public routes */}
-            <Route path="/login" element={<Login />} />
-            <Route path="/register" element={<Register />} />
-            
-            {/* Protected routes */}
-            <Route path="/" element={
-              <ProtectedRoute>
-                <Layout>
-                  <Dashboard />
-                </Layout>
-              </ProtectedRoute>
-            } />
-            <Route path="/patients" element={
-              <ProtectedRoute>
-                <Layout>
-                  <Patients />
-                </Layout>
-              </ProtectedRoute>
-            } />
-            <Route path="/patients/new" element={
-              <ProtectedRoute>
-                <Layout>
-                  <PatientForm />
-                </Layout>
-              </ProtectedRoute>
-            } />
-            <Route path="/patients/:id/edit" element={
-              <ProtectedRoute>
-                <Layout>
-                  <PatientForm />
-                </Layout>
-              </ProtectedRoute>
-            } />
-            <Route path="/doctors" element={
-              <ProtectedRoute>
-                <Layout>
-                  <Doctors />
-                </Layout>
-              </ProtectedRoute>
-            } />
-            <Route path="/doctors/new" element={
-              <ProtectedRoute>
-                <Layout>
-                  <DoctorForm />
-                </Layout>
-              </ProtectedRoute>
-            } />
-            <Route path="/doctors/:id/edit" element={
-              <ProtectedRoute>
-                <Layout>
-                  <DoctorForm />
-                </Layout>
-              </ProtectedRoute>
-            } />
-            <Route path="/appointments" element={
-              <ProtectedRoute>
-                <Layout>
-                  <Appointments />
-                </Layout>
-              </ProtectedRoute>
-            } />
-          </Routes>
-        </Layout>
-        <ToastContainer
-          position="top-left"
-          autoClose={5000}
-          hideProgressBar={false}
-          newestOnTop={false}
-          closeOnClick
-          rtl={true}
-          pauseOnFocusLoss
-          draggable
-          pauseOnHover
-          theme="light"
-        />
-      </Router>
-      <ReactQueryDevtools initialIsOpen={false} />
+          <>
+            <Routes>
+              {/* Public routes */}
+              <Route path="/login" element={<Login />} />
+              <Route path="/register" element={<Register />} />
+
+              {/* Protected routes */}
+              <Route
+                path="/"
+                element={
+                  <ProtectedRoute>
+                    <Layout>
+                      <Dashboard />
+                    </Layout>
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/patients"
+                element={
+                  <ProtectedRoute>
+                    <Layout>
+                      <Patients />
+                    </Layout>
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/patients/new"
+                element={
+                  <ProtectedRoute>
+                    <Layout>
+                      <PatientForm />
+                    </Layout>
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/patients/:id/edit"
+                element={
+                  <ProtectedRoute>
+                    <Layout>
+                      <PatientForm />
+                    </Layout>
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/doctors"
+                element={
+                  <ProtectedRoute>
+                    <Layout>
+                      <Doctors />
+                    </Layout>
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/doctors/new"
+                element={
+                  <ProtectedRoute>
+                    <Layout>
+                      <DoctorForm />
+                    </Layout>
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/doctors/:id/edit"
+                element={
+                  <ProtectedRoute>
+                    <Layout>
+                      <DoctorForm />
+                    </Layout>
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/appointments"
+                element={
+                  <ProtectedRoute>
+                    <Layout>
+                      <Appointments />
+                    </Layout>
+                  </ProtectedRoute>
+                }
+              />
+            </Routes>
+            <ToastContainer
+              position="top-left"
+              autoClose={5000}
+              hideProgressBar={false}
+              newestOnTop={false}
+              closeOnClick
+              rtl={true}
+              pauseOnFocusLoss
+              draggable
+              pauseOnHover
+              theme="light"
+            />
+          </>
+        </Router>
+        <ReactQueryDevtools initialIsOpen={false} />
+      </AuthProvider>
     </QueryClientProvider>
   );
 }

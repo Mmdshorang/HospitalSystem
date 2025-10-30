@@ -1,4 +1,5 @@
 using HospitalSystem.Domain.Entities;
+using HospitalSystem.Domain.Entities.Lookups;
 using Microsoft.EntityFrameworkCore;
 
 namespace HospitalSystem.Infrastructure.Data;
@@ -14,6 +15,8 @@ public class HospitalDbContext : DbContext
     public DbSet<Appointment> Appointments { get; set; }
     public DbSet<MedicalRecord> MedicalRecords { get; set; }
     public DbSet<User> Users { get; set; }
+    public DbSet<UserRole> UserRoles { get; set; }
+    public DbSet<Gender> Genders { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -93,15 +96,18 @@ public class HospitalDbContext : DbContext
             entity.Property(e => e.Username).IsRequired().HasMaxLength(50);
             entity.Property(e => e.Email).IsRequired().HasMaxLength(100);
             entity.Property(e => e.PasswordHash).IsRequired();
-            entity.Property(e => e.Role).IsRequired().HasMaxLength(20);
             entity.Property(e => e.FirstName).HasMaxLength(100);
             entity.Property(e => e.LastName).HasMaxLength(100);
             entity.Property(e => e.PhoneNumber).HasMaxLength(20);
+            entity.Property(e => e.RoleId).IsRequired();
             entity.HasIndex(e => e.Username).IsUnique();
             entity.HasIndex(e => e.Email).IsUnique();
+
+            // Relationships to lookup tables
+            entity.HasOne(u => u.Role).WithMany().HasForeignKey(u => u.RoleId).OnDelete(DeleteBehavior.Restrict);
+            entity.HasOne(u => u.Gender).WithMany().HasForeignKey(u => u.GenderId).OnDelete(DeleteBehavior.SetNull);
         });
 
-        // Global query filters for soft delete
         modelBuilder.Entity<Patient>().HasQueryFilter(e => !e.IsDeleted);
         modelBuilder.Entity<Doctor>().HasQueryFilter(e => !e.IsDeleted);
         modelBuilder.Entity<Appointment>().HasQueryFilter(e => !e.IsDeleted);
