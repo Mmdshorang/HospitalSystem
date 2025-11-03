@@ -185,6 +185,23 @@ app.MapControllers();
 try
 {
     Log.Information("Starting Hospital Management System API");
+    
+    // Log API endpoints
+    var urls = app.Urls;
+    if (app.Environment.IsDevelopment())
+    {
+        Log.Information("═══════════════════════════════════════════════════════════");
+        Log.Information("🏥 Hospital Management System API - Development Mode");
+        Log.Information("═══════════════════════════════════════════════════════════");
+        Log.Information("📍 API Endpoints:");
+        Log.Information("   • API Base URL:      http://localhost:5255");
+        Log.Information("   • Swagger UI:        http://localhost:5255");
+        Log.Information("   • Swagger JSON:      http://localhost:5255/swagger/v1/swagger.json");
+        Log.Information("   • Health Check:      http://localhost:5255/health");
+        Log.Information("   • Scalar Docs:       http://localhost:8080");
+        Log.Information("═══════════════════════════════════════════════════════════");
+    }
+    
     app.Run();
 }
 catch (Exception ex)

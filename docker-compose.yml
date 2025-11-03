@@ -50,6 +50,19 @@ services:
       - hospital-network
     volumes:
       - ./backend/logs:/app/logs
+  # Scalar API Reference
+  scalar:
+    image: scalarapi/api-reference:latest
+    container_name: scalar-api
+    restart: unless-stopped
+    # Use redirect or config file - simplest: use query parameter in URL
+    # Access Scalar at: http://localhost:8080?specUrl=http://backend/swagger/v1/swagger.json
+    ports:
+      - "8080:8080"
+    depends_on:
+      - backend
+    networks:
+      - hospital-network
 
   # Frontend
   frontend:
