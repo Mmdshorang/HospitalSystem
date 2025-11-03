@@ -5,19 +5,21 @@ import { toast } from 'react-toastify';
 
 const Register: React.FC = () => {
   const [formData, setFormData] = useState({
-    username: '',
     email: '',
     password: '',
     confirmPassword: '',
     firstName: '',
     lastName: '',
-    phoneNumber: '',
+    phone: '',
+    nationalCode: '',
+    gender: '',
+    birthDate: '',
   });
   const [isLoading, setIsLoading] = useState(false);
   const { register } = useAuth();
   const navigate = useNavigate();
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     setFormData({
       ...formData,
       [e.target.name]: e.target.value,
@@ -35,7 +37,31 @@ const Register: React.FC = () => {
     setIsLoading(true);
 
     try {
-      await register(formData);
+      // Map frontend form data to backend RegisterRequest format
+      const registerData: any = {
+        email: formData.email,
+        password: formData.password,
+        confirmPassword: formData.confirmPassword,
+        firstName: formData.firstName,
+        lastName: formData.lastName,
+      };
+      
+      // Add optional fields only if they have values
+      if (formData.phone) {
+        registerData.phone = formData.phone;
+      }
+      if (formData.nationalCode) {
+        registerData.nationalCode = formData.nationalCode;
+      }
+      if (formData.gender) {
+        registerData.gender = formData.gender; // Backend will parse string to enum
+      }
+      if (formData.birthDate) {
+        registerData.birthDate = formData.birthDate; // ISO date string
+      }
+      registerData.role = 'patient'; // Default role
+      
+      await register(registerData);
       toast.success('ثبت‌نام موفقیت‌آمیز!');
       navigate('/');
     } catch (error: any) {
@@ -83,12 +109,13 @@ const Register: React.FC = () => {
           <div className="grid grid-cols-2 gap-4">
             <div>
               <label htmlFor="firstName" className="block text-sm font-medium text-gray-700">
-                نام
+                نام *
               </label>
               <input
                 id="firstName"
                 name="firstName"
                 type="text"
+                required
                 value={formData.firstName}
                 onChange={handleChange}
                 className="mt-1 appearance-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
@@ -97,34 +124,19 @@ const Register: React.FC = () => {
             </div>
             <div>
               <label htmlFor="lastName" className="block text-sm font-medium text-gray-700">
-                نام خانوادگی
+                نام خانوادگی *
               </label>
               <input
                 id="lastName"
                 name="lastName"
                 type="text"
+                required
                 value={formData.lastName}
                 onChange={handleChange}
                 className="mt-1 appearance-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
                 placeholder="نام خانوادگی"
               />
             </div>
-          </div>
-          
-          <div>
-            <label htmlFor="username" className="block text-sm font-medium text-gray-700">
-              نام کاربری *
-            </label>
-            <input
-              id="username"
-              name="username"
-              type="text"
-              required
-              value={formData.username}
-              onChange={handleChange}
-              className="mt-1 appearance-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
-              placeholder="نام کاربری"
-            />
           </div>
 
           <div>
@@ -143,19 +155,67 @@ const Register: React.FC = () => {
             />
           </div>
 
-          <div>
-            <label htmlFor="phoneNumber" className="block text-sm font-medium text-gray-700">
-              شماره تلفن
-            </label>
-            <input
-              id="phoneNumber"
-              name="phoneNumber"
-              type="tel"
-              value={formData.phoneNumber}
-              onChange={handleChange}
-              className="mt-1 appearance-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
-              placeholder="شماره تلفن"
-            />
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <label htmlFor="phone" className="block text-sm font-medium text-gray-700">
+                شماره تلفن
+              </label>
+              <input
+                id="phone"
+                name="phone"
+                type="tel"
+                value={formData.phone}
+                onChange={handleChange}
+                className="mt-1 appearance-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
+                placeholder="شماره تلفن"
+              />
+            </div>
+            <div>
+              <label htmlFor="nationalCode" className="block text-sm font-medium text-gray-700">
+                کد ملی
+              </label>
+              <input
+                id="nationalCode"
+                name="nationalCode"
+                type="text"
+                value={formData.nationalCode}
+                onChange={handleChange}
+                className="mt-1 appearance-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
+                placeholder="کد ملی"
+              />
+            </div>
+          </div>
+
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <label htmlFor="gender" className="block text-sm font-medium text-gray-700">
+                جنسیت
+              </label>
+              <select
+                id="gender"
+                name="gender"
+                value={formData.gender}
+                onChange={handleChange}
+                className="mt-1 appearance-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
+              >
+                <option value="">انتخاب کنید</option>
+                <option value="male">مرد</option>
+                <option value="female">زن</option>
+              </select>
+            </div>
+            <div>
+              <label htmlFor="birthDate" className="block text-sm font-medium text-gray-700">
+                تاریخ تولد
+              </label>
+              <input
+                id="birthDate"
+                name="birthDate"
+                type="date"
+                value={formData.birthDate}
+                onChange={handleChange}
+                className="mt-1 appearance-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
+              />
+            </div>
           </div>
 
           <div>

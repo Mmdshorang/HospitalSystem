@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization;
-using HospitalSystem.Application.Common.Interfaces;
-using HospitalSystem.Application.DTOs;
+using HospitalSystem.Domain.Common.Interfaces;
+using HospitalSystem.Domain.DTOs;
 
 namespace HospitalSystem.Api.Controllers;
 

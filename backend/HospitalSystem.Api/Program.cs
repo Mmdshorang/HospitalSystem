@@ -1,7 +1,8 @@
-using HospitalSystem.Application.Common.Interfaces;
+using HospitalSystem.Domain.Common.Interfaces;
 using HospitalSystem.Infrastructure.Data;
 using HospitalSystem.Infrastructure.Repositories;
 using HospitalSystem.Api.Configuration;
+using HospitalSystem.Infrastructure.Services;
 using HospitalSystem.Api.Middleware;
 using HospitalSystem.Api.HealthChecks;
 using Microsoft.EntityFrameworkCore;
@@ -75,7 +76,7 @@ builder.Services.AddSwaggerGen(c =>
 });
 
 // Database Configuration
-builder.Services.AddDbContext<HospitalDbContext>(options =>
+builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 // Repository and Unit of Work
@@ -104,7 +105,7 @@ builder.Services.AddRateLimiting(builder.Configuration);
 // Health Checks
 builder.Services.AddHealthChecks()
     .AddCheck<DatabaseHealthCheck>("database")
-    .AddDbContextCheck<HospitalDbContext>("database_context");
+    .AddDbContextCheck<ApplicationDbContext>("database_context");
 
 // Caching
 builder.Services.AddMemoryCache();
@@ -173,12 +174,13 @@ app.MapHealthChecks("/health");
 
 app.MapControllers();
 
-// Ensure database is created
-using (var scope = app.Services.CreateScope())
-{
-    var context = scope.ServiceProvider.GetRequiredService<HospitalDbContext>();
-    context.Database.EnsureCreated();
-}
+// Database schema is created via SQL script (see Infrastructure/Scripts/create_database_schema.sql)
+// Uncomment below if you want EF Core to create tables automatically (not recommended with custom schema)
+// using (var scope = app.Services.CreateScope())
+// {
+//     var context = scope.ServiceProvider.GetRequiredService<HospitalDbContext>();
+//     context.Database.EnsureCreated();
+// }
 
 try
 {

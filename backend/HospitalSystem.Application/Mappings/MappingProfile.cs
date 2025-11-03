@@ -8,19 +8,13 @@ public class MappingProfile : Profile
 {
     public MappingProfile()
     {
-        // Patient mappings
-        CreateMap<Patient, PatientDto>().ReverseMap();
-        CreateMap<Patient, CreatePatientDto>().ReverseMap();
-        CreateMap<Patient, UpdatePatientDto>().ReverseMap();
-
-        // Doctor mappings
-        CreateMap<Doctor, DoctorDto>().ReverseMap();
-        CreateMap<Doctor, CreateDoctorDto>().ReverseMap();
-        CreateMap<Doctor, UpdateDoctorDto>().ReverseMap();
-
-        // Appointment mappings
-        CreateMap<Appointment, AppointmentDto>().ReverseMap();
-        CreateMap<Appointment, CreateAppointmentDto>().ReverseMap();
-        CreateMap<Appointment, UpdateAppointmentDto>().ReverseMap();
+        // Note: Old entity mappings removed (Patient, Doctor, Appointment)
+        // These entities have been removed from the new schema
+        // New mappings should use User, PatientProfile, ProviderProfile, ServiceRequest, etc.
+        
+        // TODO: Add mappings for new entities if needed
+        // Example:
+        // CreateMap<User, UserDto>().ReverseMap();
+        // CreateMap<PatientProfile, PatientProfileDto>().ReverseMap();
     }
 }

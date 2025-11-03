@@ -5,22 +5,22 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
-using HospitalSystem.Application.Common.Interfaces;
-using HospitalSystem.Application.DTOs;
+using HospitalSystem.Domain.Common.Interfaces;
+using HospitalSystem.Domain.DTOs;
 using HospitalSystem.Domain.Entities;
+using HospitalSystem.Domain.Entities.Enums;
 using HospitalSystem.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
-using HospitalSystem.Domain.Entities.Lookups;
 
 namespace HospitalSystem.Infrastructure.Services;
 
 public class AuthService : IAuthService
 {
-    private readonly HospitalDbContext _context;
+    private readonly ApplicationDbContext _context;
     private readonly IConfiguration _configuration;
     private readonly ILogger<AuthService> _logger;
 
-    public AuthService(HospitalDbContext context, IConfiguration configuration, ILogger<AuthService> logger)
+    public AuthService(ApplicationDbContext context, IConfiguration configuration, ILogger<AuthService> logger)
     {
         _context = context;
         _configuration = configuration;
@@ -29,19 +29,14 @@ public class AuthService : IAuthService
 
     public async Task<AuthResponse> LoginAsync(LoginRequest request)
     {
-        var user = _context.Users
-            .Include(u => u.Role)
-            .Include(u => u.Gender)
-            .FirstOrDefault(u => u.Email == request.Email && u.IsActive);
+        var user = await _context.Users
+            .FirstOrDefaultAsync(u => u.Email == request.Email && u.IsActive && u.DeletedAt == null);
 
         if (user == null || !VerifyPassword(request.Password, user.PasswordHash))
         {
             throw new UnauthorizedAccessException("Invalid credentials");
         }
 
-        user.LastLoginAt = DateTime.UtcNow;
-        await _context.SaveChangesAsync();
-
         var token = GenerateJwtToken(user);
         return new AuthResponse
         {
@@ -49,43 +44,46 @@ public class AuthService : IAuthService
             Expires = DateTime.UtcNow.AddMinutes(60),
             User = new UserInfo
             {
-                Id = user.Id.ToString(),
-                Username = user.Username,
+                Id = user.Id,
                 Email = user.Email,
-                Role = user.Role?.RoleName ?? "",
+                Role = user.Role.ToString(),
                 FirstName = user.FirstName,
                 LastName = user.LastName,
-                PhoneNumber = user.PhoneNumber
+                NationalCode = user.NationalCode,
+                Phone = user.Phone,
+                Gender = user.Gender,
+                BirthDate = user.BirthDate,
+                AvatarUrl = user.AvatarUrl,
+                IsActive = user.IsActive
             }
         };
     }
 
     public async Task<AuthResponse> RegisterAsync(RegisterRequest request)
     {
-        // Check if user already exists
-        if (_context.Users.Any(u => u.Email == request.Email || u.Username == request.Username))
+        if (await _context.Users.AnyAsync(u => u.Email == request.Email))
         {
-            throw new InvalidOperationException("User with this email or username already exists");
+            throw new InvalidOperationException("User with this email already exists");
         }
 
         var user = new User
         {
-            Username = request.Username,
             Email = request.Email,
             PasswordHash = HashPassword(request.Password),
             FirstName = request.FirstName,
             LastName = request.LastName,
-            PhoneNumber = request.PhoneNumber,
-            RoleId = 3, // مقدار پیش‌فرض patient یا مقدار مناسب
+            NationalCode = request.NationalCode ?? "",
+            Phone = request.Phone ?? "",
+            Gender = request.Gender,
+            BirthDate = request.BirthDate,
+            Role = request.Role,
             IsActive = true,
-            CreatedAt = DateTime.UtcNow
+            CreatedAt = DateTime.UtcNow,
+            UpdatedAt = DateTime.UtcNow
         };
 
         _context.Users.Add(user);
         await _context.SaveChangesAsync();
-
-        // Load Role navigation so we can include role name in token/response
-        await _context.Entry(user).Reference(u => u.Role).LoadAsync();
 
         var token = GenerateJwtToken(user);
         return new AuthResponse
@@ -94,13 +92,17 @@ public class AuthService : IAuthService
             Expires = DateTime.UtcNow.AddMinutes(60),
             User = new UserInfo
             {
-                Id = user.Id.ToString(),
-                Username = user.Username,
+                Id = user.Id,
                 Email = user.Email,
-                Role = user.Role?.RoleName ?? "",
+                Role = user.Role.ToString(),
                 FirstName = user.FirstName,
                 LastName = user.LastName,
-                PhoneNumber = user.PhoneNumber
+                NationalCode = user.NationalCode,
+                Phone = user.Phone,
+                Gender = user.Gender,
+                BirthDate = user.BirthDate,
+                AvatarUrl = user.AvatarUrl,
+                IsActive = user.IsActive
             }
         };
     }
@@ -136,10 +138,10 @@ public class AuthService : IAuthService
 
     public async Task<UserInfo> GetUserInfoAsync(string userId)
     {
+        var userIdLong = long.Parse(userId);
         var user = await _context.Users
-            .Include(u => u.Role)
-            .Include(u => u.Gender)
-            .FirstOrDefaultAsync(u => u.Id == Guid.Parse(userId));
+            .FirstOrDefaultAsync(u => u.Id == userIdLong && u.IsActive && u.DeletedAt == null);
+            
         if (user == null)
         {
             throw new KeyNotFoundException("User not found");
@@ -147,13 +149,17 @@ public class AuthService : IAuthService
 
         return new UserInfo
         {
-            Id = user.Id.ToString(),
-            Username = user.Username,
+            Id = user.Id,
             Email = user.Email,
-            Role = user.Role?.RoleName ?? "",
+            Role = user.Role.ToString(),
             FirstName = user.FirstName,
             LastName = user.LastName,
-            PhoneNumber = user.PhoneNumber
+            NationalCode = user.NationalCode,
+            Phone = user.Phone,
+            Gender = user.Gender,
+            BirthDate = user.BirthDate,
+            AvatarUrl = user.AvatarUrl,
+            IsActive = user.IsActive
         };
     }
 
@@ -170,9 +176,8 @@ public class AuthService : IAuthService
         var claims = new[]
         {
             new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
-            new Claim(ClaimTypes.Name, user.Username),
             new Claim(ClaimTypes.Email, user.Email),
-            new Claim(ClaimTypes.Role, user.Role?.RoleName ?? ""),
+            new Claim(ClaimTypes.Role, user.Role.ToString()),
             new Claim("exp", DateTimeOffset.UtcNow.AddMinutes(60).ToUnixTimeSeconds().ToString(), ClaimValueTypes.Integer64)
         };
 

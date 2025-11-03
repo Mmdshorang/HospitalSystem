@@ -1,4 +1,4 @@
-using HospitalSystem.Application.Common.Interfaces;
+using HospitalSystem.Domain.Common.Interfaces;
 using HospitalSystem.Domain.Entities;
 using HospitalSystem.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
@@ -7,10 +7,10 @@ namespace HospitalSystem.Infrastructure.Repositories;
 
 public class Repository<T> : IRepository<T> where T : BaseEntity
 {
-    protected readonly HospitalDbContext _context;
+    protected readonly ApplicationDbContext _context;
     protected readonly DbSet<T> _dbSet;
 
-    public Repository(HospitalDbContext context)
+    public Repository(ApplicationDbContext context)
     {
         _context = context;
         _dbSet = context.Set<T>();

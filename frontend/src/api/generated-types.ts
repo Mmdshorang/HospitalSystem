@@ -7,13 +7,16 @@ export interface LoginRequest {
 }
 
 export interface RegisterRequest {
-  username: string;
   email: string;
   password: string;
   confirmPassword: string;
-  firstName?: string;
-  lastName?: string;
-  phoneNumber?: string;
+  firstName: string;
+  lastName: string;
+  phone?: string;
+  nationalCode?: string;
+  gender?: string;
+  birthDate?: string;
+  role?: string;
 }
 
 export interface AuthResponse {
@@ -23,13 +26,17 @@ export interface AuthResponse {
 }
 
 export interface UserInfo {
-  id: string;
-  username: string;
+  id: number;
   email: string;
   role: string;
-  firstName?: string;
-  lastName?: string;
-  phoneNumber?: string;
+  firstName: string;
+  lastName: string;
+  phone?: string;
+  nationalCode?: string;
+  gender?: string;
+  birthDate?: string;
+  avatarUrl?: string;
+  isActive: boolean;
 }
 
 // Patient types

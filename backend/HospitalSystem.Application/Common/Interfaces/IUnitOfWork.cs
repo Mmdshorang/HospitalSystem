@@ -2,10 +2,9 @@ namespace HospitalSystem.Application.Common.Interfaces;
 
 public interface IUnitOfWork : IDisposable
 {
-    IRepository<Domain.Entities.Patient> Patients { get; }
-    IRepository<Domain.Entities.Doctor> Doctors { get; }
-    IRepository<Domain.Entities.Appointment> Appointments { get; }
-    IRepository<Domain.Entities.MedicalRecord> MedicalRecords { get; }
+    // Note: Old entities (Patient, Doctor, Appointment, MedicalRecord) have been removed
+    // This UnitOfWork is kept for backward compatibility but is empty
+    // New code should use ApplicationDbContext directly
     
     Task<int> SaveChangesAsync();
     Task BeginTransactionAsync();

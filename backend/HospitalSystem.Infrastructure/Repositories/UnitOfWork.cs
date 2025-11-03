@@ -1,5 +1,4 @@
-using HospitalSystem.Application.Common.Interfaces;
-using HospitalSystem.Domain.Entities;
+using HospitalSystem.Domain.Common.Interfaces;
 using HospitalSystem.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore.Storage;
 
@@ -7,23 +6,16 @@ namespace HospitalSystem.Infrastructure.Repositories;
 
 public class UnitOfWork : IUnitOfWork
 {
-    private readonly HospitalDbContext _context;
+    private readonly ApplicationDbContext _context;
     private IDbContextTransaction? _transaction;
     private bool _disposed = false;
 
-    public UnitOfWork(HospitalDbContext context)
+    public UnitOfWork(ApplicationDbContext context)
     {
         _context = context;
-        Patients = new Repository<Patient>(_context);
-        Doctors = new Repository<Doctor>(_context);
-        Appointments = new Repository<Appointment>(_context);
-        MedicalRecords = new Repository<MedicalRecord>(_context);
+        // Note: Old repositories removed (Patient, Doctor, Appointment, MedicalRecord)
+        // Use ApplicationDbContext directly for new entities
     }
-
-    public IRepository<Patient> Patients { get; }
-    public IRepository<Doctor> Doctors { get; }
-    public IRepository<Appointment> Appointments { get; }
-    public IRepository<MedicalRecord> MedicalRecords { get; }
 
     public async Task<int> SaveChangesAsync()
     {

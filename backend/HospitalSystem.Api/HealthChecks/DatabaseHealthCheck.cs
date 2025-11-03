@@ -5,9 +5,9 @@ namespace HospitalSystem.Api.HealthChecks;
 
 public class DatabaseHealthCheck : IHealthCheck
 {
-    private readonly HospitalDbContext _context;
+    private readonly ApplicationDbContext _context;
 
-    public DatabaseHealthCheck(HospitalDbContext context)
+    public DatabaseHealthCheck(ApplicationDbContext context)
     {
         _context = context;
     }
