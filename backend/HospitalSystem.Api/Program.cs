@@ -178,7 +178,7 @@ app.MapControllers();
 // Uncomment below if you want EF Core to create tables automatically (not recommended with custom schema)
 // using (var scope = app.Services.CreateScope())
 // {
-//     var context = scope.ServiceProvider.GetRequiredService<HospitalDbContext>();
+//     var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
 //     context.Database.EnsureCreated();
 // }
 
