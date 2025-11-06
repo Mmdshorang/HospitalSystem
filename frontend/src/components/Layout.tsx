@@ -9,6 +9,8 @@ import {
   X,
   LogOut,
   User,
+  Hospital,
+  Shield,
 } from "lucide-react";
 import { useState } from "react";
 import { useAuth } from "../contexts/AuthContext";
@@ -24,11 +26,11 @@ const Layout = ({ children }: LayoutProps) => {
 
   const navigation = [
     { name: "خانه", href: "/", icon: Home },
-    { name: "پزشکان", href: "/patients", icon: Users },
-    { name: "کلینیک ها", href: "/doctors", icon: UserCheck },
-    { name: "کاربران", href: "/appointments", icon: Calendar },
+    { name: "پزشکان", href: "/doctors", icon: UserCheck },
+    { name: "کلینیک ها", href: "/clinic", icon: Hospital },
+    { name: "کاربران", href: "/users", icon: Users },
     { name: "خدمات", href: "/services", icon: Calendar },
-    { name: "بیمه", href: "/services", icon: Calendar },
+    { name: "بیمه", href: "/services", icon: Shield },
   ];
 
   return (

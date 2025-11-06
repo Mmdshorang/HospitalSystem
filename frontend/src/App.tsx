@@ -7,7 +7,7 @@ import ProtectedRoute from './components/ProtectedRoute';
 import Layout from './components/Layout';
 import Dashboard from './pages/admin/Home/Home';
 import Patients from './pages/Patients';
-import Doctors from './pages/Doctors';
+import Doctors from './pages/admin/Doctors/DoctorsList';
 import Appointments from './pages/Appointments';
 import PatientForm from './pages/PatientForm';
 import DoctorForm from './pages/DoctorForm';
