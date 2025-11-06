@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization;
 using HospitalSystem.Domain.Common.Interfaces;
 using HospitalSystem.Domain.DTOs;
+using HospitalSystem.Domain.Entities.Enums;
 
 namespace HospitalSystem.Api.Controllers;
 
@@ -49,17 +50,54 @@ public class AuthController : ControllerBase
     {
         try
         {
+            // Check model validation
+            if (!ModelState.IsValid)
+            {
+                var errors = ModelState
+                    .Where(x => x.Value?.Errors.Count > 0)
+                    .SelectMany(x => x.Value!.Errors)
+                    .Select(x => x.ErrorMessage)
+                    .ToList();
+                
+                _logger.LogWarning("Registration validation failed: {Errors}", string.Join(", ", errors));
+                return BadRequest(new { message = "Validation failed", errors = errors });
+            }
+
+            // Validate password confirmation manually (Compare attribute might not work with JSON)
+            if (request.Password != request.ConfirmPassword)
+            {
+                return BadRequest(new { message = "Password and confirm password do not match" });
+            }
+
+            // Ensure role defaults to patient (already set in DTO, but double-check)
+            if (request.Role == default(UserRole))
+            {
+                request.Role = UserRole.patient;
+            }
+
             var result = await _authService.RegisterAsync(request);
             return Ok(result);
         }
         catch (InvalidOperationException ex)
         {
-            return BadRequest(new { message = ex.Message });
+            _logger.LogWarning(ex, "Registration business logic error: {Message}", ex.Message);
+            // Include inner exception details if available
+            var errorMessage = ex.Message;
+            if (ex.InnerException != null)
+            {
+                errorMessage += $" | Inner: {ex.InnerException.Message}";
+            }
+            return BadRequest(new { message = errorMessage });
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error during registration");
-            return StatusCode(500, "Internal server error");
+            _logger.LogError(ex, "Error during registration: {Message}", ex.Message);
+            var errorDetails = ex.Message;
+            if (ex.InnerException != null)
+            {
+                errorDetails += $" | Inner: {ex.InnerException.Message}";
+            }
+            return StatusCode(500, new { message = "Internal server error", details = errorDetails });
         }
     }
 

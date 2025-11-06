@@ -66,6 +66,43 @@ public class AuthService : IAuthService
             throw new InvalidOperationException("User with this email already exists");
         }
 
+        // Ensure role is valid (default to patient if not set)
+        var role = request.Role;
+        if (role == default(UserRole))
+        {
+            role = UserRole.patient;
+        }
+
+        // Validate role exists in database enum (admin, doctor, patient only)
+        if (role != UserRole.admin && role != UserRole.doctor && role != UserRole.patient)
+        {
+            _logger.LogWarning("Invalid role {Role} provided, defaulting to patient", role);
+            role = UserRole.patient;
+        }
+
+        // Ensure all DateTime values are UTC for PostgreSQL
+        // Convert BirthDate to UTC if it has a value
+        DateTime? birthDate = null;
+        if (request.BirthDate.HasValue)
+        {
+            var date = request.BirthDate.Value;
+            if (date.Kind == DateTimeKind.Unspecified)
+            {
+                // If unspecified, assume it's UTC and specify it
+                birthDate = DateTime.SpecifyKind(date, DateTimeKind.Utc);
+            }
+            else if (date.Kind == DateTimeKind.Local)
+            {
+                // Convert local time to UTC
+                birthDate = date.ToUniversalTime();
+            }
+            else
+            {
+                // Already UTC
+                birthDate = date;
+            }
+        }
+
         var user = new User
         {
             Email = request.Email,
@@ -74,16 +111,29 @@ public class AuthService : IAuthService
             LastName = request.LastName,
             NationalCode = request.NationalCode ?? "",
             Phone = request.Phone ?? "",
-            Gender = request.Gender,
-            BirthDate = request.BirthDate,
-            Role = request.Role,
+            Gender = request.Gender, // Nullable - will be null if not provided
+            BirthDate = birthDate,
+            Role = role,
             IsActive = true,
             CreatedAt = DateTime.UtcNow,
             UpdatedAt = DateTime.UtcNow
         };
 
-        _context.Users.Add(user);
-        await _context.SaveChangesAsync();
+        try
+        {
+            _context.Users.Add(user);
+            await _context.SaveChangesAsync();
+        }
+        catch (Microsoft.EntityFrameworkCore.DbUpdateException ex)
+        {
+            _logger.LogError(ex, "Database error during user registration. Inner exception: {InnerException}", ex.InnerException?.Message);
+            throw new InvalidOperationException($"Failed to save user: {ex.InnerException?.Message ?? ex.Message}", ex);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Unexpected error during user registration");
+            throw;
+        }
 
         var token = GenerateJwtToken(user);
         return new AuthResponse
