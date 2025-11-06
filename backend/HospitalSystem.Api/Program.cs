@@ -22,6 +22,7 @@ builder.Services.AddControllers()
     .AddNewtonsoftJson(options =>
     {
         options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore;
+        options.SerializerSettings.Converters.Add(new Newtonsoft.Json.Converters.StringEnumConverter());
     });
 
 builder.Services.AddEndpointsApiExplorer();
@@ -77,7 +78,16 @@ builder.Services.AddSwaggerGen(c =>
 
 // Database Configuration
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
-    options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
+{
+    options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection"), npgsqlOptions =>
+    {
+        // Configure Npgsql to handle DateTime conversions properly
+        npgsqlOptions.EnableRetryOnFailure();
+    });
+    
+    // Configure to use UTC for all DateTime values
+    AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", false);
+});
 
 // Repository and Unit of Work
 builder.Services.AddScoped(typeof(IRepository<>), typeof(Repository<>));

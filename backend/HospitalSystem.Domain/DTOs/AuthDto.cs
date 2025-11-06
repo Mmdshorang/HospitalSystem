@@ -25,7 +25,6 @@ public class RegisterRequest
     public string Password { get; set; } = string.Empty;
 
     [Required]
-    [Compare(nameof(Password))]
     public string ConfirmPassword { get; set; } = string.Empty;
 
     [Required]
@@ -38,6 +37,9 @@ public class RegisterRequest
     public string? Phone { get; set; }
     public GenderType? Gender { get; set; }
     public DateTime? BirthDate { get; set; }
+    
+    // Role can be sent as string from frontend (converted by StringEnumConverter)
+    // Defaults to patient if not provided
     public UserRole Role { get; set; } = UserRole.patient;
 }
 

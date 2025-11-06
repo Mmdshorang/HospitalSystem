@@ -44,22 +44,25 @@ const Register: React.FC = () => {
         confirmPassword: formData.confirmPassword,
         firstName: formData.firstName,
         lastName: formData.lastName,
+        role: 'patient', // Default role
       };
       
       // Add optional fields only if they have values
-      if (formData.phone) {
-        registerData.phone = formData.phone;
+      if (formData.phone && formData.phone.trim()) {
+        registerData.phone = formData.phone.trim();
       }
-      if (formData.nationalCode) {
-        registerData.nationalCode = formData.nationalCode;
+      if (formData.nationalCode && formData.nationalCode.trim()) {
+        registerData.nationalCode = formData.nationalCode.trim();
       }
-      if (formData.gender) {
-        registerData.gender = formData.gender; // Backend will parse string to enum
+      if (formData.gender && formData.gender.trim()) {
+        registerData.gender = formData.gender.trim(); // Backend will parse string to enum
       }
       if (formData.birthDate) {
-        registerData.birthDate = formData.birthDate; // ISO date string
+        // Convert date string to UTC ISO string
+        // Input type="date" gives us YYYY-MM-DD, we need to convert to UTC
+        const date = new Date(formData.birthDate + 'T00:00:00Z');
+        registerData.birthDate = date.toISOString();
       }
-      registerData.role = 'patient'; // Default role
       
       await register(registerData);
       toast.success('ثبت‌نام موفقیت‌آمیز!');
@@ -201,6 +204,7 @@ const Register: React.FC = () => {
                 <option value="">انتخاب کنید</option>
                 <option value="male">مرد</option>
                 <option value="female">زن</option>
+                <option value="other">سایر</option>
               </select>
             </div>
             <div>

@@ -49,14 +49,15 @@ namespace HospitalSystem.Infrastructure.Data
             // or use the default EF Core naming which converts to lowercase
 
             // Register PostgreSQL ENUMs
-            modelBuilder.HasPostgresEnum<UserRole>("user_role");
-            modelBuilder.HasPostgresEnum<GenderType>("gender_type");
+            // Note: UserRole uses string conversion instead of HasPostgresEnum
+            // for simpler handling and null support
             modelBuilder.HasPostgresEnum<DayOfWeekEnum>("day_of_week");
             modelBuilder.HasPostgresEnum<AppointmentType>("appointment_type");
             modelBuilder.HasPostgresEnum<RequestStatus>("request_status");
             modelBuilder.HasPostgresEnum<PaymentMethod>("payment_method");
             modelBuilder.HasPostgresEnum<PaymentStatus>("payment_status");
             modelBuilder.HasPostgresEnum<NotificationType>("notification_type");
+            modelBuilder.HasPostgresEnum<GenderType>("gender_type");
             
             // User Configuration
             modelBuilder.Entity<User>(entity =>
@@ -72,16 +73,36 @@ namespace HospitalSystem.Infrastructure.Data
                 entity.Property(e => e.PasswordHash).HasMaxLength(255);
                 entity.Property(e => e.AvatarUrl).HasMaxLength(255);
                 entity.Property(e => e.IsActive).HasDefaultValue(true);
-                entity.Property(e => e.CreatedAt).HasDefaultValueSql("NOW()");
-                entity.Property(e => e.UpdatedAt).HasDefaultValueSql("NOW()");
+                entity.Property(e => e.CreatedAt)
+                    .HasDefaultValueSql("NOW()")
+                    .HasConversion(
+                        v => v.Kind == DateTimeKind.Unspecified ? DateTime.SpecifyKind(v, DateTimeKind.Utc) : v.ToUniversalTime(),
+                        v => DateTime.SpecifyKind(v, DateTimeKind.Utc));
+                entity.Property(e => e.UpdatedAt)
+                    .HasDefaultValueSql("NOW()")
+                    .HasConversion(
+                        v => v.Kind == DateTimeKind.Unspecified ? DateTime.SpecifyKind(v, DateTimeKind.Utc) : v.ToUniversalTime(),
+                        v => DateTime.SpecifyKind(v, DateTimeKind.Utc));
+                entity.Property(e => e.BirthDate)
+                    .HasConversion(
+                        v => v.HasValue 
+                            ? (v.Value.Kind == DateTimeKind.Unspecified 
+                                ? DateTime.SpecifyKind(v.Value, DateTimeKind.Utc) 
+                                : v.Value.ToUniversalTime())
+                            : (DateTime?)null,
+                        v => v.HasValue ? DateTime.SpecifyKind(v.Value, DateTimeKind.Utc) : (DateTime?)null);
                 
                 // ENUM mappings
                 entity.Property(e => e.Role)
                     .HasConversion<string>()
                     .HasColumnType("user_role");
+                // Gender: Use PostgreSQL enum type directly (registered with HasPostgresEnum above)
+                // Npgsql automatically converts C# enum ↔ PostgreSQL enum
+                // Default value: 'other' (no need to send from frontend)
                 entity.Property(e => e.Gender)
-                    .HasConversion<string>()
-                    .HasColumnType("gender_type");
+                    .HasColumnType("gender_type")
+                    .HasDefaultValueSql("'other'::gender_type");
+
                 
                 // Indexes
                 entity.HasIndex(e => e.Email);
