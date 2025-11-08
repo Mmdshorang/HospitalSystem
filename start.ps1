@@ -11,7 +11,7 @@ Start-Process powershell -ArgumentList "-NoExit", "-Command", "cd frontend; pnpm
 
 Write-Host ""
 Write-Host "Both services are starting..." -ForegroundColor Green
-Write-Host "Backend will be available at: http://localhost:5255" -ForegroundColor Cyan
+Write-Host "Backend will be available at: http://localhost:5000" -ForegroundColor Cyan
 Write-Host "Frontend will be available at: http://localhost:3000 (or next available port)" -ForegroundColor Cyan
 Write-Host ""
 Write-Host "Press any key to exit..." -ForegroundColor Gray

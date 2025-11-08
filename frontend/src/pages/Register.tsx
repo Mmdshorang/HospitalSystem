@@ -204,7 +204,6 @@ const Register: React.FC = () => {
                 <option value="">انتخاب کنید</option>
                 <option value="male">مرد</option>
                 <option value="female">زن</option>
-                <option value="other">سایر</option>
               </select>
             </div>
             <div>
