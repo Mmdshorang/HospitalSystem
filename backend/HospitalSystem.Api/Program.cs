@@ -11,6 +11,7 @@ using System.Reflection;
 using Serilog;
 using FluentValidation;
 using FluentValidation.AspNetCore;
+using HospitalSystem.Domain.Entities.Enums;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -84,7 +85,7 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
         // Configure Npgsql to handle DateTime conversions properly
         npgsqlOptions.EnableRetryOnFailure();
     });
-    
+
     // Configure to use UTC for all DateTime values
     AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", false);
 });
@@ -204,10 +205,10 @@ try
         Log.Information("🏥 Hospital Management System API - Development Mode");
         Log.Information("═══════════════════════════════════════════════════════════");
         Log.Information("📍 API Endpoints:");
-        Log.Information("   • API Base URL:      http://localhost:5255");
-        Log.Information("   • Swagger UI:        http://localhost:5255");
-        Log.Information("   • Swagger JSON:      http://localhost:5255/swagger/v1/swagger.json");
-        Log.Information("   • Health Check:      http://localhost:5255/health");
+        Log.Information("   • API Base URL:      http://localhost:5000");
+        Log.Information("   • Swagger UI:        http://localhost:5000");
+        Log.Information("   • Swagger JSON:      http://localhost:5000/swagger/v1/swagger.json");
+        Log.Information("   • Health Check:      http://localhost:5000/health");
         Log.Information("   • Scalar Docs:       http://localhost:8080");
         Log.Information("═══════════════════════════════════════════════════════════");
     }

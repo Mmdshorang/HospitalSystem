@@ -103,6 +103,20 @@ public class AuthService : IAuthService
             }
         }
 
+        // Validate Gender enum value
+        GenderType? gender = null;
+        if (request.Gender.HasValue)
+        {
+            if (Enum.IsDefined(typeof(GenderType), request.Gender.Value))
+            {
+                gender = request.Gender.Value;
+            }
+            else
+            {
+                _logger.LogWarning("Invalid Gender value {Gender} provided, will be set to null", request.Gender.Value);
+            }
+        }
+
         var user = new User
         {
             Email = request.Email,
@@ -111,7 +125,7 @@ public class AuthService : IAuthService
             LastName = request.LastName,
             NationalCode = request.NationalCode ?? "",
             Phone = request.Phone ?? "",
-            Gender = request.Gender, // Nullable - will be null if not provided
+            Gender = gender, // Will be null if not provided or invalid
             BirthDate = birthDate,
             Role = role,
             IsActive = true,

@@ -13,7 +13,7 @@ const generateTypes = async () => {
     console.log('🔄 Generating types from OpenAPI schema...');
     
     // Fetch OpenAPI schema from backend
-    const response = await fetch('http://localhost:5255/swagger/v1/swagger.json');
+    const response = await fetch('http://localhost:5000/swagger/v1/swagger.json');
     
     if (!response.ok) {
       throw new Error(`Failed to fetch OpenAPI schema: ${response.status}`);
@@ -33,7 +33,7 @@ const generateTypes = async () => {
     
   } catch (error) {
     console.error('❌ Error generating types:', error.message);
-    console.log('💡 Make sure the backend is running on http://localhost:5255');
+    console.log('💡 Make sure the backend is running on http://localhost:5000');
     process.exit(1);
   }
 };
