@@ -1,11 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization;
-using MediatR;
-using HospitalSystem.Application.Features.Providers.Queries.GetAllProviders;
-using HospitalSystem.Application.Features.Providers.Queries.GetProviderById;
-using HospitalSystem.Application.Features.Providers.Commands.CreateProvider;
-using HospitalSystem.Application.Features.Providers.Commands.UpdateProvider;
-using HospitalSystem.Application.Features.Providers.Commands.DeleteProvider;
+using HospitalSystem.Infrastructure.Models;
+using HospitalSystem.Infrastructure.Services;
 
 namespace HospitalSystem.Api.Controllers;
 
@@ -14,12 +10,12 @@ namespace HospitalSystem.Api.Controllers;
 [Authorize]
 public class ProvidersController : ControllerBase
 {
-    private readonly IMediator _mediator;
+    private readonly ProviderService _providerService;
     private readonly ILogger<ProvidersController> _logger;
 
-    public ProvidersController(IMediator mediator, ILogger<ProvidersController> logger)
+    public ProvidersController(ProviderService providerService, ILogger<ProvidersController> logger)
     {
-        _mediator = mediator;
+        _providerService = providerService;
         _logger = logger;
     }
 
@@ -35,15 +31,7 @@ public class ProvidersController : ControllerBase
     {
         try
         {
-            var query = new GetAllProvidersQuery
-            {
-                SearchTerm = searchTerm,
-                SpecialtyId = specialtyId,
-                ClinicId = clinicId,
-                IsActive = isActive
-            };
-
-            var providers = await _mediator.Send(query);
+            var providers = await _providerService.GetAllAsync(searchTerm, specialtyId, clinicId, isActive);
             return Ok(providers);
         }
         catch (Exception ex)
@@ -61,8 +49,7 @@ public class ProvidersController : ControllerBase
     {
         try
         {
-            var query = new GetProviderByIdQuery { Id = id };
-            var provider = await _mediator.Send(query);
+            var provider = await _providerService.GetByIdAsync(id);
 
             if (provider == null)
                 return NotFound(new { message = "Provider not found" });
@@ -81,11 +68,11 @@ public class ProvidersController : ControllerBase
     /// </summary>
     [HttpPost]
     [Authorize(Roles = "admin")]
-    public async Task<IActionResult> Create([FromBody] CreateProviderCommand command)
+    public async Task<IActionResult> Create([FromBody] CreateProviderProfileDto dto)
     {
         try
         {
-            var provider = await _mediator.Send(command);
+            var provider = await _providerService.CreateAsync(dto);
             return CreatedAtAction(nameof(GetById), new { id = provider.Id }, provider);
         }
         catch (Exception ex)
@@ -100,14 +87,14 @@ public class ProvidersController : ControllerBase
     /// </summary>
     [HttpPut("{id}")]
     [Authorize(Roles = "admin")]
-    public async Task<IActionResult> Update(long id, [FromBody] UpdateProviderCommand command)
+    public async Task<IActionResult> Update(long id, [FromBody] UpdateProviderProfileDto dto)
     {
         try
         {
-            if (id != command.Id)
+            if (id != dto.Id)
                 return BadRequest(new { message = "ID mismatch" });
 
-            var provider = await _mediator.Send(command);
+            var provider = await _providerService.UpdateAsync(id, dto);
 
             if (provider == null)
                 return NotFound(new { message = "Provider not found" });
@@ -130,8 +117,7 @@ public class ProvidersController : ControllerBase
     {
         try
         {
-            var command = new DeleteProviderCommand { Id = id };
-            var result = await _mediator.Send(command);
+            var result = await _providerService.DeleteAsync(id);
 
             if (!result)
                 return NotFound(new { message = "Provider not found" });

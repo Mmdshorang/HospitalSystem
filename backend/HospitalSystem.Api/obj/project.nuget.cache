@@ -1,18 +1,16 @@
 {
   "version": 2,
-  "dgSpecHash": "9fzmWmCfnCmu9XeXuA/gHdnjl8JTq+RFLgm16Epk0bw+DLK0m8nY+3nPO2NalrZPA+foHSxMGiLj+AUqHUqd+g==",
+  "dgSpecHash": "ltzb1/ENv/IzSTaqNETGn3dP4nx2hjWpE17tI0uIJ69SZdHPRf1ySKGrXwsY12C01S32hSMCkMJ49ox2VaPxsw==",
   "success": true,
   "projectFilePath": "C:\\Users\\mmdsk\\Desktop\\hospital-system\\backend\\HospitalSystem.Api\\HospitalSystem.Api.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\mmdsk\\.nuget\\packages\\aspnetcoreratelimit\\5.0.0\\aspnetcoreratelimit.5.0.0.nupkg.sha512",
     "C:\\Users\\mmdsk\\.nuget\\packages\\automapper\\12.0.1\\automapper.12.0.1.nupkg.sha512",
     "C:\\Users\\mmdsk\\.nuget\\packages\\automapper.extensions.microsoft.dependencyinjection\\12.0.1\\automapper.extensions.microsoft.dependencyinjection.12.0.1.nupkg.sha512",
-    "C:\\Users\\mmdsk\\.nuget\\packages\\fluentvalidation\\11.11.0\\fluentvalidation.11.11.0.nupkg.sha512",
+    "C:\\Users\\mmdsk\\.nuget\\packages\\fluentvalidation\\11.5.1\\fluentvalidation.11.5.1.nupkg.sha512",
     "C:\\Users\\mmdsk\\.nuget\\packages\\fluentvalidation.aspnetcore\\11.3.0\\fluentvalidation.aspnetcore.11.3.0.nupkg.sha512",
     "C:\\Users\\mmdsk\\.nuget\\packages\\fluentvalidation.dependencyinjectionextensions\\11.5.1\\fluentvalidation.dependencyinjectionextensions.11.5.1.nupkg.sha512",
     "C:\\Users\\mmdsk\\.nuget\\packages\\humanizer.core\\2.14.1\\humanizer.core.2.14.1.nupkg.sha512",
-    "C:\\Users\\mmdsk\\.nuget\\packages\\mediatr\\12.4.1\\mediatr.12.4.1.nupkg.sha512",
-    "C:\\Users\\mmdsk\\.nuget\\packages\\mediatr.contracts\\2.0.1\\mediatr.contracts.2.0.1.nupkg.sha512",
     "C:\\Users\\mmdsk\\.nuget\\packages\\microsoft.aspnetcore.authentication.abstractions\\2.2.0\\microsoft.aspnetcore.authentication.abstractions.2.2.0.nupkg.sha512",
     "C:\\Users\\mmdsk\\.nuget\\packages\\microsoft.aspnetcore.authentication.jwtbearer\\8.0.11\\microsoft.aspnetcore.authentication.jwtbearer.8.0.11.nupkg.sha512",
     "C:\\Users\\mmdsk\\.nuget\\packages\\microsoft.aspnetcore.authorization\\8.0.11\\microsoft.aspnetcore.authorization.8.0.11.nupkg.sha512",
@@ -180,16 +178,6 @@
       "warningLevel": 1,
       "message": "HospitalSystem.Infrastructure depends on Microsoft.Extensions.Configuration.Abstractions (>= 8.0.11) but Microsoft.Extensions.Configuration.Abstractions 8.0.11 was not found. An approximate best match of Microsoft.Extensions.Configuration.Abstractions 9.0.0 was resolved.",
       "libraryId": "Microsoft.Extensions.Configuration.Abstractions",
-      "targetGraphs": [
-        "net8.0"
-      ]
-    },
-    {
-      "code": "NU1603",
-      "level": "Warning",
-      "warningLevel": 1,
-      "message": "HospitalSystem.Application depends on Microsoft.Extensions.DependencyInjection.Abstractions (>= 8.0.11) but Microsoft.Extensions.DependencyInjection.Abstractions 8.0.11 was not found. An approximate best match of Microsoft.Extensions.DependencyInjection.Abstractions 9.0.0 was resolved.",
-      "libraryId": "Microsoft.Extensions.DependencyInjection.Abstractions",
       "targetGraphs": [
         "net8.0"
       ]

@@ -17,17 +17,9 @@ namespace HospitalSystem.Infrastructure.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "8.0.21")
+                .HasAnnotation("ProductVersion", "8.0.11")
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
-            NpgsqlModelBuilderExtensions.HasPostgresEnum(modelBuilder, "appointment_type", "appointment_type", new[] { "in_person", "remote" });
-            NpgsqlModelBuilderExtensions.HasPostgresEnum(modelBuilder, "day_of_week", "day_of_week_enum", new[] { "monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday" });
-            NpgsqlModelBuilderExtensions.HasPostgresEnum(modelBuilder, "gender_type", "gender_type", new[] { "male", "female", "other" });
-            NpgsqlModelBuilderExtensions.HasPostgresEnum(modelBuilder, "notification_type", "notification_type", new[] { "info", "warning", "success" });
-            NpgsqlModelBuilderExtensions.HasPostgresEnum(modelBuilder, "payment_method", "payment_method", new[] { "online", "cash", "card" });
-            NpgsqlModelBuilderExtensions.HasPostgresEnum(modelBuilder, "payment_status", "payment_status", new[] { "pending", "success", "failed" });
-            NpgsqlModelBuilderExtensions.HasPostgresEnum(modelBuilder, "request_status", "request_status", new[] { "pending", "approved", "in_progress", "done", "rejected" });
-            NpgsqlModelBuilderExtensions.HasPostgresEnum(modelBuilder, "user_role", "user_role", new[] { "admin", "doctor", "patient" });
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
             modelBuilder.Entity("HospitalSystem.Domain.Entities.AuditLog", b =>
@@ -239,7 +231,8 @@ namespace HospitalSystem.Infrastructure.Migrations
 
                     b.Property<string>("DayOfWeek")
                         .IsRequired()
-                        .HasColumnType("day_of_week");
+                        .HasMaxLength(20)
+                        .HasColumnType("character varying(20)");
 
                     b.Property<TimeSpan?>("EndTime")
                         .HasColumnType("interval");
@@ -329,7 +322,8 @@ namespace HospitalSystem.Infrastructure.Migrations
 
                     b.Property<string>("Type")
                         .IsRequired()
-                        .HasColumnType("notification_type");
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)");
 
                     b.Property<long>("UserId")
                         .HasColumnType("bigint");
@@ -452,7 +446,8 @@ namespace HospitalSystem.Infrastructure.Migrations
                         .HasColumnType("NUMERIC(10,2)");
 
                     b.Property<string>("Method")
-                        .HasColumnType("payment_method");
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)");
 
                     b.Property<DateTime?>("PaidAt")
                         .HasColumnType("timestamp with time zone");
@@ -462,7 +457,8 @@ namespace HospitalSystem.Infrastructure.Migrations
 
                     b.Property<string>("Status")
                         .IsRequired()
-                        .HasColumnType("payment_status");
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)");
 
                     b.Property<string>("TransactionId")
                         .HasMaxLength(100)
@@ -619,7 +615,8 @@ namespace HospitalSystem.Infrastructure.Migrations
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
 
                     b.Property<string>("AppointmentType")
-                        .HasColumnType("appointment_type");
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)");
 
                     b.Property<long?>("ClinicId")
                         .HasColumnType("bigint");
@@ -655,7 +652,8 @@ namespace HospitalSystem.Infrastructure.Migrations
 
                     b.Property<string>("Status")
                         .IsRequired()
-                        .HasColumnType("request_status");
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)");
 
                     b.Property<decimal?>("TotalPrice")
                         .HasColumnType("NUMERIC(10,2)");
@@ -819,7 +817,8 @@ namespace HospitalSystem.Infrastructure.Migrations
                         .HasColumnType("character varying(255)");
 
                     b.Property<string>("Gender")
-                        .HasColumnType("gender_type");
+                        .HasMaxLength(20)
+                        .HasColumnType("character varying(20)");
 
                     b.Property<bool>("IsActive")
                         .ValueGeneratedOnAdd()
@@ -848,7 +847,8 @@ namespace HospitalSystem.Infrastructure.Migrations
 
                     b.Property<string>("Role")
                         .IsRequired()
-                        .HasColumnType("user_role");
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)");
 
                     b.Property<DateTime>("UpdatedAt")
                         .ValueGeneratedOnAdd()
@@ -874,7 +874,8 @@ namespace HospitalSystem.Infrastructure.Migrations
 
                     b.Property<string>("DayOfWeek")
                         .IsRequired()
-                        .HasColumnType("day_of_week");
+                        .HasMaxLength(20)
+                        .HasColumnType("character varying(20)");
 
                     b.Property<TimeSpan?>("EndTime")
                         .HasColumnType("interval");
