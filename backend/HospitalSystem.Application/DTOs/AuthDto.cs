@@ -62,3 +62,20 @@ public class UserInfo
     public string? AvatarUrl { get; set; }
     public bool IsActive { get; set; }
 }
+
+public class SendOtpRequest
+{
+    [Phone]
+    public string Phone { get; set; } = string.Empty;
+}
+
+public class VerifyOtpRequest
+{
+    [Phone]
+    public string Phone { get; set; } = string.Empty;
+
+    [Required]
+    [MinLength(4)]
+    [MaxLength(6)]
+    public string Code { get; set; } = string.Empty;
+}

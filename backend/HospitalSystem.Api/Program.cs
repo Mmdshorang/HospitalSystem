@@ -1,7 +1,5 @@
-using HospitalSystem.Domain.Common.Interfaces;
-using HospitalSystem.Infrastructure.Data;
-using HospitalSystem.Infrastructure.Repositories;
 using HospitalSystem.Api.Configuration;
+using HospitalSystem.Infrastructure.Data;
 using HospitalSystem.Infrastructure.Services;
 using HospitalSystem.Api.Middleware;
 using HospitalSystem.Api.HealthChecks;
@@ -12,6 +10,7 @@ using Serilog;
 using FluentValidation;
 using FluentValidation.AspNetCore;
 using HospitalSystem.Domain.Entities.Enums;
+using HospitalSystem.Domain.Common.Interfaces;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -90,18 +89,15 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
     AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", false);
 });
 
-// Repository and Unit of Work
-builder.Services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
-builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
-
-// Authentication Service
+// Services
 builder.Services.AddScoped<IAuthService, HospitalSystem.Infrastructure.Services.AuthService>();
+builder.Services.AddScoped<HospitalSystem.Infrastructure.Services.SpecialtyService>();
+builder.Services.AddScoped<HospitalSystem.Infrastructure.Services.ProviderService>();
+builder.Services.AddScoped<IOtpService, MockOtpService>();
+builder.Services.AddHttpClient<SmsIrOtpService>();
 
-// AutoMapper
+// AutoMapper (optional, can be removed if not used)
 builder.Services.AddAutoMapper(typeof(Program));
-
-// MediatR
-builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(Program).Assembly));
 
 // FluentValidation
 builder.Services.AddFluentValidationAutoValidation();

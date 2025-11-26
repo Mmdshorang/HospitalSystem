@@ -26,7 +26,6 @@
     <PackageReference Include="AutoMapper" Version="12.0.1" />
     <PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="12.0.1" />
     <PackageReference Include="FluentValidation.AspNetCore" Version="11.3.0" />
-    <PackageReference Include="MediatR" Version="12.4.1" />
     <PackageReference Include="Microsoft.AspNetCore.Cors" Version="2.2.0" />
 
     <!-- Modern Backend Packages -->
@@ -55,8 +54,8 @@
 
   <ItemGroup>
     <ProjectReference Include="..\HospitalSystem.Domain\HospitalSystem.Domain.csproj" />
-    <ProjectReference Include="..\HospitalSystem.Application\HospitalSystem.Application.csproj" />
     <ProjectReference Include="..\HospitalSystem.Infrastructure\HospitalSystem.Infrastructure.csproj" />
+    <!-- Application layer removed - DTOs are now in Infrastructure/Models -->
   </ItemGroup>
 
 </Project>

@@ -24,7 +24,7 @@ if %errorlevel% neq 0 (
 
 echo.
 echo [3/4] Creating initial migration...
-dotnet ef migrations add InitialCreate
+dotnet ef migrations add InitialCreate --project ../HospitalSystem.Infrastructure
 if %errorlevel% neq 0 (
     echo ❌ Migration failed! Check connection string
     pause
@@ -34,7 +34,7 @@ echo ✅ Migration created successfully!
 
 echo.
 echo [4/4] Updating database...
-dotnet ef database update
+dotnet ef database update --project ../HospitalSystem.Infrastructure
 if %errorlevel% neq 0 (
     echo ❌ Database update failed! Check connection string
     pause

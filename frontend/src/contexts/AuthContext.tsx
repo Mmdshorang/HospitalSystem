@@ -6,7 +6,9 @@ interface AuthContextType {
   user: UserInfo | null;
   isAuthenticated: boolean;
   isLoading: boolean;
-  login: (email: string, password: string) => Promise<void>;
+  requestOtp: (phone: string) => Promise<void>;
+  verifyOtp: (phone: string, code: string) => Promise<boolean>;
+  loginWithOtp: (phone: string, code: string) => Promise<void>;
   register: (userData: any) => Promise<void>;
   logout: () => void;
 }
@@ -48,13 +50,22 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     initializeAuth();
   }, []);
 
-  const login = async (email: string, password: string) => {
+  const requestOtp = async (phone: string) => {
+    await authService.sendOtp({ phone });
+  };
+
+  const verifyOtp = async (phone: string, code: string) => {
     try {
-      const response = await authService.login({ email, password });
-      setUser(response.user);
+      await authService.verifyOtp({ phone, code });
+      return true;
     } catch (error) {
       throw error;
     }
+  };
+
+  const loginWithOtp = async (phone: string, code: string) => {
+    const response = await authService.loginWithOtp({ phone, code });
+    setUser(response.user);
   };
 
   const register = async (userData: any) => {
@@ -78,7 +89,9 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     user,
     isAuthenticated,
     isLoading,
-    login,
+    requestOtp,
+    verifyOtp,
+    loginWithOtp,
     register,
     logout,
   };

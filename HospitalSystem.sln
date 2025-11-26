@@ -6,8 +6,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "backend", "backend", "{1AE8
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HospitalSystem.Api", "backend\HospitalSystem.Api\HospitalSystem.Api.csproj", "{669085FD-F02D-EF9B-0520-31CF27627B20}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HospitalSystem.Application", "backend\HospitalSystem.Application\HospitalSystem.Application.csproj", "{CF5DDAE6-D602-8220-CDCE-B74F54EE8279}"
-EndProject
+# Application layer removed - simplified to 3 layers: Api, Infrastructure, Domain
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HospitalSystem.Domain", "backend\HospitalSystem.Domain\HospitalSystem.Domain.csproj", "{2BB84A6F-33AD-E177-CC51-651E40D6D784}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HospitalSystem.Infrastructure", "backend\HospitalSystem.Infrastructure\HospitalSystem.Infrastructure.csproj", "{04CFC1BE-F85C-E6CC-A13D-AA3364FE0BA5}"
@@ -22,10 +21,7 @@ Global
 		{669085FD-F02D-EF9B-0520-31CF27627B20}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{669085FD-F02D-EF9B-0520-31CF27627B20}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{669085FD-F02D-EF9B-0520-31CF27627B20}.Release|Any CPU.Build.0 = Release|Any CPU
-		{CF5DDAE6-D602-8220-CDCE-B74F54EE8279}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{CF5DDAE6-D602-8220-CDCE-B74F54EE8279}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{CF5DDAE6-D602-8220-CDCE-B74F54EE8279}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{CF5DDAE6-D602-8220-CDCE-B74F54EE8279}.Release|Any CPU.Build.0 = Release|Any CPU
+		# Application layer build configs removed
 		{2BB84A6F-33AD-E177-CC51-651E40D6D784}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{2BB84A6F-33AD-E177-CC51-651E40D6D784}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{2BB84A6F-33AD-E177-CC51-651E40D6D784}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -40,7 +36,7 @@ Global
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{669085FD-F02D-EF9B-0520-31CF27627B20} = {1AE8ACA6-933B-BF2A-3671-3E2EAC007D16}
-		{CF5DDAE6-D602-8220-CDCE-B74F54EE8279} = {1AE8ACA6-933B-BF2A-3671-3E2EAC007D16}
+		# Application layer nested project removed
 		{2BB84A6F-33AD-E177-CC51-651E40D6D784} = {1AE8ACA6-933B-BF2A-3671-3E2EAC007D16}
 		{04CFC1BE-F85C-E6CC-A13D-AA3364FE0BA5} = {1AE8ACA6-933B-BF2A-3671-3E2EAC007D16}
 	EndGlobalSection

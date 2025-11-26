@@ -1,11 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization;
-using MediatR;
-using HospitalSystem.Application.Features.Specialties.Queries.GetAllSpecialties;
-using HospitalSystem.Application.Features.Specialties.Queries.GetSpecialtyById;
-using HospitalSystem.Application.Features.Specialties.Commands.CreateSpecialty;
-using HospitalSystem.Application.Features.Specialties.Commands.UpdateSpecialty;
-using HospitalSystem.Application.Features.Specialties.Commands.DeleteSpecialty;
+using HospitalSystem.Infrastructure.Models;
+using HospitalSystem.Infrastructure.Services;
 
 namespace HospitalSystem.Api.Controllers;
 
@@ -14,12 +10,12 @@ namespace HospitalSystem.Api.Controllers;
 [Authorize]
 public class SpecialtiesController : ControllerBase
 {
-    private readonly IMediator _mediator;
+    private readonly SpecialtyService _specialtyService;
     private readonly ILogger<SpecialtiesController> _logger;
 
-    public SpecialtiesController(IMediator mediator, ILogger<SpecialtiesController> logger)
+    public SpecialtiesController(SpecialtyService specialtyService, ILogger<SpecialtiesController> logger)
     {
-        _mediator = mediator;
+        _specialtyService = specialtyService;
         _logger = logger;
     }
 
@@ -31,13 +27,7 @@ public class SpecialtiesController : ControllerBase
     {
         try
         {
-            var query = new GetAllSpecialtiesQuery
-            {
-                SearchTerm = searchTerm,
-                CategoryId = categoryId
-            };
-
-            var specialties = await _mediator.Send(query);
+            var specialties = await _specialtyService.GetAllAsync(searchTerm, categoryId);
             return Ok(specialties);
         }
         catch (Exception ex)
@@ -55,8 +45,7 @@ public class SpecialtiesController : ControllerBase
     {
         try
         {
-            var query = new GetSpecialtyByIdQuery { Id = id };
-            var specialty = await _mediator.Send(query);
+            var specialty = await _specialtyService.GetByIdAsync(id);
 
             if (specialty == null)
                 return NotFound(new { message = "Specialty not found" });
@@ -75,11 +64,11 @@ public class SpecialtiesController : ControllerBase
     /// </summary>
     [HttpPost]
     [Authorize(Roles = "admin")]
-    public async Task<IActionResult> Create([FromBody] CreateSpecialtyCommand command)
+    public async Task<IActionResult> Create([FromBody] CreateSpecialtyDto dto)
     {
         try
         {
-            var specialty = await _mediator.Send(command);
+            var specialty = await _specialtyService.CreateAsync(dto);
             return CreatedAtAction(nameof(GetById), new { id = specialty.Id }, specialty);
         }
         catch (Exception ex)
@@ -94,14 +83,14 @@ public class SpecialtiesController : ControllerBase
     /// </summary>
     [HttpPut("{id}")]
     [Authorize(Roles = "admin")]
-    public async Task<IActionResult> Update(long id, [FromBody] UpdateSpecialtyCommand command)
+    public async Task<IActionResult> Update(long id, [FromBody] UpdateSpecialtyDto dto)
     {
         try
         {
-            if (id != command.Id)
+            if (id != dto.Id)
                 return BadRequest(new { message = "ID mismatch" });
 
-            var specialty = await _mediator.Send(command);
+            var specialty = await _specialtyService.UpdateAsync(id, dto);
 
             if (specialty == null)
                 return NotFound(new { message = "Specialty not found" });
@@ -124,8 +113,7 @@ public class SpecialtiesController : ControllerBase
     {
         try
         {
-            var command = new DeleteSpecialtyCommand { Id = id };
-            var result = await _mediator.Send(command);
+            var result = await _specialtyService.DeleteAsync(id);
 
             if (!result)
                 return NotFound(new { message = "Specialty not found" });

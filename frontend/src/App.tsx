@@ -13,6 +13,9 @@ import PatientForm from './pages/PatientForm';
 import DoctorForm from './pages/DoctorForm';
 import Login from './pages/Login';
 import Register from './pages/Register';
+import ClinicsList from './pages/admin/Clinics/ClinicsList';
+import InsurancesList from './pages/admin/Insurances/InsurancesList';
+import ServiceCategoriesList from './pages/admin/ServiceCategories/ServiceCategoriesList';
 import 'react-toastify/dist/ReactToastify.css';
 
 const queryClient = new QueryClient({
@@ -43,6 +46,36 @@ function App() {
                   <ProtectedRoute>
                     <Layout>
                       <Dashboard />
+                    </Layout>
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/admin/clinics"
+                element={
+                  <ProtectedRoute>
+                    <Layout>
+                      <ClinicsList />
+                    </Layout>
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/admin/insurances"
+                element={
+                  <ProtectedRoute>
+                    <Layout>
+                      <InsurancesList />
+                    </Layout>
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/admin/service-categories"
+                element={
+                  <ProtectedRoute>
+                    <Layout>
+                      <ServiceCategoriesList />
                     </Layout>
                   </ProtectedRoute>
                 }

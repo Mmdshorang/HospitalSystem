@@ -6,6 +6,7 @@ public enum UserRole
     doctor,
     patient,
     clinic,
-    service_provider
+    service_provider,
+    manager
 }
 
