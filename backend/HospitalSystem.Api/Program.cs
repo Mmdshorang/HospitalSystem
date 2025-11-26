@@ -93,6 +93,8 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 builder.Services.AddScoped<IAuthService, HospitalSystem.Infrastructure.Services.AuthService>();
 builder.Services.AddScoped<HospitalSystem.Infrastructure.Services.SpecialtyService>();
 builder.Services.AddScoped<HospitalSystem.Infrastructure.Services.ProviderService>();
+builder.Services.AddScoped<IOtpService, MockOtpService>();
+builder.Services.AddHttpClient<SmsIrOtpService>();
 
 // AutoMapper (optional, can be removed if not used)
 builder.Services.AddAutoMapper(typeof(Program));

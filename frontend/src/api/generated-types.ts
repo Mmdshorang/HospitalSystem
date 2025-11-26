@@ -25,6 +25,15 @@ export interface AuthResponse {
   user: UserInfo;
 }
 
+export interface SendOtpRequest {
+  phone: string;
+}
+
+export interface VerifyOtpRequest {
+  phone: string;
+  code: string;
+}
+
 export interface UserInfo {
   id: number;
   email: string;

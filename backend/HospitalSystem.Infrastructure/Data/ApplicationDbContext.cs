@@ -39,6 +39,7 @@ namespace HospitalSystem.Infrastructure.Data
         // Notifications & Logs
         public DbSet<Notification> Notifications { get; set; } = null!;
         public DbSet<AuditLog> AuditLogs { get; set; } = null!;
+        public DbSet<OtpVerification> OtpVerifications { get; set; } = null!;
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -429,6 +430,22 @@ namespace HospitalSystem.Infrastructure.Data
                 entity.Property(e => e.CreatedAt).HasDefaultValueSql("NOW()");
                 
                 entity.HasIndex(e => e.UserId);
+            });
+
+            // OTP Verification Configuration
+            modelBuilder.Entity<OtpVerification>(entity =>
+            {
+                entity.HasKey(e => e.Id);
+                entity.Property(e => e.Id).ValueGeneratedOnAdd();
+                entity.Property(e => e.Phone).HasMaxLength(20);
+                entity.Property(e => e.Code).HasMaxLength(10);
+                entity.Property(e => e.CreatedAt).HasDefaultValueSql("NOW()");
+                entity.Property(e => e.ExpiresAt).HasConversion(
+                    v => v.Kind == DateTimeKind.Unspecified ? DateTime.SpecifyKind(v, DateTimeKind.Utc) : v.ToUniversalTime(),
+                    v => DateTime.SpecifyKind(v, DateTimeKind.Utc));
+
+                entity.HasIndex(e => new { e.Phone, e.Code });
+                entity.HasIndex(e => e.CreatedAt);
             });
         }
     }

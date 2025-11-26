@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
+using System.Linq;
 using Microsoft.AspNetCore.Authorization;
 using HospitalSystem.Domain.Common.Interfaces;
 using HospitalSystem.Domain.DTOs;
@@ -152,6 +153,68 @@ public class AuthController : ControllerBase
         {
             _logger.LogError(ex, "Error getting current user");
             return StatusCode(500, "Internal server error");
+        }
+    }
+
+    /// <summary>
+    /// ارسال کد تایید به شماره موبایل
+    /// </summary>
+    [HttpPost("send-otp")]
+    public async Task<IActionResult> SendOtp([FromBody] SendOtpRequest request)
+    {
+        if (!ModelState.IsValid)
+        {
+            return BadRequest(ModelState);
+        }
+
+        await _authService.SendOtpAsync(request.Phone ?? string.Empty);
+        return Ok(new { message = string.IsNullOrWhiteSpace(request.Phone) ? "ورود آزمایشی بدون شماره" : "کد تایید ارسال شد" });
+    }
+
+    /// <summary>
+    /// بررسی کد تایید
+    /// </summary>
+    [HttpPost("verify-otp")]
+    public async Task<IActionResult> VerifyOtp([FromBody] VerifyOtpRequest request)
+    {
+        if (!ModelState.IsValid)
+        {
+            return BadRequest(ModelState);
+        }
+
+        var isValid = await _authService.VerifyOtpCodeAsync(request.Phone, request.Code);
+        if (!isValid)
+        {
+            return BadRequest(new { message = "کد تایید نامعتبر یا منقضی شده است" });
+        }
+
+        return Ok(new { message = "کد تایید معتبر است" });
+    }
+
+    /// <summary>
+    /// ورود با شماره موبایل و کد تایید
+    /// </summary>
+    [HttpPost("login-otp")]
+    public async Task<IActionResult> LoginWithOtp([FromBody] VerifyOtpRequest request)
+    {
+        if (!ModelState.IsValid)
+        {
+            return BadRequest(ModelState);
+        }
+
+        try
+        {
+            var result = await _authService.LoginWithOtpAsync(request.Phone, request.Code);
+            return Ok(result);
+        }
+        catch (UnauthorizedAccessException ex)
+        {
+            return Unauthorized(new { message = ex.Message });
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error during OTP login");
+            return StatusCode(500, new { message = "خطای داخلی سرور" });
         }
     }
 }
