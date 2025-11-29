@@ -51,11 +51,8 @@ const Home = () => {
               وضعیت نوبت‌ها، پوشش بیمه، ظرفیت کلینیک‌ها و عملکرد پزشکان در یک نگاه.
             </p>
             <div className="flex flex-wrap gap-2 text-xs text-slate-500">
-              <span className="rounded-full border border-slate-100 bg-slate-50 px-3 py-1">ریِل‌تایم</span>
               <span className="rounded-full border border-slate-100 bg-slate-50 px-3 py-1">امنیت تاییدشده</span>
-              <span className="rounded-full border border-slate-100 bg-slate-50 px-3 py-1">
-                اتصال به PostgreSQL
-              </span>
+            
             </div>
           </div>
           <div className="grid gap-4 text-right sm:grid-cols-3">

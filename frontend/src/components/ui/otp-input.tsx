@@ -24,29 +24,29 @@ export const OtpInput: React.FC<OtpInputProps> = ({
             {label && <span className="text-sm font-medium text-gray-700">{label}</span>}
             <OTPInput
                 maxLength={length}
-                containerClassName="flex items-center gap-3"
+                containerClassName="flex items-center gap-3 w-full"
                 value={value}
                 onChange={onChange}
                 inputMode="numeric"
                 disabled={disabled}
                 render={({ slots }) => (
-                    <>
+                    <div className="flex w-full gap-3 flex-row-reverse">
                         {slots.map((slot, idx) => (
                             <div
                                 key={idx}
                                 className={cn(
-                                    'relative flex h-12 w-12 items-center justify-center rounded-2xl border bg-white/90 text-xl font-semibold text-gray-700 shadow-sm transition',
-                                    slot.isActive && 'border-primary shadow-primary/20',
-                                    error ? 'border-red-400 text-red-500' : 'border-gray-200'
+                                    'relative flex h-14 flex-1 items-center justify-center rounded-2xl border bg-white text-2xl font-bold text-gray-800 shadow-sm transition',
+                                    slot.isActive && 'border-blue-500 shadow-blue-500/30 ring-2 ring-blue-500/20',
+                                    error ? 'border-red-400 text-red-500' : 'border-gray-300'
                                 )}
                             >
                                 {slot.char ?? <span className="text-gray-300">•</span>}
                                 {slot.hasFakeCaret && (
-                                    <span className="pointer-events-none absolute inset-y-2 w-px bg-primary animate-pulse" />
+                                    <span className="pointer-events-none absolute inset-y-2 w-px bg-blue-500 animate-pulse" />
                                 )}
                             </div>
                         ))}
-                    </>
+                    </div>
                 )}
             />
             {error && <span className="text-xs text-red-500">{error}</span>}

@@ -23,7 +23,7 @@ const QuickActions: React.FC<QuickActionsProps> = ({ actions }) => {
           <Link
             key={action.title}
             to={action.to}
-            className="w-full text-center bg-primary-600 hover:bg-primary-700 text-white px-4 py-2 rounded-md"
+            className="w-full text-center bg-primary-600 hover:bg-primary-700 text-slate-600 px-4 py-2 rounded-md"
           >
             {action.title}
           </Link>

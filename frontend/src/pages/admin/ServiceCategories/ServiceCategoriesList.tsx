@@ -47,7 +47,7 @@ const ServiceCategoriesList = () => {
                         </p>
                     </div>
                     <Button
-                        className="h-12 rounded-2xl bg-gradient-to-l from-primary-600 to-primary-400 px-8 text-sm font-semibold text-white shadow-lg shadow-primary/30"
+                        className="h-12 rounded-2xl from-primary-600 to-primary-400 px-8 text-sm font-semibold shadow-lg shadow-primary/30"
                         onClick={() => setIsDialogOpen(true)}
                     >
                         <Plus className="ml-2 h-4 w-4" />

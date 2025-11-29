@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
-import { ShieldCheck, Sparkles, Smartphone, Clock4, ArrowRight, ArrowRightCircle } from 'lucide-react';
+import { ShieldCheck, Smartphone, Clock4, ArrowRight, ArrowRightCircle } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { PhoneInput } from '../components/ui/phone-input';
 import { OtpInput } from '../components/ui/otp-input';
@@ -87,32 +87,19 @@ const Login: React.FC = () => {
   );
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-900 px-4 py-10 text-white">
-      <div className="mx-auto max-w-6xl overflow-hidden rounded-[32px] border border-white/20 bg-white/5 shadow-2xl backdrop-blur-2xl">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-100 px-4 py-10">
+      <div className="mx-auto max-w-6xl overflow-hidden rounded-[32px] border border-slate-200 bg-white shadow-2xl">
         <div className="grid items-center gap-0 lg:grid-cols-2">
-          <section className="order-2 space-y-8 bg-white/95 p-8 text-slate-900 lg:order-none lg:p-12">
-            <div className="space-y-3">
-              <p className="inline-flex items-center gap-2 rounded-full bg-slate-100 px-4 py-1 text-xs font-semibold text-slate-600">
-                <Sparkles className="h-4 w-4 text-primary-500" />
-                نسخه جدید پنل ادمین
-              </p>
-              <h1 className="text-3xl font-black leading-tight text-slate-900 sm:text-4xl">
-                ورود سریع با شماره موبایل و کد یک‌بار مصرف
-              </h1>
-              <p className="text-sm text-slate-500">
-                برای امنیت بیشتر، ورود تنها با تأیید شماره و OTP انجام می‌شود. شماره خود را وارد کنید تا کد به صورت خودکار ارسال شود.
-              </p>
-            </div>
-
-            <div className="rounded-3xl border border-slate-100 bg-white/70 p-6 shadow-inner">
-              <div className="flex items-center justify-between text-sm font-semibold text-slate-500">
-                <span>مرحله {step === 'phone' ? '۱' : '۲'} از ۲</span>
+          <section className="order-2 space-y-8 bg-white p-8 lg:order-0 lg:p-12">
+            <div className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
+              <div className="flex items-center justify-between text-sm font-semibold">
+                <span className="text-slate-800">مرحله {step === 'phone' ? '۱' : '۲'} از ۲</span>
                 <span className="flex items-center gap-2 text-primary-600">
                   <Smartphone className="h-4 w-4" />
-                  ورود امن
+                  <span className="text-primary-600">ورود امن</span>
                 </span>
               </div>
-              <div className="mt-4 h-2 w-full rounded-full bg-slate-100">
+              <div className="mt-4 h-2 w-full rounded-full bg-slate-200">
                 <div
                   className="h-full rounded-full bg-gradient-to-l from-primary-600 to-primary-400 transition-all"
                   style={{ width: step === 'phone' ? '50%' : '100%' }}
@@ -132,7 +119,7 @@ const Login: React.FC = () => {
                       maxLength={11}
                     />
                     <Button
-                      className="h-12 rounded-2xl text-base font-semibold"
+                      className="h-12 w-full rounded-2xl bg-gradient-to-l from-blue-600 to-blue-500 text-base font-semibold text-white shadow-lg shadow-blue-500/30 transition hover:shadow-xl hover:shadow-blue-500/40 hover:from-blue-700 hover:to-blue-600"
                       disabled={isRequesting}
                       onClick={handleRequestOtp}
                     >
@@ -143,16 +130,16 @@ const Login: React.FC = () => {
 
                 {step === 'otp' && (
                   <>
-                    <div className="flex items-center justify-between text-sm text-slate-500">
+                    <div className="flex items-center justify-between text-sm">
                       <button
                         className="flex items-center gap-2 text-primary-600 transition hover:text-primary-700"
                         onClick={() => setStep('phone')}
                         type="button"
                       >
                         <ArrowRight className="h-4 w-4" />
-                        ویرایش شماره
+                        <span className="text-primary-600">ویرایش شماره</span>
                       </button>
-                      <span className="flex items-center gap-1 rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-500">
+                      <span className="flex items-center gap-1 rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-800">
                         <Clock4 className="h-4 w-4" />
                         {countdown > 0 ? `ارسال مجدد تا ${countdown} ثانیه` : 'امکان ارسال مجدد'}
                       </span>
@@ -176,13 +163,13 @@ const Login: React.FC = () => {
                         type="button"
                         variant="outline"
                         disabled={countdown > 0 || isRequesting}
-                        className="h-12 flex-1 rounded-2xl border-slate-200 text-base"
+                        className="h-12 flex-1 rounded-2xl border-slate-300 text-base text-slate-700 hover:bg-slate-50"
                         onClick={handleRequestOtp}
                       >
                         ارسال مجدد کد
                       </Button>
                       <Button
-                        className="h-12 flex-1 rounded-2xl bg-gradient-to-l from-primary-600 to-primary-400 text-base font-semibold shadow-lg shadow-primary/30"
+                        className="h-12 flex-1 rounded-2xl bg-gradient-to-l from-blue-600 to-blue-500 text-base font-semibold text-white shadow-lg shadow-blue-500/30 transition hover:shadow-xl hover:shadow-blue-500/40 hover:from-blue-700 hover:to-blue-600"
                         disabled={isSubmitting}
                         onClick={handleLogin}
                       >
@@ -194,24 +181,24 @@ const Login: React.FC = () => {
               </div>
             </div>
 
-            <div className="flex flex-wrap items-center justify-between gap-4 text-sm text-slate-500">
-              <Link to="/register" className="flex items-center gap-2 text-primary-600 hover:text-primary-700">
+            <div className="flex flex-wrap items-center justify-between gap-4 text-sm">
+              <Link to="/register" className="flex items-center gap-2 text-primary-600 transition hover:text-primary-700">
                 <ArrowRightCircle className="h-4 w-4" />
-                ثبت‌نام مدیر جدید
+                <span className="text-primary-600">ثبت‌نام مدیر جدید</span>
               </Link>
-              <p>پشتیبانی ۲۴ ساعته: ۰۲۱-۴۵۶۷۸۹</p>
+              <p className="text-slate-800">پشتیبانی ۲۴ ساعته: ۰۲۱-۴۵۶۷۸۹</p>
             </div>
           </section>
 
-          <section className="relative flex h-full flex-col justify-between bg-gradient-to-b from-slate-900 via-slate-900 to-slate-950 p-8 text-white">
+          <section className="relative flex h-full flex-col justify-between bg-gradient-to-br from-blue-600 via-blue-500 to-blue-700 p-8 text-white">
             <div className="space-y-4">
-              <span className="inline-flex items-center gap-2 rounded-full border border-white/20 px-4 py-1 text-xs font-semibold uppercase tracking-[0.3em] text-white/70">
+              <span className="inline-flex items-center gap-2 rounded-full border border-white/30 bg-white/10 px-4 py-1 text-xs font-semibold uppercase tracking-[0.3em] text-white backdrop-blur-sm">
                 سلامت دیجیتال
               </span>
-              <h2 className="text-4xl font-black leading-tight">
+              <h2 className="text-4xl font-black leading-tight text-white">
                 پنل مدیریت بیمارستان با تجربه‌ای چشمگیر
               </h2>
-              <p className="text-white/70">
+              <p className="text-white/95">
                 تمام تمرکز شما بر ارائه خدمات درمانی؛ مدیریت هوشمند کلینیک، بیمه و تیم پزشکی را به ما بسپارید.
               </p>
             </div>
@@ -220,20 +207,20 @@ const Login: React.FC = () => {
               {stats.map((item) => (
                 <div
                   key={item.label}
-                  className="rounded-2xl border border-white/10 bg-white/5 p-5 shadow-inner shadow-black/10 backdrop-blur"
+                  className="rounded-2xl border border-white/30 bg-white/15 p-5 shadow-xl backdrop-blur-sm"
                 >
                   <div className="text-3xl font-black text-white">{item.value}</div>
-                  <div className="mt-1 text-sm text-white/70">{item.label}</div>
+                  <div className="mt-1 text-sm font-medium text-white/95">{item.label}</div>
                 </div>
               ))}
             </div>
 
-            <div className="rounded-2xl border border-white/20 bg-white/10 p-6 backdrop-blur">
+            <div className="mt-8 rounded-2xl border border-white/30 bg-white/15 p-6 backdrop-blur-sm shadow-xl">
               <div className="flex items-center gap-2 text-sm font-semibold text-white">
-                <ShieldCheck className="h-5 w-5 text-emerald-400" />
+                <ShieldCheck className="h-5 w-5 text-emerald-200" />
                 امنیت تایید شده
               </div>
-              <p className="mt-2 text-sm text-white/70">
+              <p className="mt-2 text-sm text-white/95">
                 دسترسی مدیران و پزشکان پس از تایید ادمین فعال می‌شود. تمامی ورود‌ها ثبت و مانیتور می‌شوند.
               </p>
             </div>

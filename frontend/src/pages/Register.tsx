@@ -28,7 +28,7 @@ const Register: React.FC = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (formData.password !== formData.confirmPassword) {
       toast.error('رمز عبور و تأیید رمز عبور مطابقت ندارند');
       return;
@@ -46,7 +46,7 @@ const Register: React.FC = () => {
         lastName: formData.lastName,
         role: 'patient', // Default role
       };
-      
+
       // Add optional fields only if they have values
       if (formData.phone && formData.phone.trim()) {
         registerData.phone = formData.phone.trim();
@@ -63,7 +63,7 @@ const Register: React.FC = () => {
         const date = new Date(formData.birthDate + 'T00:00:00Z');
         registerData.birthDate = date.toISOString();
       }
-      
+
       await register(registerData);
       toast.success('ثبت‌نام موفقیت‌آمیز!');
       navigate('/');
@@ -71,9 +71,9 @@ const Register: React.FC = () => {
       console.error('Registration error:', error);
       console.error('Error response:', error.response?.data);
       console.error('Error status:', error.response?.status);
-      
+
       let errorMessage = 'خطا در ثبت‌نام';
-      
+
       if (error.response?.data?.message) {
         errorMessage = error.response.data.message;
       } else if (error.response?.data?.errors) {
@@ -84,7 +84,7 @@ const Register: React.FC = () => {
       } else if (error.message) {
         errorMessage = error.message;
       }
-      
+
       toast.error(errorMessage);
     } finally {
       setIsLoading(false);
