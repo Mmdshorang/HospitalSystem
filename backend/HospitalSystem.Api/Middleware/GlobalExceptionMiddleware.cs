@@ -1,5 +1,7 @@
 using System.Net;
 using System.Text.Json;
+using Npgsql;
+using Microsoft.EntityFrameworkCore;
 
 namespace HospitalSystem.Api.Middleware;
 
@@ -22,22 +24,68 @@ public class GlobalExceptionMiddleware
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "An unhandled exception occurred");
+            _logger.LogError(ex, "An unhandled exception occurred: {ExceptionType}", ex.GetType().Name);
             await HandleExceptionAsync(context, ex);
         }
     }
 
-    private static async Task HandleExceptionAsync(HttpContext context, Exception exception)
+    private async Task HandleExceptionAsync(HttpContext context, Exception exception)
     {
         context.Response.ContentType = "application/json";
-        context.Response.StatusCode = (int)HttpStatusCode.InternalServerError;
+        
+        var statusCode = HttpStatusCode.InternalServerError;
+        string message = "An error occurred while processing your request";
+        string details = exception.Message;
+
+        // Handle database connection errors
+        if (exception is NpgsqlException npgsqlEx)
+        {
+            _logger.LogError(npgsqlEx, "Database connection error: {SqlState}, {MessageText}", 
+                npgsqlEx.SqlState, npgsqlEx.Message);
+            
+            statusCode = HttpStatusCode.ServiceUnavailable;
+            message = "Database connection error";
+            details = "Unable to connect to the database. Please try again later.";
+            
+            // Log connection details (without sensitive info)
+            if (npgsqlEx.InnerException != null)
+            {
+                _logger.LogError("Inner exception: {InnerException}", npgsqlEx.InnerException.Message);
+            }
+        }
+        else if (exception is DbUpdateException dbEx)
+        {
+            _logger.LogError(dbEx, "Database update error: {Message}", dbEx.Message);
+            
+            if (dbEx.InnerException is NpgsqlException innerNpgsql)
+            {
+                statusCode = HttpStatusCode.ServiceUnavailable;
+                message = "Database operation failed";
+                details = "Unable to complete the database operation. Please try again later.";
+            }
+            else
+            {
+                statusCode = HttpStatusCode.BadRequest;
+                message = "Database operation failed";
+                details = dbEx.Message;
+            }
+        }
+        else if (exception is TimeoutException)
+        {
+            _logger.LogError(exception, "Operation timeout");
+            statusCode = HttpStatusCode.RequestTimeout;
+            message = "Request timeout";
+            details = "The operation took too long to complete. Please try again.";
+        }
+
+        context.Response.StatusCode = (int)statusCode;
 
         var response = new
         {
             error = new
             {
-                message = "An error occurred while processing your request",
-                details = exception.Message,
+                message = message,
+                details = details,
                 timestamp = DateTime.UtcNow
             }
         };

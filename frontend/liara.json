@@ -1,0 +1,11 @@
+{
+  "app": "hospital-system-front",
+  "port": 80,
+  "build": {
+    "location": "iran",
+    "args": {
+      "VITE_API_BASE_URL": "https://hospital-system-backend.liara.run"
+    }
+  },
+  "disks": []
+}
