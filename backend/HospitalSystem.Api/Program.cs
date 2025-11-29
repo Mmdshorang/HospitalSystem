@@ -93,7 +93,13 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 builder.Services.AddScoped<IAuthService, HospitalSystem.Infrastructure.Services.AuthService>();
 builder.Services.AddScoped<HospitalSystem.Infrastructure.Services.SpecialtyService>();
 builder.Services.AddScoped<HospitalSystem.Infrastructure.Services.ProviderService>();
-builder.Services.AddScoped<IOtpService, MockOtpService>();
+
+// OTP services
+// در محیط فعلی از Kavenegar برای ارسال واقعی OTP استفاده می‌کنیم.
+builder.Services.AddHttpClient<KavenegarOtpService>();
+builder.Services.AddScoped<IOtpService, KavenegarOtpService>();
+// در صورت نیاز هنوز می‌توانید از MockOtpService برای توسعه استفاده کنید:
+// builder.Services.AddScoped<IOtpService, MockOtpService>();
 builder.Services.AddHttpClient<SmsIrOtpService>();
 
 // AutoMapper (optional, can be removed if not used)

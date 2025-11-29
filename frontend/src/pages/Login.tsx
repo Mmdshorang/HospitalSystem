@@ -9,8 +9,6 @@ import { Button } from '../components/ui/button';
 
 type Step = 'phone' | 'otp';
 
-const DEFAULT_DEV_CODE = '123456';
-
 const Login: React.FC = () => {
   const [step, setStep] = useState<Step>('phone');
   const [phone, setPhone] = useState('');
@@ -31,9 +29,8 @@ const Login: React.FC = () => {
 
   const validatePhone = () => {
     if (!phone) {
-      // حالت ورود سریع بدون شماره
-      setErrors((prev) => ({ ...prev, phone: undefined }));
-      return true;
+      setErrors((prev) => ({ ...prev, phone: 'شماره موبایل الزامی است' }));
+      return false;
     }
     if (!/^09\d{9}$/.test(phone)) {
       setErrors((prev) => ({ ...prev, phone: 'شماره را با فرمت 09xxxxxxxxx وارد کنید' }));
@@ -45,20 +42,6 @@ const Login: React.FC = () => {
 
   const handleRequestOtp = async () => {
     if (!validatePhone()) return;
-    if (!phone) {
-      try {
-        setIsRequesting(true);
-        toast.info('ورود آزمایشی بدون شماره');
-        await loginWithOtp('', DEFAULT_DEV_CODE);
-        toast.success('خوش آمدید!');
-        navigate('/');
-      } catch (error: any) {
-        toast.error(error.response?.data?.message || 'ورود آزمایشی ناموفق بود');
-      } finally {
-        setIsRequesting(false);
-      }
-      return;
-    }
     setIsRequesting(true);
     try {
       await requestOtp(phone);
@@ -74,14 +57,17 @@ const Login: React.FC = () => {
   };
 
   const handleLogin = async () => {
-    if (phone && otp.length < 4) {
+    if (!phone) {
+      setErrors((prev) => ({ ...prev, phone: 'شماره موبایل الزامی است' }));
+      return;
+    }
+    if (otp.length < 4) {
       setErrors((prev) => ({ ...prev, otp: 'کد تایید باید حداقل ۴ رقم باشد' }));
       return;
     }
     setIsSubmitting(true);
     try {
-      const effectiveOtp = phone ? otp : DEFAULT_DEV_CODE;
-      await loginWithOtp(phone, effectiveOtp);
+      await loginWithOtp(phone, otp);
       toast.success('خوش آمدید!');
       navigate('/');
     } catch (error: any) {
@@ -182,7 +168,7 @@ const Login: React.FC = () => {
                         }
                       }}
                       error={errors.otp}
-                      length={6}
+                      length={4}
                     />
 
                     <div className="flex gap-3">
