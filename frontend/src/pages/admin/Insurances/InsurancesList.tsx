@@ -59,31 +59,41 @@ const InsurancesList = () => {
                             پوشش‌ها، درصد پرداخت و وضعیت فعال بودن بیمه‌ها را کنترل کنید.
                         </p>
                     </div>
-                    <div className="flex gap-3">
-                        {['all', 'active', 'inactive'].map((option) => (
-                            <button
-                                key={option}
-                                className={`rounded-2xl px-4 py-2 text-sm font-semibold transition ${filter === option
-                                    ? 'bg-gradient-to-l from-primary-600 to-primary-400 text-white shadow-primary/20'
-                                    : 'bg-slate-100 text-slate-500 hover:text-slate-700'
-                                    }`}
-                                onClick={() => setFilter(option as typeof filter)}
-                            >
-                                {option === 'all'
-                                    ? 'همه'
-                                    : option === 'active'
-                                        ? 'فعال'
-                                        : 'غیرفعال'}
-                            </button>
-                        ))}
+                    <div className="flex flex-wrap items-center gap-3">
+                        {['all', 'active', 'inactive'].map((option) => {
+                            const active = filter === option;
+
+                            return (
+                                <button
+                                    key={option}
+                                    onClick={() => setFilter(option as typeof filter)}
+                                    className={`
+          rounded-xl px-5 py-2.5 text-sm font-semibold transition-all duration-200
+          ${active
+                                            ? 'bg-blue-600 text-white shadow-md shadow-blue-600/30'
+                                            : 'bg-white border border-gray-300 text-gray-700 hover:bg-gray-100'
+                                        }
+        `}
+                                >
+                                    {option === 'all'
+                                        ? 'همه'
+                                        : option === 'active'
+                                            ? 'فعال'
+                                            : 'غیرفعال'}
+                                </button>
+                            );
+                        })}
+
                         <Button
-                            className="rounded-2xl bg-gradient-to-l from-primary-600 to-primary-400 px-6 font-semibold text-white shadow-lg shadow-primary/30"
                             onClick={() => setIsDialogOpen(true)}
+                            className="rounded-xl px-6 py-2.5 font-semibold flex items-center gap-2
+        bg-blue-600 hover:bg-blue-500 text-white shadow-md shadow-blue-500/30"
                         >
-                            <Plus className="ml-2 h-4 w-4" />
+                            <Plus className="h-4 w-4" />
                             بیمه جدید
                         </Button>
                     </div>
+
                 </div>
             </section>
 

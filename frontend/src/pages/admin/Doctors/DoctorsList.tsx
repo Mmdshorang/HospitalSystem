@@ -142,14 +142,14 @@ const Doctors = () => {
         cell: (_: unknown, row: Provider) => (
           <div className="flex gap-1.5">
             <button
-              className="text-indigo-600 hover:text-indigo-900"
+              className="rounded-lg p-1.5 text-blue-600 transition hover:bg-blue-50 hover:text-blue-700"
               title="ویرایش"
               onClick={() => toast.info("ویرایش به زودی اضافه خواهد شد")}
             >
               <Edit className="h-5 w-5" />
             </button>
             <button
-              className="text-red-600 hover:text-red-900"
+              className="rounded-lg p-1.5 text-red-600 transition hover:bg-red-50 hover:text-red-700"
               title="حذف"
               onClick={() => handleDelete(row.id)}
             >
@@ -195,7 +195,7 @@ const Doctors = () => {
             </div>
           </div>
           <Button
-            className="h-12 rounded-2xl bg-gradient-to-l from-primary-600 to-primary-400 px-8 text-sm font-semibold text-white shadow-lg shadow-primary/30"
+            className="h-12 rounded-2xl bg-gradient-to-l from-blue-600 to-blue-500 px-8 text-sm font-semibold text-white shadow-lg shadow-blue-500/30 transition hover:shadow-xl hover:shadow-blue-500/40 hover:from-blue-700 hover:to-blue-600"
             onClick={() => setIsAddOpen(true)}
           >
             <Plus className="ml-2 h-4 w-4" />

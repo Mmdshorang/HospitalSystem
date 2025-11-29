@@ -133,7 +133,7 @@ export const ClinicFormDialog = ({ open, onClose, onSubmit }: ClinicFormDialogPr
                         </Button>
                         <Button
                             type="submit"
-                            className="h-11 rounded-2xl bg-gradient-to-l from-primary-600 to-primary-400 px-10 text-sm font-semibold text-white"
+                            className="h-11 rounded-2xl bg-gradient-to-l from-primary-600 to-primary-400 px-10 text-sm font-semibold text-slate-600"
                             disabled={isSubmitting}
                         >
                             {isSubmitting ? 'در حال ذخیره...' : 'ثبت کلینیک'}

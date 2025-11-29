@@ -97,14 +97,14 @@ export const ServiceCategoryFormDialog = ({
                         <Button
                             type="button"
                             variant="outline"
-                            className="h-11 rounded-2xl border-slate-200 px-6 text-sm text-slate-600"
+                            className="h-11 rounded-2xl border-slate-200 px-6 text-sm text-slate-600 hover:bg-slate-50 hover:border-slate-300 transition-colors"
                             onClick={onClose}
                         >
                             انصراف
                         </Button>
                         <Button
                             type="submit"
-                            className="h-11 rounded-2xl bg-gradient-to-l from-primary-600 to-primary-400 px-10 text-sm font-semibold text-white"
+                            className="h-11 rounded-2xl from-primary-600 to-primary-400 px-10 text-sm font-semibold text-slate-600 shadow-lg shadow-primary-600/20 hover:from-primary-700 hover:to-primary-500 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                             disabled={loading}
                         >
                             {loading ? 'در حال ذخیره...' : 'ثبت دسته‌بندی'}
