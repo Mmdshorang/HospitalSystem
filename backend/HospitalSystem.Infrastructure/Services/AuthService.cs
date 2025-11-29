@@ -6,12 +6,14 @@ using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
 using System.Linq;
+using System.Text.Json;
 using HospitalSystem.Domain.Common.Interfaces;
 using HospitalSystem.Domain.DTOs;
 using HospitalSystem.Domain.Entities;
 using HospitalSystem.Domain.Entities.Enums;
 using HospitalSystem.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Caching.Distributed;
 
 namespace HospitalSystem.Infrastructure.Services;
 
@@ -21,17 +23,20 @@ public class AuthService : IAuthService
     private readonly IConfiguration _configuration;
     private readonly ILogger<AuthService> _logger;
     private readonly IOtpService _otpService;
+    private readonly IDistributedCache _cache;
 
     public AuthService(
         ApplicationDbContext context,
         IConfiguration configuration,
         ILogger<AuthService> logger,
-        IOtpService otpService)
+        IOtpService otpService,
+        IDistributedCache cache)
     {
         _context = context;
         _configuration = configuration;
         _logger = logger;
         _otpService = otpService;
+        _cache = cache;
     }
 
     public async Task<AuthResponse> LoginAsync(LoginRequest request)
@@ -236,14 +241,94 @@ public class AuthService : IAuthService
 
     public async Task SendOtpAsync(string phone)
     {
-        _logger.LogInformation("OTP feature temporarily disabled; skipping SendOtpAsync for {Phone}", phone);
-        await Task.CompletedTask;
+        var normalizedPhone = NormalizePhone(phone);
+        if (string.IsNullOrWhiteSpace(normalizedPhone))
+        {
+            throw new ArgumentException("شماره موبایل نامعتبر است", nameof(phone));
+        }
+
+        var user = await _context.Users
+            .FirstOrDefaultAsync(u => u.Phone == normalizedPhone && u.IsActive && u.DeletedAt == null);
+
+        if (user == null)
+        {
+            throw new KeyNotFoundException("حسابی با این شماره یافت نشد");
+        }
+
+        var code = GenerateOtpCode();
+        var cacheKey = $"otp:{normalizedPhone}";
+        var otpData = new
+        {
+            Code = code,
+            Phone = normalizedPhone,
+            CreatedAt = DateTime.UtcNow
+        };
+
+        var options = new DistributedCacheEntryOptions
+        {
+            AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(2)
+        };
+
+        try
+        {
+            var jsonData = JsonSerializer.Serialize(otpData);
+            await _cache.SetStringAsync(cacheKey, jsonData, options);
+            _logger.LogInformation("OTP saved to Redis for {Phone}", normalizedPhone);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Failed to save OTP to Redis for {Phone}. Error: {Error}", 
+                normalizedPhone, ex.Message);
+            throw new InvalidOperationException($"خطا در ذخیره کد تایید: {ex.Message}", ex);
+        }
+
+        _logger.LogInformation("Generated OTP for {Phone}. Using IOtpService to send.", normalizedPhone);
+        await _otpService.SendOtpAsync(normalizedPhone, code);
     }
 
     public async Task<bool> VerifyOtpCodeAsync(string phone, string code)
     {
-        _logger.LogInformation("OTP feature temporarily disabled; skipping VerifyOtpCodeAsync for {Phone}", phone);
-        return await Task.FromResult(true);
+        var normalizedPhone = NormalizePhone(phone);
+        if (string.IsNullOrWhiteSpace(normalizedPhone))
+        {
+            return false;
+        }
+
+        var cacheKey = $"otp:{normalizedPhone}";
+        
+        try
+        {
+            var cachedData = await _cache.GetStringAsync(cacheKey);
+            if (string.IsNullOrWhiteSpace(cachedData))
+            {
+                _logger.LogWarning("OTP not found or expired for {Phone}", normalizedPhone);
+                return false;
+            }
+
+            var otpData = JsonSerializer.Deserialize<OtpCacheData>(cachedData);
+            if (otpData == null || otpData.Code != code)
+            {
+                _logger.LogWarning("Invalid OTP code for {Phone}", normalizedPhone);
+                return false;
+            }
+
+            // Remove OTP from cache after successful verification
+            await _cache.RemoveAsync(cacheKey);
+            _logger.LogInformation("OTP verified successfully for {Phone}", normalizedPhone);
+            return true;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error verifying OTP for {Phone}", normalizedPhone);
+            return false;
+        }
+    }
+
+    private class OtpCacheData
+    {
+        public string Code { get; set; } = string.Empty;
+        public string Phone { get; set; } = string.Empty;
+        public DateTime CreatedAt { get; set; }
     }
 
     public async Task<AuthResponse> LoginWithOtpAsync(string phone, string code)
@@ -352,7 +437,8 @@ public class AuthService : IAuthService
 
     private static string GenerateOtpCode()
     {
-        var randomNumber = RandomNumberGenerator.GetInt32(100000, 999999);
+        // چهار رقم مثل rnd.ToString() در مثال شما
+        var randomNumber = RandomNumberGenerator.GetInt32(1000, 9999);
         return randomNumber.ToString();
     }
 
