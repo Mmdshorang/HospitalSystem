@@ -9,7 +9,8 @@ public static class JwtConfiguration
     public static IServiceCollection AddJwtAuthentication(this IServiceCollection services, IConfiguration configuration)
     {
         var jwtSettings = configuration.GetSection("JwtSettings");
-        var secretKey = jwtSettings["SecretKey"] ?? "YourSuperSecretKeyThatIsAtLeast32CharactersLong!";
+        // Prioritize environment variables over appsettings
+        var secretKey = configuration["JWT_SECRET"] ?? jwtSettings["SecretKey"] ?? "YourSuperSecretKeyThatIsAtLeast32CharactersLong!";
         var issuer = jwtSettings["Issuer"] ?? "HospitalSystem";
         var audience = jwtSettings["Audience"] ?? "HospitalSystemUsers";
 

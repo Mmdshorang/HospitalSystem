@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -12,28 +12,6 @@ namespace HospitalSystem.Infrastructure.Migrations
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            // Create PostgreSQL ENUM types first
-            migrationBuilder.Sql(@"
-                CREATE TYPE user_role AS ENUM ('admin', 'doctor', 'patient');
-                CREATE TYPE gender_type AS ENUM ('male', 'female', 'other');
-                CREATE TYPE day_of_week AS ENUM ('monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday');
-                CREATE TYPE appointment_type AS ENUM ('in_person', 'remote');
-                CREATE TYPE request_status AS ENUM ('pending', 'approved', 'in_progress', 'done', 'rejected');
-                CREATE TYPE payment_method AS ENUM ('online', 'cash', 'card');
-                CREATE TYPE payment_status AS ENUM ('pending', 'success', 'failed');
-                CREATE TYPE notification_type AS ENUM ('info', 'warning', 'success');
-            ");
-            
-            migrationBuilder.AlterDatabase()
-                .Annotation("Npgsql:Enum:appointment_type.appointment_type", "in_person,remote")
-                .Annotation("Npgsql:Enum:day_of_week.day_of_week_enum", "monday,tuesday,wednesday,thursday,friday,saturday,sunday")
-                .Annotation("Npgsql:Enum:gender_type.gender_type", "male,female,other")
-                .Annotation("Npgsql:Enum:notification_type.notification_type", "info,warning,success")
-                .Annotation("Npgsql:Enum:payment_method.payment_method", "online,cash,card")
-                .Annotation("Npgsql:Enum:payment_status.payment_status", "pending,success,failed")
-                .Annotation("Npgsql:Enum:request_status.request_status", "pending,approved,in_progress,done,rejected")
-                .Annotation("Npgsql:Enum:user_role.user_role", "admin,doctor,patient");
-
             migrationBuilder.CreateTable(
                 name: "Insurances",
                 columns: table => new
@@ -96,8 +74,8 @@ namespace HospitalSystem.Infrastructure.Migrations
                     Phone = table.Column<string>(type: "character varying(20)", maxLength: 20, nullable: false),
                     Email = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: false),
                     PasswordHash = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: false),
-                    Role = table.Column<string>(type: "user_role", nullable: false),
-                    Gender = table.Column<string>(type: "gender_type", nullable: true),
+                    Role = table.Column<string>(type: "character varying(50)", maxLength: 50, nullable: false),
+                    Gender = table.Column<string>(type: "character varying(20)", maxLength: 20, nullable: true),
                     BirthDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
                     AvatarUrl = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: true),
                     IsActive = table.Column<bool>(type: "boolean", nullable: false, defaultValue: true),
@@ -219,7 +197,7 @@ namespace HospitalSystem.Infrastructure.Migrations
                     UserId = table.Column<long>(type: "bigint", nullable: false),
                     Title = table.Column<string>(type: "character varying(150)", maxLength: 150, nullable: true),
                     Message = table.Column<string>(type: "text", nullable: true),
-                    Type = table.Column<string>(type: "notification_type", nullable: false),
+                    Type = table.Column<string>(type: "character varying(50)", maxLength: 50, nullable: false),
                     IsRead = table.Column<bool>(type: "boolean", nullable: false, defaultValue: false),
                     CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false, defaultValueSql: "NOW()")
                 },
@@ -349,7 +327,7 @@ namespace HospitalSystem.Infrastructure.Migrations
                     Id = table.Column<long>(type: "bigint", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     ClinicId = table.Column<long>(type: "bigint", nullable: false),
-                    DayOfWeek = table.Column<string>(type: "day_of_week", nullable: false),
+                    DayOfWeek = table.Column<string>(type: "character varying(20)", maxLength: 20, nullable: false),
                     StartTime = table.Column<TimeSpan>(type: "interval", nullable: true),
                     EndTime = table.Column<TimeSpan>(type: "interval", nullable: true),
                     IsActive = table.Column<bool>(type: "boolean", nullable: false, defaultValue: true),
@@ -418,8 +396,8 @@ namespace HospitalSystem.Infrastructure.Migrations
                     InsuranceId = table.Column<long>(type: "bigint", nullable: true),
                     PerformedByUserId = table.Column<long>(type: "bigint", nullable: true),
                     PreferredTime = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
-                    AppointmentType = table.Column<string>(type: "appointment_type", nullable: true),
-                    Status = table.Column<string>(type: "request_status", nullable: false),
+                    AppointmentType = table.Column<string>(type: "character varying(50)", maxLength: 50, nullable: true),
+                    Status = table.Column<string>(type: "character varying(50)", maxLength: 50, nullable: false),
                     TotalPrice = table.Column<decimal>(type: "numeric(10,2)", nullable: true),
                     InsuranceCovered = table.Column<decimal>(type: "numeric(10,2)", nullable: true),
                     PatientPayable = table.Column<decimal>(type: "numeric(10,2)", nullable: true),
@@ -500,7 +478,7 @@ namespace HospitalSystem.Infrastructure.Migrations
                     Id = table.Column<long>(type: "bigint", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     ProviderId = table.Column<long>(type: "bigint", nullable: false),
-                    DayOfWeek = table.Column<string>(type: "day_of_week", nullable: false),
+                    DayOfWeek = table.Column<string>(type: "character varying(20)", maxLength: 20, nullable: false),
                     StartTime = table.Column<TimeSpan>(type: "interval", nullable: true),
                     EndTime = table.Column<TimeSpan>(type: "interval", nullable: true),
                     IsActive = table.Column<bool>(type: "boolean", nullable: false, defaultValue: true)
@@ -524,9 +502,9 @@ namespace HospitalSystem.Infrastructure.Migrations
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     RequestId = table.Column<long>(type: "bigint", nullable: false),
                     Amount = table.Column<decimal>(type: "numeric(10,2)", nullable: true),
-                    Method = table.Column<string>(type: "payment_method", nullable: true),
+                    Method = table.Column<string>(type: "character varying(50)", maxLength: 50, nullable: true),
                     TransactionId = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: true),
-                    Status = table.Column<string>(type: "payment_status", nullable: false),
+                    Status = table.Column<string>(type: "character varying(50)", maxLength: 50, nullable: false),
                     PaidAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: true)
                 },
                 constraints: table =>
@@ -784,18 +762,6 @@ namespace HospitalSystem.Infrastructure.Migrations
 
             migrationBuilder.DropTable(
                 name: "SpecialtyCategories");
-            
-            // Drop ENUM types
-            migrationBuilder.Sql(@"
-                DROP TYPE IF EXISTS notification_type;
-                DROP TYPE IF EXISTS payment_status;
-                DROP TYPE IF EXISTS payment_method;
-                DROP TYPE IF EXISTS request_status;
-                DROP TYPE IF EXISTS appointment_type;
-                DROP TYPE IF EXISTS day_of_week;
-                DROP TYPE IF EXISTS gender_type;
-                DROP TYPE IF EXISTS user_role;
-            ");
         }
     }
 }

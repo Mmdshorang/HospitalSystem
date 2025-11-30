@@ -124,6 +124,11 @@ public class AuthController : ControllerBase
                 user = userInfo
             });
         }
+        catch (KeyNotFoundException ex)
+        {
+            _logger.LogWarning(ex, "User not found for token validation");
+            return NotFound(new { message = ex.Message });
+        }
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error validating token");
@@ -149,10 +154,15 @@ public class AuthController : ControllerBase
             var userInfo = await _authService.GetUserInfoAsync(userId);
             return Ok(userInfo);
         }
+        catch (KeyNotFoundException ex)
+        {
+            _logger.LogWarning(ex, "User not found for current user request");
+            return NotFound(new { message = ex.Message });
+        }
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error getting current user");
-            return StatusCode(500, "Internal server error");
+            return StatusCode(500, new { message = "Internal server error" });
         }
     }
 
@@ -167,8 +177,31 @@ public class AuthController : ControllerBase
             return BadRequest(ModelState);
         }
 
-        await _authService.SendOtpAsync(request.Phone ?? string.Empty);
-        return Ok(new { message = string.IsNullOrWhiteSpace(request.Phone) ? "ورود آزمایشی بدون شماره" : "کد تایید ارسال شد" });
+        try
+        {
+            await _authService.SendOtpAsync(request.Phone ?? string.Empty);
+            return Ok(new { message = string.IsNullOrWhiteSpace(request.Phone) ? "ورود آزمایشی بدون شماره" : "کد تایید ارسال شد" });
+        }
+        catch (KeyNotFoundException ex)
+        {
+            _logger.LogWarning(ex, "User not found for phone number");
+            return NotFound(new { message = ex.Message });
+        }
+        catch (ArgumentException ex)
+        {
+            _logger.LogWarning(ex, "Invalid phone number");
+            return BadRequest(new { message = ex.Message });
+        }
+        catch (InvalidOperationException ex)
+        {
+            _logger.LogError(ex, "Error sending OTP");
+            return StatusCode(500, new { message = ex.Message });
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Unexpected error sending OTP");
+            return StatusCode(500, new { message = "خطای داخلی سرور در ارسال کد تایید" });
+        }
     }
 
     /// <summary>
@@ -209,7 +242,13 @@ public class AuthController : ControllerBase
         }
         catch (UnauthorizedAccessException ex)
         {
+            _logger.LogWarning(ex, "Unauthorized OTP login attempt");
             return Unauthorized(new { message = ex.Message });
+        }
+        catch (KeyNotFoundException ex)
+        {
+            _logger.LogWarning(ex, "User not found for OTP login");
+            return NotFound(new { message = ex.Message });
         }
         catch (Exception ex)
         {

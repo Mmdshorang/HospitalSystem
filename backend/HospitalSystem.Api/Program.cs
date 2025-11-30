@@ -11,6 +11,8 @@ using FluentValidation;
 using FluentValidation.AspNetCore;
 using HospitalSystem.Domain.Entities.Enums;
 using HospitalSystem.Domain.Common.Interfaces;
+using Npgsql;
+using Microsoft.AspNetCore.DataProtection;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -79,10 +81,25 @@ builder.Services.AddSwaggerGen(c =>
 // Database Configuration
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
 {
-    options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection"), npgsqlOptions =>
+    // Get connection string from configuration (appsettings.json or environment variables)
+    // Falls back to hardcoded value if not found in configuration
+    string connectionString = builder.Configuration.GetConnectionString("DefaultConnection") 
+        ?? "Host=eiger.liara.cloud;Port=32125;Database=hospital-system;Username=root;Password=RVDI99mIYKTjdNHbMsNwzr0d;";
+    
+    Log.Information("Using PostgreSQL connection from configuration: {ConnectionString}", 
+        connectionString.Replace("Password=", "Password=***"));
+
+    options.UseNpgsql(connectionString, npgsqlOptions =>
     {
         // Configure Npgsql to handle DateTime conversions properly
-        npgsqlOptions.EnableRetryOnFailure();
+        // Reduced retry count to 3 with exponential backoff (max 5 seconds delay)
+        npgsqlOptions.EnableRetryOnFailure(
+            maxRetryCount: 3,
+            maxRetryDelay: TimeSpan.FromSeconds(5),
+            errorCodesToAdd: null);
+        
+        // Set command timeout
+        npgsqlOptions.CommandTimeout(30);
     });
 
     // Configure to use UTC for all DateTime values
@@ -109,6 +126,58 @@ builder.Services.AddAutoMapper(typeof(Program));
 builder.Services.AddFluentValidationAutoValidation();
 builder.Services.AddValidatorsFromAssembly(typeof(Program).Assembly);
 
+// Data Protection Configuration
+// Configure Data Protection to persist keys to a persistent location
+// This prevents keys from being lost when the container restarts
+var dataProtectionKeysPath = Environment.GetEnvironmentVariable("DATA_PROTECTION_KEYS_PATH") 
+    ?? Path.Combine(Directory.GetCurrentDirectory(), "data", "keys");
+
+// Ensure the directory exists
+if (!Directory.Exists(dataProtectionKeysPath))
+{
+    Directory.CreateDirectory(dataProtectionKeysPath);
+    Log.Information("Created Data Protection keys directory: {Path}", dataProtectionKeysPath);
+}
+
+var dataProtectionBuilder = builder.Services.AddDataProtection()
+    .PersistKeysToFileSystem(new DirectoryInfo(dataProtectionKeysPath))
+    .SetApplicationName("HospitalSystem")
+    .SetDefaultKeyLifetime(TimeSpan.FromDays(90)); // Keys expire after 90 days
+
+// Configure XML encryptor if a protection certificate path is provided
+// For production, use a certificate stored in environment variables
+var dataProtectionCertPath = Environment.GetEnvironmentVariable("DATA_PROTECTION_CERT_PATH");
+if (!string.IsNullOrEmpty(dataProtectionCertPath) && File.Exists(dataProtectionCertPath))
+{
+    // Use a certificate for XML encryption (recommended for production)
+    // This requires a .pfx certificate file
+    try
+    {
+        var certPassword = Environment.GetEnvironmentVariable("DATA_PROTECTION_CERT_PASSWORD");
+        var certificate = new System.Security.Cryptography.X509Certificates.X509Certificate2(
+            dataProtectionCertPath, 
+            certPassword ?? string.Empty);
+        dataProtectionBuilder.ProtectKeysWithCertificate(certificate);
+        Log.Information("Data Protection XML encryption enabled using certificate");
+    }
+    catch (Exception ex)
+    {
+        Log.Warning(ex, "Failed to load Data Protection certificate. Keys will be stored unencrypted.");
+    }
+}
+else
+{
+    // In development/container environments, keys are stored unencrypted (warning will appear)
+    // For production with multiple instances, consider using:
+    // 1. A shared certificate (set DATA_PROTECTION_CERT_PATH)
+    // 2. Redis for key storage (if available)
+    // 3. Azure Key Vault or similar service
+    Log.Warning("Data Protection keys will be stored unencrypted. " +
+                "For production, set DATA_PROTECTION_CERT_PATH environment variable with a certificate path.");
+}
+
+Log.Information("Data Protection configured. Keys stored at: {Path}", dataProtectionKeysPath);
+
 // JWT Authentication
 builder.Services.AddJwtAuthentication(builder.Configuration);
 
@@ -122,10 +191,21 @@ builder.Services.AddHealthChecks()
 
 // Caching
 builder.Services.AddMemoryCache();
-builder.Services.AddStackExchangeRedisCache(options =>
+
+// Distributed Cache - Redis if available, otherwise use MemoryDistributedCache
+var redisConnectionString = builder.Configuration.GetConnectionString("Redis");
+if (!string.IsNullOrEmpty(redisConnectionString) && redisConnectionString != "localhost:6379")
 {
-    options.Configuration = builder.Configuration.GetConnectionString("Redis");
-});
+    builder.Services.AddStackExchangeRedisCache(options =>
+    {
+        options.Configuration = redisConnectionString;
+    });
+}
+else
+{
+    // Fallback to MemoryDistributedCache if Redis is not available
+    builder.Services.AddDistributedMemoryCache();
+}
 
 // Response Compression
 builder.Services.AddResponseCompression(options =>
@@ -133,29 +213,36 @@ builder.Services.AddResponseCompression(options =>
     options.EnableForHttps = true;
 });
 
-// CORS
+// CORS - Allow all origins for flexibility
 builder.Services.AddCors(options =>
 {
+    options.AddDefaultPolicy(policy =>
+    {
+        policy.AllowAnyOrigin()
+              .AllowAnyHeader()
+              .AllowAnyMethod()
+              .WithExposedHeaders("*");
+    });
+    
     options.AddPolicy("AllowFrontend", policy =>
     {
         policy.AllowAnyOrigin()
               .AllowAnyHeader()
-              .AllowAnyMethod();
+              .AllowAnyMethod()
+              .WithExposedHeaders("*");
     });
 });
 
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
+// Enable Swagger in all environments for debugging
+app.UseSwagger();
+app.UseSwaggerUI(c =>
 {
-    app.UseSwagger();
-    app.UseSwaggerUI(c =>
-    {
-        c.SwaggerEndpoint("/swagger/v1/swagger.json", "Hospital System API v1");
-        c.RoutePrefix = string.Empty; // Set Swagger UI at the app's root
-    });
-}
+    c.SwaggerEndpoint("/swagger/v1/swagger.json", "Hospital System API v1");
+    c.RoutePrefix = string.Empty; // Set Swagger UI at the app's root
+});
 
 // Global Exception Handling
 app.UseMiddleware<GlobalExceptionMiddleware>();
@@ -166,17 +253,26 @@ app.UseResponseCompression();
 // Rate Limiting - Using AspNetCoreRateLimit instead of built-in rate limiting
 // app.UseIpRateLimiting(); // Commented out as it's not available in .NET 8.0
 
-// Security Headers
+// Only use HTTPS redirection if we're behind a proxy (Liara handles HTTPS)
+// app.UseHttpsRedirection();
+
+// CORS must be before UseAuthentication and UseAuthorization
+// CORS should be early in the pipeline to handle OPTIONS requests
+// The CORS middleware automatically handles OPTIONS preflight requests
+app.UseCors("AllowFrontend");
+
+// Security Headers (after CORS to avoid interfering with preflight requests)
 app.Use(async (context, next) =>
 {
-    context.Response.Headers["X-Content-Type-Options"] = "nosniff";
-    context.Response.Headers["X-Frame-Options"] = "DENY";
-    context.Response.Headers["X-XSS-Protection"] = "1; mode=block";
+    // Skip security headers for OPTIONS requests (CORS preflight)
+    if (context.Request.Method != "OPTIONS")
+    {
+        context.Response.Headers["X-Content-Type-Options"] = "nosniff";
+        context.Response.Headers["X-Frame-Options"] = "DENY";
+        context.Response.Headers["X-XSS-Protection"] = "1; mode=block";
+    }
     await next();
 });
-
-app.UseHttpsRedirection();
-app.UseCors("AllowFrontend");
 
 // Authentication & Authorization
 app.UseAuthentication();
@@ -185,35 +281,227 @@ app.UseAuthorization();
 // Health Checks
 app.MapHealthChecks("/health");
 
+// List available databases endpoint - connects to postgres first to check databases
+app.MapGet("/health/databases", async (IConfiguration configuration) =>
+{
+    try
+    {
+        // Get connection string from configuration
+        var defaultConnection = configuration.GetConnectionString("DefaultConnection") 
+            ?? "Host=eiger.liara.cloud;Port=32125;Database=hospital-system;Username=root;Password=RVDI99mIYKTjdNHbMsNwzr0d;";
+        
+        // Extract connection details to build postgres connection string
+        var postgresUri = configuration.GetConnectionString("PostgreSQL");
+        string postgresConnectionString;
+        
+        if (!string.IsNullOrEmpty(postgresUri))
+        {
+            // Parse PostgreSQL URI format: postgresql://user:pass@host:port/db
+            var uri = new Uri(postgresUri);
+            postgresConnectionString = $"Host={uri.Host};Port={uri.Port};Database=postgres;Username={uri.UserInfo.Split(':')[0]};Password={uri.UserInfo.Split(':')[1]};";
+        }
+        else
+        {
+            // Build postgres connection string from DefaultConnection
+            // Replace database name with "postgres"
+            postgresConnectionString = defaultConnection.Replace("Database=hospital-system", "Database=postgres");
+        }
+        
+        await using var connection = new NpgsqlConnection(postgresConnectionString);
+        await connection.OpenAsync();
+        
+        var databases = new List<string>();
+        await using var command = new NpgsqlCommand(
+            "SELECT datname FROM pg_database WHERE datistemplate = false ORDER BY datname;",
+            connection);
+        
+        await using var reader = await command.ExecuteReaderAsync();
+        while (await reader.ReadAsync())
+        {
+            databases.Add(reader.GetString(0));
+        }
+        
+        // Step 2: Try to connect to hospital-system database using configured connection string
+        bool canConnectToHospitalSystem = false;
+        string? hospitalSystemError = null;
+        
+        try
+        {
+            await using var hospitalSystemConnection = new NpgsqlConnection(defaultConnection);
+            await hospitalSystemConnection.OpenAsync();
+            canConnectToHospitalSystem = true;
+        }
+        catch (Exception ex)
+        {
+            hospitalSystemError = ex.Message;
+        }
+        
+        return Results.Ok(new
+        {
+            databases = databases,
+            count = databases.Count,
+            hospitalSystemExists = databases.Contains("hospital-system"),
+            canConnectToHospitalSystem = canConnectToHospitalSystem,
+            hospitalSystemError = hospitalSystemError,
+            timestamp = DateTime.UtcNow
+        });
+    }
+    catch (Exception ex)
+    {
+        Log.Error(ex, "Error listing databases: {Message}", ex.Message);
+        return Results.Problem(
+            title: "Failed to list databases",
+            detail: ex.Message,
+            statusCode: 500
+        );
+    }
+}).WithTags("Health");
+
+// Detailed database health check endpoint
+app.MapGet("/health/database", async (ApplicationDbContext context, IConfiguration configuration) =>
+{
+    try
+    {
+        // Get connection string from configuration
+        var connectionString = configuration.GetConnectionString("DefaultConnection") 
+            ?? "Host=eiger.liara.cloud;Port=32125;Database=hospital-system;Username=root;Password=RVDI99mIYKTjdNHbMsNwzr0d;";
+        
+        // Parse connection string to extract connection info
+        var connectionStringBuilder = new Npgsql.NpgsqlConnectionStringBuilder(connectionString);
+        var dbHost = connectionStringBuilder.Host;
+        var dbPort = connectionStringBuilder.Port.ToString();
+        var dbName = connectionStringBuilder.Database;
+        var dbUser = connectionStringBuilder.Username;
+        
+        var canConnect = await context.Database.CanConnectAsync();
+        if (canConnect)
+        {
+            return Results.Ok(new
+            {
+                status = "healthy",
+                database = "connected",
+                host = dbHost,
+                port = dbPort,
+                databaseName = dbName,
+                user = dbUser,
+                timestamp = DateTime.UtcNow
+            });
+        }
+        else
+        {
+            return Results.Problem(
+                title: "Database connection failed",
+                detail: "Cannot connect to database",
+                statusCode: 503,
+                extensions: new Dictionary<string, object?>
+                {
+                    ["host"] = dbHost,
+                    ["port"] = dbPort,
+                    ["database"] = dbName,
+                    ["user"] = dbUser
+                }
+            );
+        }
+    }
+    catch (Npgsql.NpgsqlException npgsqlEx)
+    {
+        Log.Error(npgsqlEx, "Npgsql error: {SqlState}, {Message}", npgsqlEx.SqlState, npgsqlEx.Message);
+        return Results.Problem(
+            title: "Database connection failed (Npgsql)",
+            detail: npgsqlEx.Message,
+            statusCode: 503,
+            extensions: new Dictionary<string, object?>
+            {
+                ["sqlState"] = npgsqlEx.SqlState ?? "unknown",
+                ["errorCode"] = npgsqlEx.ErrorCode.ToString(),
+                ["innerException"] = npgsqlEx.InnerException?.Message
+            }
+        );
+    }
+    catch (Exception ex)
+    {
+        Log.Error(ex, "Database connection error: {Message}", ex.Message);
+        return Results.Problem(
+            title: "Database connection failed",
+            detail: ex.Message,
+            statusCode: 503,
+            extensions: new Dictionary<string, object?>
+            {
+                ["exceptionType"] = ex.GetType().Name,
+                ["innerException"] = ex.InnerException?.Message,
+                ["stackTrace"] = ex.StackTrace
+            }
+        );
+    }
+}).WithTags("Health");
+
+// Root endpoint for testing
+app.MapGet("/", () => new { 
+    message = "Hospital System API is running", 
+    version = "1.0.0",
+    endpoints = new {
+        health = "/health",
+        swagger = "/swagger",
+        api = "/api"
+    }
+}).WithTags("Root");
+
 app.MapControllers();
 
-// Database schema is created via SQL script (see Infrastructure/Scripts/create_database_schema.sql)
-// Uncomment below if you want EF Core to create tables automatically (not recommended with custom schema)
-// using (var scope = app.Services.CreateScope())
-// {
-//     var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
-//     context.Database.EnsureCreated();
-// }
+// Apply database migrations on startup
+using (var scope = app.Services.CreateScope())
+{
+    try
+    {
+        var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+        Log.Information("Applying database migrations...");
+        context.Database.Migrate();
+        Log.Information("Database migrations applied successfully");
+    }
+    catch (Exception ex)
+    {
+        Log.Error(ex, "Error applying database migrations: {Message}", ex.Message);
+        // Don't throw - let the app start even if migrations fail
+        // The error will be logged and can be fixed manually
+    }
+}
 
 try
 {
     Log.Information("Starting Hospital Management System API");
     
-    // Log API endpoints
-    var urls = app.Urls;
+    // Use PORT env var if provided (e.g., by Liara), otherwise use ASPNETCORE_URLS or default
+    var port = Environment.GetEnvironmentVariable("PORT") ?? "3000";
+    var urls = builder.Configuration["ASPNETCORE_URLS"] ?? $"http://0.0.0.0:{port}";
+    
+    // Override ASPNETCORE_URLS if PORT is set
+    if (!string.IsNullOrEmpty(Environment.GetEnvironmentVariable("PORT")))
+    {
+        Environment.SetEnvironmentVariable("ASPNETCORE_URLS", urls);
+    }
+    
+    var environment = app.Environment.EnvironmentName;
+    
+    Log.Information("═══════════════════════════════════════════════════════════");
+    Log.Information("🏥 Hospital Management System API - {Environment} Mode", environment);
+    Log.Information("═══════════════════════════════════════════════════════════");
+    Log.Information("📍 Configuration:");
+    Log.Information("   • Environment:        {Environment}", environment);
+    Log.Information("   • Listening URLs:     {Urls}", urls);
+    
     if (app.Environment.IsDevelopment())
     {
-        Log.Information("═══════════════════════════════════════════════════════════");
-        Log.Information("🏥 Hospital Management System API - Development Mode");
-        Log.Information("═══════════════════════════════════════════════════════════");
-        Log.Information("📍 API Endpoints:");
-        Log.Information("   • API Base URL:      http://localhost:5000");
-        Log.Information("   • Swagger UI:        http://localhost:5000");
-        Log.Information("   • Swagger JSON:      http://localhost:5000/swagger/v1/swagger.json");
-        Log.Information("   • Health Check:      http://localhost:5000/health");
-        Log.Information("   • Scalar Docs:       http://localhost:8080");
-        Log.Information("═══════════════════════════════════════════════════════════");
+        Log.Information("   • API Base URL:      http://localhost:3000");
+        Log.Information("   • Swagger UI:        http://localhost:3000");
+        Log.Information("   • Swagger JSON:      http://localhost:3000/swagger/v1/swagger.json");
+        Log.Information("   • Health Check:      http://localhost:3000/health");
     }
+    else
+    {
+        Log.Information("   • Health Check:      /health");
+        Log.Information("   • Swagger JSON:      /swagger/v1/swagger.json");
+    }
+    Log.Information("═══════════════════════════════════════════════════════════");
     
     app.Run();
 }

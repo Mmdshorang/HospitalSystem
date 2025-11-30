@@ -1,0 +1,20 @@
+{
+    "app": "hospital-system-backend",
+    "port": 3000,
+    "build": {
+        "location": "germany"
+    },
+    "disks": [],
+    "env": {
+        "DATABASE_URL": "postgresql://root:RVDI99mIYKTjdNHbMsNwzr0d@eiger.liara.cloud:32125/hospital-system",
+        "DB_HOST": "eiger.liara.cloud",
+        "DB_PORT": "32125",
+        "DB_NAME": "hospital-system",
+        "DB_USER": "root",
+        "DB_PASSWORD": "RVDI99mIYKTjdNHbMsNwzr0d",
+        "JWT_SECRET": "hospital_system_super_secret_jwt_key_2025",
+        "JWT_EXPIRE": "7d",
+        "ASPNETCORE_ENVIRONMENT": "Production",
+        "CORS_ORIGIN": "*"
+    }
+}
