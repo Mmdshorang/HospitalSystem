@@ -4,15 +4,13 @@ export interface AddDoctorFormValues {
   firstName: string;
   lastName: string;
   phone: string;
+  nationalId?: string | null;
   licenseNumber: string;
-  specializationName: string; 
-  specialtyId?: number | null; 
-  userId?: number | null;
+  specialtyId?: number | null;
   clinicId?: number | null;
   degree?: string | null;
   experienceYears?: number | null;
-  sharePercent?: number | null; 
-  isActive: boolean; 
+  isActive: boolean;
 }
 
 interface AddDoctorDialogProps {
@@ -21,19 +19,21 @@ interface AddDoctorDialogProps {
   onSubmit: (values: AddDoctorFormValues) => void;
 }
 
-const AddDoctorDialog: React.FC<AddDoctorDialogProps> = ({ isOpen, onClose, onSubmit }) => {
+const AddDoctorDialog: React.FC<AddDoctorDialogProps> = ({
+  isOpen,
+  onClose,
+  onSubmit,
+}) => {
   const [values, setValues] = useState<AddDoctorFormValues>({
     firstName: "",
     lastName: "",
     phone: "",
+    nationalId: null,
     licenseNumber: "",
-    specializationName: "",
     specialtyId: null,
-    userId: null,
     clinicId: null,
     degree: "",
     experienceYears: null,
-    sharePercent: null,
     isActive: true,
   });
 
@@ -42,28 +42,36 @@ const AddDoctorDialog: React.FC<AddDoctorDialogProps> = ({ isOpen, onClose, onSu
       firstName: "",
       lastName: "",
       phone: "",
+      nationalId: null,
       licenseNumber: "",
-      specializationName: "",
       specialtyId: null,
-      userId: null,
       clinicId: null,
       degree: "",
       experienceYears: null,
-      sharePercent: null,
       isActive: true,
     });
     onClose();
   };
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
+  ) => {
     const { name, value } = e.target;
     setValues((prev) => ({
       ...prev,
-      [name]: name === "experienceYears" || name === "userId" || name === "clinicId" || name === "specialtyId"
-        ? (value === "" ? null : Number(value))
-        : name === "sharePercent"
-        ? (value === "" ? null : Number(value))
-        : value,
+      [name]:
+        name === "experienceYears" ||
+        name === "userId" ||
+        name === "clinicId" ||
+        name === "specialtyId"
+          ? value === ""
+            ? null
+            : Number(value)
+          : name === "sharePercent"
+          ? value === ""
+            ? null
+            : Number(value)
+          : value,
     }));
   };
 
@@ -101,7 +109,9 @@ const AddDoctorDialog: React.FC<AddDoctorDialogProps> = ({ isOpen, onClose, onSu
               />
             </div>
             <div>
-              <label className="block text-sm text-gray-700 mb-1">نام خانوادگی</label>
+              <label className="block text-sm text-gray-700 mb-1">
+                نام خانوادگی
+              </label>
               <input
                 name="lastName"
                 value={values.lastName}
@@ -111,7 +121,18 @@ const AddDoctorDialog: React.FC<AddDoctorDialogProps> = ({ isOpen, onClose, onSu
               />
             </div>
             <div>
-              <label className="block text-sm text-gray-700 mb-1">شماره تماس</label>
+              <label className="block text-sm text-gray-700 mb-1">کد ملی</label>
+              <input
+                name="nationalId"
+                value={values.nationalId ?? ""}
+                onChange={handleChange}
+                className="input"
+              />
+            </div>
+            <div>
+              <label className="block text-sm text-gray-700 mb-1">
+                شماره تماس
+              </label>
               <input
                 name="phone"
                 value={values.phone}
@@ -119,8 +140,11 @@ const AddDoctorDialog: React.FC<AddDoctorDialogProps> = ({ isOpen, onClose, onSu
                 className="input"
               />
             </div>
+
             <div>
-              <label className="block text-sm text-gray-700 mb-1">شماره نظام پزشکی</label>
+              <label className="block text-sm text-gray-700 mb-1">
+                شماره نظام پزشکی
+              </label>
               <input
                 name="licenseNumber"
                 value={values.licenseNumber}
@@ -130,38 +154,16 @@ const AddDoctorDialog: React.FC<AddDoctorDialogProps> = ({ isOpen, onClose, onSu
               />
             </div>
             <div>
-              <label className="block text-sm text-gray-700 mb-1">تخصص (عنوان نمایشی)</label>
+              <label className="block text-sm text-gray-700 mb-1">تخصص</label>
               <input
                 name="specializationName"
-                value={values.specializationName}
-                onChange={handleChange}
-                className="input"
-              />
-            </div>
-            <div>
-              <label className="block text-sm text-gray-700 mb-1">شناسه تخصص</label>
-              <input
-                name="specialtyId"
                 value={values.specialtyId ?? ""}
                 onChange={handleChange}
                 className="input"
-                type="number"
-                min={0}
               />
             </div>
             <div>
-              <label className="block text-sm text-gray-700 mb-1">شناسه کاربر (UserId)</label>
-              <input
-                name="userId"
-                value={values.userId ?? ""}
-                onChange={handleChange}
-                className="input"
-                type="number"
-                min={0}
-              />
-            </div>
-            <div>
-              <label className="block text-sm text-gray-700 mb-1">شناسه کلینیک (ClinicId)</label>
+              <label className="block text-sm text-gray-700 mb-1">کلینیک</label>
               <input
                 name="clinicId"
                 value={values.clinicId ?? ""}
@@ -172,7 +174,7 @@ const AddDoctorDialog: React.FC<AddDoctorDialogProps> = ({ isOpen, onClose, onSu
               />
             </div>
             <div>
-              <label className="block text-sm text-gray-700 mb-1">مدرک (Degree)</label>
+              <label className="block text-sm text-gray-700 mb-1">مدرک</label>
               <input
                 name="degree"
                 value={values.degree ?? ""}
@@ -182,7 +184,9 @@ const AddDoctorDialog: React.FC<AddDoctorDialogProps> = ({ isOpen, onClose, onSu
               />
             </div>
             <div>
-              <label className="block text-sm text-gray-700 mb-1">سال‌های تجربه</label>
+              <label className="block text-sm text-gray-700 mb-1">
+                سال‌های تجربه
+              </label>
               <input
                 name="experienceYears"
                 value={values.experienceYears ?? ""}
@@ -190,19 +194,6 @@ const AddDoctorDialog: React.FC<AddDoctorDialogProps> = ({ isOpen, onClose, onSu
                 className="input"
                 type="number"
                 min={0}
-              />
-            </div>
-            <div>
-              <label className="block text-sm text-gray-700 mb-1">درصد سهم (0 تا 100 با دو رقم اعشار)</label>
-              <input
-                name="sharePercent"
-                value={values.sharePercent ?? ""}
-                onChange={handleChange}
-                className="input"
-                type="number"
-                min={0}
-                max={100}
-                step={0.01}
               />
             </div>
             <div className="flex items-center gap-2">
@@ -214,12 +205,18 @@ const AddDoctorDialog: React.FC<AddDoctorDialogProps> = ({ isOpen, onClose, onSu
                 onChange={handleCheckbox}
                 className="h-4 w-4"
               />
-              <label htmlFor="isActive" className="text-sm text-gray-700">فعال باشد</label>
+              <label htmlFor="isActive" className="text-sm text-gray-700">
+                فعال باشد
+              </label>
             </div>
           </div>
 
           <div className="flex items-center justify-end gap-3 pt-4 border-t border-gray-100">
-            <button type="button" className="btn btn-ghost" onClick={resetAndClose}>
+            <button
+              type="button"
+              className="btn btn-ghost"
+              onClick={resetAndClose}
+            >
               انصراف
             </button>
             <button type="submit" className="btn btn-primary">
@@ -233,5 +230,3 @@ const AddDoctorDialog: React.FC<AddDoctorDialogProps> = ({ isOpen, onClose, onSu
 };
 
 export default AddDoctorDialog;
-
-
