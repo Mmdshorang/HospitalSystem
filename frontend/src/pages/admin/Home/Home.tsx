@@ -44,7 +44,7 @@ const Home = () => {
             <p className="inline-flex items-center gap-2 rounded-full bg-slate-100 px-4 py-1 text-xs font-semibold uppercase tracking-[0.4em] text-slate-500">
               hospi
             </p>
-            <h1 className="text-4xl font-black leading-tight text-slate-900">
+            <h1 className="text-3xl font-black leading-tight text-slate-900">
               داشبورد یکپارچه مدیریت بیمارستان
             </h1>
             <p className="text-sm text-slate-500">
@@ -176,7 +176,7 @@ const Home = () => {
           </div>
         </article>
 
-        <article className="rounded-3xl border border-slate-100 bg-white p-6 shadow-sm">
+        {/* <article className="rounded-3xl border border-slate-100 bg-white p-6 shadow-sm">
           <div className="flex items-center justify-between text-sm text-slate-500">
             <span>پایداری سامانه</span>
             <span className="font-semibold text-emerald-600">۹۹.۴٪</span>
@@ -193,7 +193,7 @@ const Home = () => {
             </div>
             <ShieldCheck className="h-5 w-5 text-emerald-500" />
           </div>
-        </article>
+        </article> */}
       </section>
     </div>
   );

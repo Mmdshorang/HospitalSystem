@@ -1,18 +1,24 @@
-import { useEffect, useMemo, useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import { toast } from 'react-toastify';
-import { ShieldCheck, Smartphone, Clock4, ArrowRight, ArrowRightCircle } from 'lucide-react';
-import { useAuth } from '../contexts/AuthContext';
-import { PhoneInput } from '../components/ui/phone-input';
-import { OtpInput } from '../components/ui/otp-input';
-import { Button } from '../components/ui/button';
+import { useEffect, useMemo, useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
+import {
+  ShieldCheck,
+  Smartphone,
+  Clock4,
+  ArrowRight,
+  ArrowRightCircle,
+} from "lucide-react";
+import { useAuth } from "../contexts/AuthContext";
+import { PhoneInput } from "../components/ui/phone-input";
+import { OtpInput } from "../components/ui/otp-input";
+import { Button } from "../components/ui/button";
 
-type Step = 'phone' | 'otp';
+type Step = "phone" | "otp";
 
 const Login: React.FC = () => {
-  const [step, setStep] = useState<Step>('phone');
-  const [phone, setPhone] = useState('');
-  const [otp, setOtp] = useState('');
+  const [step, setStep] = useState<Step>("phone");
+  const [phone, setPhone] = useState("");
+  const [otp, setOtp] = useState("");
   const [countdown, setCountdown] = useState(0);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isRequesting, setIsRequesting] = useState(false);
@@ -21,19 +27,25 @@ const Login: React.FC = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (step === 'otp' && countdown > 0) {
-      const timer = setInterval(() => setCountdown((prev) => Math.max(prev - 1, 0)), 1000);
+    if (step === "otp" && countdown > 0) {
+      const timer = setInterval(
+        () => setCountdown((prev) => Math.max(prev - 1, 0)),
+        1000
+      );
       return () => clearInterval(timer);
     }
   }, [countdown, step]);
 
   const validatePhone = () => {
     if (!phone) {
-      setErrors((prev) => ({ ...prev, phone: 'شماره موبایل الزامی است' }));
+      setErrors((prev) => ({ ...prev, phone: "شماره موبایل الزامی است" }));
       return false;
     }
     if (!/^09\d{9}$/.test(phone)) {
-      setErrors((prev) => ({ ...prev, phone: 'شماره را با فرمت 09xxxxxxxxx وارد کنید' }));
+      setErrors((prev) => ({
+        ...prev,
+        phone: "شماره را با فرمت 09xxxxxxxxx وارد کنید",
+      }));
       return false;
     }
     setErrors((prev) => ({ ...prev, phone: undefined }));
@@ -45,12 +57,12 @@ const Login: React.FC = () => {
     setIsRequesting(true);
     try {
       await requestOtp(phone);
-      toast.success('کد تایید ارسال شد');
-      setStep('otp');
-      setOtp('');
+      toast.success("کد تایید ارسال شد");
+      setStep("otp");
+      setOtp("");
       setCountdown(60);
     } catch (error: any) {
-      toast.error(error.response?.data?.message || 'ارسال کد با خطا مواجه شد');
+      toast.error(error.response?.data?.message || "ارسال کد با خطا مواجه شد");
     } finally {
       setIsRequesting(false);
     }
@@ -58,33 +70,24 @@ const Login: React.FC = () => {
 
   const handleLogin = async () => {
     if (!phone) {
-      setErrors((prev) => ({ ...prev, phone: 'شماره موبایل الزامی است' }));
+      setErrors((prev) => ({ ...prev, phone: "شماره موبایل الزامی است" }));
       return;
     }
     if (otp.length < 4) {
-      setErrors((prev) => ({ ...prev, otp: 'کد تایید باید حداقل ۴ رقم باشد' }));
+      setErrors((prev) => ({ ...prev, otp: "کد تایید باید حداقل ۴ رقم باشد" }));
       return;
     }
     setIsSubmitting(true);
     try {
       await loginWithOtp(phone, otp);
-      toast.success('خوش آمدید!');
-      navigate('/');
+      toast.success("خوش آمدید!");
+      navigate("/");
     } catch (error: any) {
-      toast.error(error.response?.data?.message || 'کد تایید نامعتبر است');
+      toast.error(error.response?.data?.message || "کد تایید نامعتبر است");
     } finally {
       setIsSubmitting(false);
     }
   };
-
-  const stats = useMemo(
-    () => [
-      { label: 'کلینیک فعال', value: '128+' },
-      { label: 'پزشک تایید شده', value: '640+' },
-      { label: 'نوبت موفق', value: '12k+' },
-    ],
-    []
-  );
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-100 px-4 py-10">
@@ -93,7 +96,9 @@ const Login: React.FC = () => {
           <section className="order-2 space-y-8 bg-white p-8 lg:order-0 lg:p-12">
             <div className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
               <div className="flex items-center justify-between text-sm font-semibold">
-                <span className="text-slate-800">مرحله {step === 'phone' ? '۱' : '۲'} از ۲</span>
+                <span className="text-slate-800">
+                  مرحله {step === "phone" ? "۱" : "۲"} از ۲
+                </span>
                 <span className="flex items-center gap-2 text-primary-600">
                   <Smartphone className="h-4 w-4" />
                   <span className="text-primary-600">ورود امن</span>
@@ -102,12 +107,12 @@ const Login: React.FC = () => {
               <div className="mt-4 h-2 w-full rounded-full bg-slate-200">
                 <div
                   className="h-full rounded-full bg-gradient-to-l from-primary-600 to-primary-400 transition-all"
-                  style={{ width: step === 'phone' ? '50%' : '100%' }}
+                  style={{ width: step === "phone" ? "50%" : "100%" }}
                 />
               </div>
 
               <div className="mt-8 space-y-6">
-                {step === 'phone' && (
+                {step === "phone" && (
                   <>
                     <PhoneInput
                       label="شماره موبایل"
@@ -123,17 +128,17 @@ const Login: React.FC = () => {
                       disabled={isRequesting}
                       onClick={handleRequestOtp}
                     >
-                      {isRequesting ? 'در حال ارسال...' : 'ارسال کد تایید'}
+                      {isRequesting ? "در حال ارسال..." : "ارسال کد تایید"}
                     </Button>
                   </>
                 )}
 
-                {step === 'otp' && (
+                {step === "otp" && (
                   <>
                     <div className="flex items-center justify-between text-sm">
                       <button
                         className="flex items-center gap-2 text-primary-600 transition hover:text-primary-700"
-                        onClick={() => setStep('phone')}
+                        onClick={() => setStep("phone")}
                         type="button"
                       >
                         <ArrowRight className="h-4 w-4" />
@@ -141,7 +146,9 @@ const Login: React.FC = () => {
                       </button>
                       <span className="flex items-center gap-1 rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-800">
                         <Clock4 className="h-4 w-4" />
-                        {countdown > 0 ? `ارسال مجدد تا ${countdown} ثانیه` : 'امکان ارسال مجدد'}
+                        {countdown > 0
+                          ? `ارسال مجدد تا ${countdown} ثانیه`
+                          : "امکان ارسال مجدد"}
                       </span>
                     </div>
 
@@ -173,7 +180,7 @@ const Login: React.FC = () => {
                         disabled={isSubmitting}
                         onClick={handleLogin}
                       >
-                        {isSubmitting ? 'در حال ورود...' : 'ورود به پنل'}
+                        {isSubmitting ? "در حال ورود..." : "ورود به پنل"}
                       </Button>
                     </div>
                   </>
@@ -182,7 +189,10 @@ const Login: React.FC = () => {
             </div>
 
             <div className="flex flex-wrap items-center justify-between gap-4 text-sm">
-              <Link to="/register" className="flex items-center gap-2 text-primary-600 transition hover:text-primary-700">
+              <Link
+                to="/register"
+                className="flex items-center gap-2 text-primary-600 transition hover:text-primary-700"
+              >
                 <ArrowRightCircle className="h-4 w-4" />
                 <span className="text-primary-600">ثبت‌نام مدیر جدید</span>
               </Link>
@@ -190,40 +200,8 @@ const Login: React.FC = () => {
             </div>
           </section>
 
-          <section className="relative flex h-full flex-col justify-between bg-gradient-to-br from-blue-600 via-blue-500 to-blue-700 p-8 text-white">
-            <div className="space-y-4">
-              <span className="inline-flex items-center gap-2 rounded-full border border-white/30 bg-white/10 px-4 py-1 text-xs font-semibold uppercase tracking-[0.3em] text-white backdrop-blur-sm">
-                سلامت دیجیتال
-              </span>
-              <h2 className="text-4xl font-black leading-tight text-white">
-                پنل مدیریت بیمارستان با تجربه‌ای چشمگیر
-              </h2>
-              <p className="text-white/95">
-                تمام تمرکز شما بر ارائه خدمات درمانی؛ مدیریت هوشمند کلینیک، بیمه و تیم پزشکی را به ما بسپارید.
-              </p>
-            </div>
-
-            <div className="grid gap-6 text-right">
-              {stats.map((item) => (
-                <div
-                  key={item.label}
-                  className="rounded-2xl border border-white/30 bg-white/15 p-5 shadow-xl backdrop-blur-sm"
-                >
-                  <div className="text-3xl font-black text-white">{item.value}</div>
-                  <div className="mt-1 text-sm font-medium text-white/95">{item.label}</div>
-                </div>
-              ))}
-            </div>
-
-            <div className="mt-8 rounded-2xl border border-white/30 bg-white/15 p-6 backdrop-blur-sm shadow-xl">
-              <div className="flex items-center gap-2 text-sm font-semibold text-white">
-                <ShieldCheck className="h-5 w-5 text-emerald-200" />
-                امنیت تایید شده
-              </div>
-              <p className="mt-2 text-sm text-white/95">
-                دسترسی مدیران و پزشکان پس از تایید ادمین فعال می‌شود. تمامی ورود‌ها ثبت و مانیتور می‌شوند.
-              </p>
-            </div>
+          <section className="relative flex h-full flex-col justify-between text-white">
+            <img src="OTP.svg" alt="" />
           </section>
         </div>
       </div>
