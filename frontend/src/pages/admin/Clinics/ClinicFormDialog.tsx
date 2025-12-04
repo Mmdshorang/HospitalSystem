@@ -1,30 +1,27 @@
 import { useState } from 'react';
 import { X } from 'lucide-react';
-import type { ClinicPayload } from '../../../api/services/clinicService';
+import type { CreateClinicDto } from '../../../api/services/clinicService';
 import { PhoneInput } from '../../../components/ui/phone-input';
 import { Button } from '../../../components/ui/button';
 
 interface ClinicFormDialogProps {
     open: boolean;
     onClose: () => void;
-    onSubmit: (values: ClinicPayload) => Promise<void> | void;
+    onSubmit: (values: CreateClinicDto) => Promise<void> | void;
 }
 
-const defaultValues: ClinicPayload = {
+const defaultValues: CreateClinicDto = {
     name: '',
-    city: '',
-    address: '',
-    managerName: '',
     phone: '',
-    status: 'pending',
-    capacity: 60,
+    email: '',
+    isActive: true,
 };
 
 export const ClinicFormDialog = ({ open, onClose, onSubmit }: ClinicFormDialogProps) => {
-    const [values, setValues] = useState<ClinicPayload>(defaultValues);
+    const [values, setValues] = useState<CreateClinicDto>(defaultValues);
     const [isSubmitting, setIsSubmitting] = useState(false);
 
-    const handleChange = (field: keyof ClinicPayload, value: string | number | undefined) => {
+    const handleChange = (field: keyof CreateClinicDto, value: string | number | boolean | undefined) => {
         setValues((prev) => ({ ...prev, [field]: value }));
     };
 
@@ -59,68 +56,36 @@ export const ClinicFormDialog = ({ open, onClose, onSubmit }: ClinicFormDialogPr
                             نام کلینیک
                             <input
                                 className="mt-2 h-12 w-full rounded-2xl border border-slate-200 px-4 text-sm outline-none focus:border-primary"
-                                value={values.name}
+                                value={values.name || ''}
                                 onChange={(e) => handleChange('name', e.target.value)}
-                                required
-                            />
-                        </label>
-                        <label className="text-sm font-medium text-slate-600">
-                            شهر
-                            <input
-                                className="mt-2 h-12 w-full rounded-2xl border border-slate-200 px-4 text-sm outline-none focus:border-primary"
-                                value={values.city}
-                                onChange={(e) => handleChange('city', e.target.value)}
-                                required
-                            />
-                        </label>
-                        <label className="text-sm font-medium text-slate-600">
-                            مدیر کلینیک
-                            <input
-                                className="mt-2 h-12 w-full rounded-2xl border border-slate-200 px-4 text-sm outline-none focus:border-primary"
-                                value={values.managerName}
-                                onChange={(e) => handleChange('managerName', e.target.value)}
                                 required
                             />
                         </label>
                         <PhoneInput
                             label="شماره تماس"
-                            value={values.phone}
+                            value={values.phone || ''}
                             onChange={(event) => handleChange('phone', event.target.value)}
                             maxLength={11}
                         />
                     </div>
                     <label className="text-sm font-medium text-slate-600">
-                        آدرس کامل
-                        <textarea
-                            className="mt-2 min-h-[90px] w-full rounded-2xl border border-slate-200 p-4 text-sm outline-none focus:border-primary"
-                            value={values.address}
-                            onChange={(e) => handleChange('address', e.target.value)}
+                        ایمیل
+                        <input
+                            type="email"
+                            className="mt-2 h-12 w-full rounded-2xl border border-slate-200 px-4 text-sm outline-none focus:border-primary"
+                            value={values.email || ''}
+                            onChange={(e) => handleChange('email', e.target.value)}
                         />
                     </label>
-
-                    <div className="grid gap-4 sm:grid-cols-2">
-                        <label className="text-sm font-medium text-slate-600">
-                            ظرفیت روزانه
-                            <input
-                                type="number"
-                                className="mt-2 h-12 w-full rounded-2xl border border-slate-200 px-4 text-sm outline-none focus:border-primary"
-                                value={values.capacity}
-                                onChange={(e) => handleChange('capacity', Number(e.target.value))}
-                            />
-                        </label>
-                        <label className="text-sm font-medium text-slate-600">
-                            وضعیت
-                            <select
-                                className="mt-2 h-12 w-full rounded-2xl border border-slate-200 px-4 text-sm outline-none focus:border-primary"
-                                value={values.status}
-                                onChange={(e) => handleChange('status', e.target.value as ClinicPayload['status'])}
-                            >
-                                <option value="active">فعال</option>
-                                <option value="pending">در انتظار تایید</option>
-                                <option value="inactive">غیرفعال</option>
-                            </select>
-                        </label>
-                    </div>
+                    <label className="flex items-center gap-2 text-sm font-medium text-slate-600">
+                        <input
+                            type="checkbox"
+                            checked={values.isActive ?? true}
+                            onChange={(e) => handleChange('isActive', e.target.checked)}
+                            className="h-4 w-4 rounded border-slate-300"
+                        />
+                        فعال باشد
+                    </label>
 
                     <div className="flex justify-end gap-3 pt-4">
                         <Button

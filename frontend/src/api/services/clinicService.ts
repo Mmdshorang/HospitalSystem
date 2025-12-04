@@ -2,119 +2,107 @@ import apiClient from "../client";
 
 export interface Clinic {
   id: number;
-  name: string;
-  city: string;
-  address: string;
-  managerName: string;
-  phone: string;
-  services: number;
-  status: "active" | "pending" | "inactive";
-  rating: number;
-  capacity: number;
-  logo?: string;
+  name?: string;
+  phone?: string;
+  email?: string;
+  managerId?: number;
+  managerName?: string;
+  logoUrl?: string;
+  isActive: boolean;
+  createdAt: string;
+  updatedAt: string;
+  workHours?: ClinicWorkHours[];
+  addresses?: ClinicAddress[];
 }
 
-export interface ClinicPayload {
-  name: string;
-  city: string;
-  address: string;
-  managerName: string;
-  phone: string;
-  status?: Clinic["status"];
-  capacity?: number;
+export interface ClinicWorkHours {
+  id: number;
+  dayOfWeek: string;
+  startTime?: string;
+  endTime?: string;
+  isActive: boolean;
+  createdAt: string;
+  updatedAt: string;
 }
 
-let mockClinics: Clinic[] = [
-  {
-    id: 1,
-    name: "کلینیک آفتاب سبز",
-    city: "تهران",
-    address: "خیابان ولیعصر، بالاتر از ونک",
-    managerName: "دکتر نیلوفر ادیبی",
-    phone: "021-88990011",
-    services: 24,
-    status: "active",
-    rating: 4.7,
-    capacity: 120,
-  },
-  {
-    id: 2,
-    name: "مرکز جامع پارسه",
-    city: "اصفهان",
-    address: "میدان نقش جهان، کوچه طبیبان",
-    managerName: "دکتر مهران راد",
-    phone: "031-33445522",
-    services: 18,
-    status: "pending",
-    rating: 4.2,
-    capacity: 80,
-  },
-  {
-    id: 3,
-    name: "کلینیک تخصصی ساحل",
-    city: "رشت",
-    address: "بلوار معلم، نبش کوچه ۱۲",
-    managerName: "دکتر لیلا عرب",
-    phone: "013-22334455",
-    services: 15,
-    status: "active",
-    rating: 4.5,
-    capacity: 65,
-  },
-];
+export interface ClinicAddress {
+  id: number;
+  street?: string;
+  city?: string;
+  state?: string;
+  postalCode?: string;
+  country?: string;
+}
+
+export interface CreateClinicDto {
+  name?: string;
+  phone?: string;
+  email?: string;
+  managerId?: number;
+  logoUrl?: string;
+  isActive?: boolean;
+  workHours?: CreateClinicWorkHours[];
+  addresses?: CreateClinicAddress[];
+}
+
+export interface CreateClinicWorkHours {
+  dayOfWeek: string;
+  startTime?: string;
+  endTime?: string;
+  isActive?: boolean;
+}
+
+export interface CreateClinicAddress {
+  street?: string;
+  city?: string;
+  state?: string;
+  postalCode?: string;
+  country?: string;
+}
+
+export interface UpdateClinicDto {
+  id: number;
+  name?: string;
+  phone?: string;
+  email?: string;
+  managerId?: number;
+  logoUrl?: string;
+  isActive?: boolean;
+}
 
 export const clinicService = {
-  async getAll(): Promise<Clinic[]> {
-    try {
-      const { data } = await apiClient.get<Clinic[]>("/api/clinics");
-      return data;
-    } catch {
-      return Promise.resolve([...mockClinics]);
-    }
+  async getAll(
+    searchTerm?: string,
+    city?: string,
+    isActive?: boolean
+  ): Promise<Clinic[]> {
+    const params = new URLSearchParams();
+    if (searchTerm) params.append("searchTerm", searchTerm);
+    if (city) params.append("city", city);
+    if (isActive !== undefined) params.append("isActive", isActive.toString());
+
+    const { data } = await apiClient.get<Clinic[]>(
+      `/api/clinics?${params.toString()}`
+    );
+    return data;
   },
 
-  async create(payload: ClinicPayload): Promise<Clinic> {
-    try {
-      const { data } = await apiClient.post<Clinic>("/api/clinics", payload);
-      return data;
-    } catch {
-      const clinic: Clinic = {
-        id: Date.now(),
-        services: 0,
-        rating: 4.3,
-        status: payload.status ?? "pending",
-        capacity: payload.capacity ?? 50,
-        ...payload,
-      };
-      mockClinics = [clinic, ...mockClinics];
-      return clinic;
-    }
+  async getById(id: number): Promise<Clinic> {
+    const { data } = await apiClient.get<Clinic>(`/api/clinics/${id}`);
+    return data;
   },
 
-  async update(id: number, payload: Partial<ClinicPayload>): Promise<Clinic> {
-    try {
-      const { data } = await apiClient.put<Clinic>(
-        `/api/clinics/${id}`,
-        payload
-      );
-      return data;
-    } catch {
-      mockClinics = mockClinics.map((clinic) =>
-        clinic.id === id ? { ...clinic, ...payload } : clinic
-      );
-      const updated = mockClinics.find((clinic) => clinic.id === id);
-      if (!updated) {
-        throw new Error("کلینیک یافت نشد");
-      }
-      return updated;
-    }
+  async create(payload: CreateClinicDto): Promise<Clinic> {
+    const { data } = await apiClient.post<Clinic>("/api/clinics", payload);
+    return data;
+  },
+
+  async update(id: number, payload: UpdateClinicDto): Promise<Clinic> {
+    const { data } = await apiClient.put<Clinic>(`/api/clinics/${id}`, payload);
+    return data;
   },
 
   async remove(id: number): Promise<void> {
-    try {
-      await apiClient.delete(`/api/clinics/${id}`);
-    } catch {
-      mockClinics = mockClinics.filter((clinic) => clinic.id !== id);
-    }
+    await apiClient.delete(`/api/clinics/${id}`);
   },
 };

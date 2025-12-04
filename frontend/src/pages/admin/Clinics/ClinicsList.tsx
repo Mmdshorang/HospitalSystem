@@ -1,38 +1,39 @@
 import { useMemo, useState } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
-import { Building2, MapPin, Search, Sparkles } from 'lucide-react';
-import { clinicService, type Clinic, type ClinicPayload } from '../../../api/services/clinicService';
+import { Building2, MapPin, Search, Sparkles, Settings } from 'lucide-react';
+import { clinicService, type Clinic, type CreateClinicDto } from '../../../api/services/clinicService';
 import { Button } from '../../../components/ui/button';
 import { EmptyState } from '../../../components/states/EmptyState';
 import { PageLoader } from '../../../components/states/PageLoader';
 import { ClinicFormDialog } from './ClinicFormDialog';
 
-const statusLabels: Record<Clinic['status'], string> = {
-    active: 'فعال',
-    pending: 'در انتظار تایید',
-    inactive: 'غیرفعال',
+const statusLabels: Record<string, string> = {
+    true: 'فعال',
+    false: 'غیرفعال',
 };
 
-const statusColors: Record<Clinic['status'], string> = {
-    active: 'bg-emerald-100 text-emerald-700',
-    pending: 'bg-amber-100 text-amber-700',
-    inactive: 'bg-rose-100 text-rose-700',
+const statusColors: Record<string, string> = {
+    true: 'bg-emerald-100 text-emerald-700',
+    false: 'bg-rose-100 text-rose-700',
 };
 
 const ClinicsList = () => {
     const [search, setSearch] = useState('');
-    const [status, setStatus] = useState<'all' | Clinic['status']>('all');
+    const [status, setStatus] = useState<'all' | string>('all');
+    const [city, setCity] = useState('');
     const [isDialogOpen, setIsDialogOpen] = useState(false);
     const queryClient = useQueryClient();
+    const navigate = useNavigate();
 
     const { data: clinics = [], isLoading } = useQuery<Clinic[]>({
-        queryKey: ['clinics'],
-        queryFn: clinicService.getAll,
+        queryKey: ['clinics', search, city, status],
+        queryFn: () => clinicService.getAll(search || undefined, city || undefined, status === 'all' ? undefined : status === 'true'),
     });
 
     const createClinic = useMutation({
-        mutationFn: (payload: ClinicPayload) => clinicService.create(payload),
+        mutationFn: (payload: CreateClinicDto) => clinicService.create(payload),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['clinics'] });
             toast.success('کلینیک جدید ثبت شد');
@@ -40,30 +41,15 @@ const ClinicsList = () => {
         onError: () => toast.error('ثبت کلینیک با خطا مواجه شد'),
     });
 
-    const filteredClinics = useMemo(() => {
-        return clinics.filter((clinic) => {
-            const matchesStatus = status === 'all' ? true : clinic.status === status;
-            const normalizedSearch = search.trim();
-            if (!normalizedSearch) return matchesStatus;
-            return (
-                matchesStatus &&
-                [clinic.name, clinic.city, clinic.managerName].some((field) =>
-                    field.toLowerCase().includes(normalizedSearch.toLowerCase())
-                )
-            );
-        });
-    }, [clinics, search, status]);
+    const filteredClinics = clinics; // Filtering is done on backend
 
     const stats = useMemo(() => {
-        const active = clinics.filter((clinic) => clinic.status === 'active').length;
-        const pending = clinics.filter((clinic) => clinic.status === 'pending').length;
-        const averageCapacity =
-            clinics.reduce((sum, clinic) => sum + (clinic.capacity ?? 0), 0) /
-            Math.max(clinics.length, 1);
+        const active = clinics.filter((clinic) => clinic.isActive).length;
+        const inactive = clinics.filter((clinic) => !clinic.isActive).length;
         return [
-            { label: 'کلینیک فعال', value: `${active}`, chip: '+4 این هفته' },
-            { label: 'در انتظار تایید', value: `${pending}`, chip: '۴ پرونده باز' },
-            { label: 'میانگین ظرفیت', value: `${Math.round(averageCapacity)} مراجعه`, chip: 'روزانه' },
+            { label: 'کلینیک فعال', value: `${active}`, chip: 'فعال' },
+            { label: 'غیرفعال', value: `${inactive}`, chip: 'غیرفعال' },
+            { label: 'کل کلینیک‌ها', value: `${clinics.length}`, chip: 'مجموع' },
         ];
     }, [clinics]);
 
@@ -108,15 +94,20 @@ const ClinicsList = () => {
                         />
                     </div>
                     <div className="flex flex-wrap gap-3">
+                        <input
+                            className="h-12 flex-1 rounded-2xl border border-slate-200 bg-white px-4 text-sm outline-none focus:border-primary"
+                            placeholder="شهر..."
+                            value={city}
+                            onChange={(e) => setCity(e.target.value)}
+                        />
                         <select
                             value={status}
-                            onChange={(e) => setStatus(e.target.value as typeof status)}
+                            onChange={(e) => setStatus(e.target.value)}
                             className="h-12 rounded-2xl border border-slate-200 bg-white px-4 text-sm outline-none focus:border-primary"
                         >
                             <option value="all">همه وضعیت‌ها</option>
-                            <option value="active">فعال</option>
-                            <option value="pending">در انتظار تایید</option>
-                            <option value="inactive">غیرفعال</option>
+                            <option value="true">فعال</option>
+                            <option value="false">غیرفعال</option>
                         </select>
                         <Button
                             className="h-12 rounded-2xl bg-gradient-to-l from-primary-600 to-primary-400 px-6 text-sm font-semibold shadow-lg shadow-primary/30"
@@ -153,32 +144,42 @@ const ClinicsList = () => {
                                             </div>
                                         </div>
                                         <span
-                                            className={`rounded-full px-3 py-1 text-xs font-semibold ${statusColors[clinic.status]}`}
+                                            className={`rounded-full px-3 py-1 text-xs font-semibold ${statusColors[clinic.isActive.toString()]}`}
                                         >
-                                            {statusLabels[clinic.status]}
+                                            {statusLabels[clinic.isActive.toString()]}
                                         </span>
                                     </div>
 
-                                    <div className="mt-4 flex items-center gap-2 text-sm text-slate-500">
-                                        <MapPin className="h-4 w-4" />
-                                        {clinic.city} · {clinic.address}
-                                    </div>
+                                    {clinic.addresses && clinic.addresses.length > 0 && (
+                                        <div className="mt-4 flex items-center gap-2 text-sm text-slate-500">
+                                            <MapPin className="h-4 w-4" />
+                                            {clinic.addresses[0].city} · {clinic.addresses[0].street}
+                                        </div>
+                                    )}
 
                                     <div className="mt-6 grid grid-cols-2 gap-3 text-xs font-semibold text-slate-500">
                                         <div className="rounded-2xl bg-white/70 px-4 py-3 text-slate-600">
-                                            <p>ظرفیت روزانه</p>
+                                            <p>تلفن</p>
                                             <p className="mt-1 text-lg font-black text-primary-600">
-                                                {clinic.capacity}
-                                                <span className="text-xs font-medium text-slate-400"> مراجع</span>
+                                                {clinic.phone || 'ندارد'}
                                             </p>
                                         </div>
                                         <div className="rounded-2xl bg-white/70 px-4 py-3 text-slate-600">
-                                            <p>خدمات فعال</p>
-                                            <p className="mt-1 text-lg font-black text-emerald-600">
-                                                {clinic.services}
-                                                <span className="text-xs font-medium text-slate-400"> سرویس</span>
+                                            <p>ایمیل</p>
+                                            <p className="mt-1 text-sm font-black text-emerald-600">
+                                                {clinic.email || 'ندارد'}
                                             </p>
                                         </div>
+                                    </div>
+
+                                    <div className="mt-4 flex justify-end">
+                                        <button
+                                            onClick={() => navigate(`/admin/clinics/${clinic.id}/services`)}
+                                            className="flex items-center gap-2 rounded-2xl bg-primary/10 px-4 py-2 text-sm font-semibold text-primary-600 transition hover:bg-primary/20"
+                                        >
+                                            <Settings className="h-4 w-4" />
+                                            مدیریت خدمات
+                                        </button>
                                     </div>
                                 </article>
                             ))}

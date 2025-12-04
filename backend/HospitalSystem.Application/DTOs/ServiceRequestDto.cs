@@ -55,3 +55,32 @@ public class UpdateServiceRequestDto
     public string? Notes { get; set; }
 }
 
+public class ServiceRequestHistoryDto
+{
+    public DateTime ChangedAt { get; set; }
+    public string? ChangedBy { get; set; }
+    public string? FromStatus { get; set; }
+    public string? ToStatus { get; set; }
+    public string? Note { get; set; }
+}
+
+public class ChangeStatusDto
+{
+    public RequestStatus Status { get; set; }
+    public string? Note { get; set; }
+}
+
+public class AssignPerformerDto
+{
+    public long PerformedByUserId { get; set; }
+}
+
+public class PagedResult<T>
+{
+    public List<T> Data { get; set; } = new();
+    public int Page { get; set; }
+    public int PageSize { get; set; }
+    public int TotalCount { get; set; }
+    public int TotalPages => (int)Math.Ceiling((double)TotalCount / PageSize);
+}
+

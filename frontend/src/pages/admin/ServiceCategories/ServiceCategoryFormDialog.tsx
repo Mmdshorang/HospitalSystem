@@ -1,19 +1,17 @@
 import { useState } from 'react';
 import { X } from 'lucide-react';
-import type { ServiceCategoryPayload } from '../../../api/services/serviceCategoryService';
+import type { CreateServiceCategoryDto } from '../../../api/services/serviceCategoryService';
 import { Button } from '../../../components/ui/button';
 
 interface ServiceCategoryFormDialogProps {
     open: boolean;
     onClose: () => void;
-    onSubmit: (values: ServiceCategoryPayload) => Promise<void> | void;
+    onSubmit: (values: CreateServiceCategoryDto) => Promise<void> | void;
 }
 
-const defaultValues: ServiceCategoryPayload = {
+const defaultValues: CreateServiceCategoryDto = {
     name: '',
     description: '',
-    isActive: true,
-    parentId: null,
 };
 
 export const ServiceCategoryFormDialog = ({
@@ -21,7 +19,7 @@ export const ServiceCategoryFormDialog = ({
     onClose,
     onSubmit,
 }: ServiceCategoryFormDialogProps) => {
-    const [values, setValues] = useState<ServiceCategoryPayload>(defaultValues);
+    const [values, setValues] = useState<CreateServiceCategoryDto>(defaultValues);
     const [loading, setLoading] = useState(false);
 
     const handleSubmit = async (event: React.FormEvent) => {
@@ -69,29 +67,6 @@ export const ServiceCategoryFormDialog = ({
                         />
                     </label>
 
-                    <label className="text-sm font-medium text-slate-600">
-                        دسته والد (اختیاری)
-                        <input
-                            className="mt-2 h-12 w-full rounded-2xl border border-slate-200 px-4 text-sm outline-none focus:border-primary"
-                            placeholder="شناسه یا نام دسته والد"
-                            onChange={(e) =>
-                                setValues((prev) => ({
-                                    ...prev,
-                                    parentId: e.target.value ? Number(e.target.value) : null,
-                                }))
-                            }
-                        />
-                    </label>
-
-                    <label className="flex items-center gap-2 text-sm font-medium text-slate-600">
-                        <input
-                            type="checkbox"
-                            checked={values.isActive}
-                            onChange={(e) => setValues((prev) => ({ ...prev, isActive: e.target.checked }))}
-                            className="h-4 w-4 rounded border-slate-300"
-                        />
-                        فعال باشد
-                    </label>
 
                     <div className="flex justify-end gap-3 pt-4">
                         <Button

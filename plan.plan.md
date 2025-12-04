@@ -1,211 +1,284 @@
-<!-- 61eda0ad-a66e-4da0-8e4e-cd60662da922 582d489c-5210-4b5a-b2d0-81e609332a64 -->
-# فاز 1: لاگین OTP و پنل ادمین با طراحی مدرن
+<!-- d419f1fa-cc45-40de-be62-ab752c68c6ec 61280ab4-b709-4904-9773-985873ec0bf2 -->
+# پیاده‌سازی کامل اتصال فرانت‌اند به بک‌اند برای CRUD کامل (نسخه بهبود یافته)
 
-## تغییرات بک‌اند (حداقل برای پشتیبانی از OTP)
+## وضعیت فعلی
 
-### 1. اضافه کردن Role جدید
+### موجود در بک‌اند:
 
-- **فایل**: `backend/HospitalSystem.Domain/Entities/Enums/UserRole.cs`
-- اضافه کردن `manager` به enum
+- ✅ Entities: Clinic, Insurance, Service, ServiceCategory, ServiceRequest, ProviderProfile, Specialty
+- ✅ Controllers: AuthController, SpecialtiesController, ProvidersController
+- ✅ Services: SpecialtyService, ProviderService, AuthService
+- ✅ Infrastructure: ApplicationDbContext, Repository Pattern
 
-### 2. ایجاد Entity برای OTP
+### موجود در فرانت‌اند:
 
-- **فایل جدید**: `backend/HospitalSystem.Domain/Entities/OtpVerification.cs`
-- فیلدها: Phone, Code, ExpiresAt, IsUsed, CreatedAt
+- ✅ صفحات اولیه: ClinicsList, InsurancesList, ServiceCategoriesList, DoctorsList
+- ✅ React Query setup شده در App.tsx
+- ✅ برخی Shared Components: DataTable, Layout, EmptyState, ErrorState
+- ⚠️ فقط Mock Data استفاده می‌شود - اتصال به بک‌اند کامل نیست
 
-### 3. ایجاد Interface برای سرویس OTP
+## بهبودهای معماری
 
-- **فایل جدید**: `backend/HospitalSystem.Domain/Common/Interfaces/IOtpService.cs`
-- متدهای: `SendOtpAsync(string phone, string code)`, `VerifyOtpAsync(string phone, string code)`
-- این interface برای جداسازی منطق ارسال OTP از AuthService است
+### 1. Backend - Base Classes برای کاهش تکرار
 
-### 4. پیاده‌سازی Mock OTP Service
+#### 1.1 BaseService<T> و IBaseService<T>
 
-- **فایل جدید**: `backend/HospitalSystem.Infrastructure/Services/MockOtpService.cs`
-- پیاده‌سازی `IOtpService` با mock (چاپ در console/log)
-- برای استفاده در development و تست
-- بعداً می‌تواند با `SmsIrOtpService` جایگزین شود
+برای CRUDهای ساده (Insurance, Service, ServiceCategory):
 
-### 5. پیاده‌سازی SMS.ir OTP Service (برای آینده)
+- `GetAllAsync()`
+- `GetByIdAsync(id)`
+- `CreateAsync(dto)`
+- `UpdateAsync(id, dto)`
+- `DeleteAsync(id)`
 
-- **فایل جدید**: `backend/HospitalSystem.Infrastructure/Services/SmsIrOtpService.cs`
-- پیاده‌سازی `IOtpService` با اتصال به SMS.ir
-- اضافه کردن configuration برای API key و تنظیمات SMS.ir در `appsettings.json`
-- **نکته**: این فایل را ایجاد می‌کنیم اما فعلاً استفاده نمی‌شود
+**فایل‌ها:**
 
-### 6. تغییر AuthService برای پشتیبانی از OTP
+- `backend/HospitalSystem.Infrastructure/Services/Base/BaseService.cs` (ایجاد)
+- `backend/HospitalSystem.Domain/Common/Interfaces/IBaseService.cs` (ایجاد)
 
-- **فایل**: `backend/HospitalSystem.Infrastructure/Services/AuthService.cs`
-- متدهای جدید: `SendOtpAsync`, `VerifyOtpAsync`, `LoginWithOtpAsync`
-- استفاده از `IOtpService` (dependency injection)
-- در `Program.cs` فعلاً `MockOtpService` را register می‌کنیم
+#### 1.2 BaseController<T> 
 
-### 7. تغییر AuthController
+برای controllers ساده:
 
-- **فایل**: `backend/HospitalSystem.Api/Controllers/AuthController.cs`
-- اضافه کردن endpoint های: `/api/auth/send-otp`, `/api/auth/verify-otp`
+- `GET /api/{resource}`
+- `GET /api/{resource}/{id}`
+- `POST /api/{resource}`
+- `PUT /api/{resource}/{id}`
+- `DELETE /api/{resource}/{id}`
 
-### 8. تنظیمات Configuration
+**فایل:**
 
-- **فایل**: `backend/HospitalSystem.Api/appsettings.json`
-- اضافه کردن section `OtpSettings` برای تنظیمات آینده SMS.ir (فعلاً optional)
+- `backend/HospitalSystem.Api/Controllers/Base/BaseController.cs` (ایجاد)
 
-## تغییرات فرانت‌اند - طراحی UI/UX جدید و مدرن
+### 2. Backend - Controllers و Services
 
-### 1. طراحی سیستم Design System
+#### 2.1 ClinicController و ClinicService (با ادغام ClinicServices)
 
-- **کامپوننت‌های جدید UI**: 
-- `frontend/src/components/ui/otp-input.tsx` - کامپوننت OTP با طراحی مدرن
-- `frontend/src/components/ui/phone-input.tsx` - ورودی شماره موبایل با اعتبارسنجی
-- بهبود کامپوننت‌های موجود: card, table, badge, tabs, select
-- **استایل‌های جدید**: استفاده از gradient، shadow، animation های smooth
+**Routes:**
 
-### 2. صفحه لاگین جدید با طراحی مدرن
+- `GET /api/clinics` - لیست با فیلتر (نام، شهر، وضعیت)
+- `GET /api/clinics/{id}` - جزئیات کلینیک
+- `POST /api/clinics` - ایجاد کلینیک
+- `PUT /api/clinics/{id}` - ویرایش کلینیک
+- `DELETE /api/clinics/{id}` - حذف کلینیک
 
-- **فایل**: `frontend/src/pages/Login.tsx` (بازنویسی کامل)
-- طراحی دو ستونی: تصویر/گرافیک در سمت راست، فرم در سمت چپ
-- انیمیشن‌های ورود و خروج
-- فیلد شماره موبایل با اعتبارسنجی و فرمت خودکار
-- کامپوننت OTP با طراحی مدرن (6 خانه با انیمیشن)
-- نمایش countdown برای ارسال مجدد OTP
-- طراحی responsive و mobile-first
+**خدمات کلینیک (ادغام شده در ClinicsController):**
 
-### 3. تغییر AuthContext
+- `GET /api/clinics/{id}/services` - خدمات کلینیک
+- `POST /api/clinics/{id}/services` - افزودن خدمت به کلینیک
+- `PUT /api/clinics/{id}/services/{serviceId}` - ویرایش خدمت کلینیک
+- `DELETE /api/clinics/{id}/services/{serviceId}` - حذف خدمت از کلینیک
 
-- **فایل**: `frontend/src/contexts/AuthContext.tsx`
-- اضافه کردن متدهای `sendOtp`, `verifyOtp`, `loginWithOtp`
-- مدیریت state برای مرحله لاگین (شماره موبایل / OTP)
+**فایل‌ها:**
 
-### 4. تغییر AuthService API
+- `backend/HospitalSystem.Infrastructure/Services/ClinicService.cs` (ایجاد)
+- `backend/HospitalSystem.Api/Controllers/ClinicsController.cs` (ایجاد - شامل endpoints خدمات)
 
-- **فایل**: `frontend/src/api/services/authService.ts`
-- اضافه کردن متدهای `sendOtp`, `verifyOtp`, `loginWithOtp`
+#### 1.2 InsuranceController و InsuranceService
 
-### 5. پنل ادمین - مدیریت کلنیک‌ها (طراحی جدید)
+- `GET /api/insurances` - لیست با فیلتر
+- `GET /api/insurances/{id}`
+- `POST /api/insurances`
+- `PUT /api/insurances/{id}`
+- `DELETE /api/insurances/{id}`
 
-- **صفحه اصلی**: `frontend/src/pages/admin/Clinics/ClinicsList.tsx`
-- Header با آمار و دکمه افزودن
-- جدول مدرن با search، filter، pagination
-- کارت‌های کلنیک با تصویر، آدرس، وضعیت
-- Action buttons با icon های lucide-react
-- **کامپوننت افزودن/ویرایش**: `frontend/src/pages/admin/Clinics/ClinicFormDialog.tsx`
-- فرم چند مرحله‌ای (اطلاعات اصلی، آدرس، ساعات کاری، بیمه‌ها)
-- استفاده از Tabs برای سازماندهی
-- Preview تصویر لوگو
-- انتخاب مدیر از لیست کاربران
-- **سرویس API**: `frontend/src/api/services/clinicService.ts`
+**فایل‌ها:**
 
-### 6. پنل ادمین - مدیریت بیمه‌ها (طراحی جدید)
+- `backend/HospitalSystem.Infrastructure/Services/InsuranceService.cs` (ایجاد)
+- `backend/HospitalSystem.Api/Controllers/InsurancesController.cs` (ایجاد)
 
-- **صفحه اصلی**: `frontend/src/pages/admin/Insurances/InsurancesList.tsx`
-- Grid layout با کارت‌های بیمه
-- نمایش درصد پوشش با progress bar
-- فیلتر بر اساس وضعیت فعال/غیرفعال
-- Search با highlight نتایج
-- **کامپوننت افزودن/ویرایش**: `frontend/src/pages/admin/Insurances/InsuranceFormDialog.tsx`
-- فرم ساده و تمیز
-- Slider برای درصد پوشش
-- Toggle برای وضعیت فعال
-- **سرویس API**: `frontend/src/api/services/insuranceService.ts`
+#### 1.3 ServiceCategoryController و ServiceService
 
-### 7. پنل ادمین - مدیریت دسته‌بندی خدمات (طراحی جدید)
+- `GET /api/service-categories` - لیست دسته‌بندی‌ها
+- `GET /api/service-categories/{id}`
+- `POST /api/service-categories`
+- `PUT /api/service-categories/{id}`
+- `DELETE /api/service-categories/{id}`
+- `GET /api/services` - لیست خدمات با فیلتر (دسته‌بندی، نام)
+- `GET /api/services/{id}`
+- `POST /api/services`
+- `PUT /api/services/{id}`
+- `DELETE /api/services/{id}`
 
-- **صفحه اصلی**: `frontend/src/pages/admin/ServiceCategories/ServiceCategoriesList.tsx`
-- Tree view برای دسته‌بندی‌های تودرتو (اگر نیاز باشد)
-- لیست با drag & drop برای مرتب‌سازی
-- نمایش تعداد خدمات هر دسته
-- Badge برای دسته‌های فعال
-- **کامپوننت افزودن/ویرایش**: `frontend/src/pages/admin/ServiceCategories/ServiceCategoryFormDialog.tsx`
-- فرم با icon picker
-- انتخاب دسته والد (اگر تودرتو باشد)
-- **سرویس API**: `frontend/src/api/services/serviceCategoryService.ts`
+**فایل‌ها:**
 
-### 8. پنل ادمین - ثبت پزشک و پرسنل (طراحی جدید)
+- `backend/HospitalSystem.Infrastructure/Services/ServiceCategoryService.cs` (ایجاد)
+- `backend/HospitalSystem.Infrastructure/Services/ServiceService.cs` (ایجاد)
+- `backend/HospitalSystem.Api/Controllers/ServiceCategoriesController.cs` (ایجاد)
+- `backend/HospitalSystem.Api/Controllers/ServicesController.cs` (ایجاد)
 
-- **صفحه اصلی**: `frontend/src/pages/admin/Doctors/DoctorsList.tsx` (بازنویسی)
-- Tab برای تفکیک پزشک/پرسنل
-- فیلتر پیشرفته (تخصص، وضعیت، تاریخ)
-- کارت‌های پزشک با تصویر، تخصص، کلنیک
-- نمایش وضعیت تایید با badge رنگی
-- **کامپوننت افزودن/ویرایش**: `frontend/src/pages/admin/Doctors/DoctorFormDialog.tsx`
-- فرم چند مرحله‌ای (اطلاعات شخصی، تخصص، کلنیک، مدارک)
-- آپلود تصویر پروفایل
-- انتخاب تخصص از dropdown با search
-- انتخاب کلنیک
-- **سرویس API**: به‌روزرسانی `frontend/src/api/services/doctorService.ts`
+#### 1.4 ServiceRequestController (نوبت‌ها)
 
-### 9. Layout و Sidebar جدید
+- `GET /api/service-requests` - لیست با فیلتر (وضعیت، کلینیک، بیمار، تاریخ) و pagination
+- `GET /api/service-requests/{id}` - جزئیات نوبت
+- `POST /api/service-requests` - ایجاد نوبت
+- `PUT /api/service-requests/{id}` - ویرایش نوبت
+- `PATCH /api/service-requests/{id}/status` - تغییر وضعیت
+- `GET /api/service-requests/{id}/history` - تاریخچه تغییرات (از AuditLog)
+- `POST /api/service-requests/{id}/performer` - تعیین انجام‌دهنده
 
-- **فایل**: `frontend/src/components/Layout.tsx` (بازنویسی)
-- Sidebar مدرن با icon های lucide-react
-- Collapsible sidebar
-- Active state برای منوها
-- User menu در header
-- Breadcrumb navigation
-- Dark mode toggle (اختیاری)
+**فایل‌ها:**
 
-### 10. Dashboard ادمین (بهبود)
+- `backend/HospitalSystem.Infrastructure/Services/ServiceRequestService.cs` (ایجاد)
+- `backend/HospitalSystem.Api/Controllers/ServiceRequestsController.cs` (ایجاد)
 
-- **فایل**: `frontend/src/pages/admin/Home/Home.tsx`
-- Grid layout با کارت‌های آماری
-- Chart های زیبا برای آمار
-- Quick actions با hover effects
-- Recent activities با timeline design
+#### 1.5 ثبت Services در Program.cs
 
-### 11. به‌روزرسانی Routing
+- افزودن کل سرویس‌های جدید به DI container
 
-- **فایل**: `frontend/src/App.tsx`
-- اضافه کردن route های جدید برای صفحات ادمین
-- Protected routes با role-based access
+### 2. Frontend - اتصال به Backend
 
-### 12. کامپوننت‌های مشترک
+#### 2.1 به‌روزرسانی API Services
 
-- **Loading states**: Skeleton loaders برای صفحات
-- **Empty states**: طراحی زیبا برای حالت‌های خالی
-- **Error states**: نمایش خطا با طراحی کاربرپسند
-- **Toast notifications**: بهبود طراحی toast ها
+**فایل‌های موجود که باید به‌روزرسانی شوند:**
 
-## وابستگی‌ها و پکیج‌ها
+- `frontend/src/api/services/clinicService.ts` - حذف mock، اتصال واقعی
+- `frontend/src/api/services/insuranceService.ts` - حذف mock، اتصال واقعی
+- `frontend/src/api/services/serviceCategoryService.ts` - حذف mock، اتصال واقعی
+- `frontend/src/api/services/providerService.ts` - بررسی و تکمیل
+- `frontend/src/api/services/specialtyService.ts` - بررسی و تکمیل
 
-### بک‌اند
+**فایل‌های جدید:**
 
-- فعلاً نیازی به پکیج اضافی نیست (استفاده از MockOtpService)
-- برای آینده: نصب پکیج SMS.ir SDK یا استفاده از HTTP client برای API
-- اضافه کردن configuration در `appsettings.json` برای SMS.ir (فعلاً optional)
+- `frontend/src/api/services/serviceService.ts` - برای مدیریت خدمات
+- `frontend/src/api/services/clinicServiceService.ts` - برای خدمات کلینیک
+- `frontend/src/api/services/serviceRequestService.ts` - برای نوبت‌ها
 
-### فرانت‌اند
+#### 2.2 صفحات موجود - تکمیل و اتصال
 
-- پکیج `input-otp` از قبل نصب شده است
-- استفاده از `lucide-react` برای icon ها
-- استفاده از `framer-motion` برای animation (اختیاری)
+**Clinics:**
 
-## ترتیب پیاده‌سازی
+- `frontend/src/pages/admin/Clinics/ClinicsList.tsx` - اتصال به API واقعی
+- `frontend/src/pages/admin/Clinics/ClinicFormDialog.tsx` - تکمیل CRUD
 
-1. تغییرات بک‌اند (Role، Entity OTP، Interface، MockOtpService، SmsIrOtpService، AuthService، AuthController)
-2. طراحی Design System و کامپوننت‌های UI پایه
-3. صفحه لاگین جدید با OTP
-4. Layout و Sidebar جدید
-5. پنل ادمین (کلنیک‌ها، بیمه‌ها، دسته‌بندی خدمات)
-6. به‌روزرسانی ثبت پزشک/پرسنل
-7. Dashboard و کامپوننت‌های مشترک
+**Insurances:**
 
-## نکات مهم
+- `frontend/src/pages/admin/Insurances/InsurancesList.tsx` - اتصال به API واقعی
+- `frontend/src/pages/admin/Insurances/InsuranceFormDialog.tsx` - تکمیل CRUD
 
-- MockOtpService برای development استفاده می‌شود و OTP را در log چاپ می‌کند
-- برای production، فقط کافی است در `Program.cs` به جای `MockOtpService`، `SmsIrOtpService` را register کنید
-- Configuration SMS.ir در `appsettings.json` اضافه می‌شود اما فعلاً استفاده نمی‌شود
+**ServiceCategories:**
+
+- `frontend/src/pages/admin/ServiceCategories/ServiceCategoriesList.tsx` - اتصال به API واقعی
+- `frontend/src/pages/admin/ServiceCategories/ServiceCategoryFormDialog.tsx` - تکمیل CRUD
+
+**Services (صفحه جدید):**
+
+- `frontend/src/pages/admin/Services/ServicesList.tsx` (ایجاد)
+- `frontend/src/pages/admin/Services/ServiceFormDialog.tsx` (ایجاد)
+
+**ClinicServices (صفحه جدید):**
+
+- `frontend/src/pages/admin/ClinicServices/ClinicServicesList.tsx` (ایجاد) - نمایش و مدیریت خدمات هر کلینیک
+- `frontend/src/pages/admin/ClinicServices/AddClinicServiceDialog.tsx` (ایجاد)
+
+#### 2.3 صفحه نوبت‌ها (ServiceRequests/Appointments)
+
+**صفحه اصلی:**
+
+- `frontend/src/pages/admin/Appointments/AppointmentsList.tsx` (ایجاد مجدد)
+- جدول کامل با ستون‌های: بیمار، کلینیک، خدمت، انجام‌دهنده، تاریخ/زمان، وضعیت، قیمت
+- فیلترها: وضعیت، کلینیک، بیمار، بازه تاریخ
+- Pagination
+- جستجو
+- دکمه تغییر وضعیت
+- مشاهده جزئیات
+- تاریخچه تغییرات
+
+**کامپوننت‌های مرتبط:**
+
+- `frontend/src/pages/admin/Appointments/AppointmentFormDialog.tsx` - ایجاد/ویرایش نوبت
+- `frontend/src/pages/admin/Appointments/ChangeStatusDialog.tsx` - تغییر وضعیت
+- `frontend/src/pages/admin/Appointments/AppointmentHistoryDialog.tsx` - تاریخچه
+- `frontend/src/pages/admin/Appointments/AssignPerformerDialog.tsx` - تعیین انجام‌دهنده
+
+#### 2.4 Routing و Navigation
+
+- افزودن route برای صفحات جدید
+- به‌روزرسانی منوی ادمین
+
+### 3. Type Definitions
+
+**Backend DTOs:**
+
+- بررسی DTOs موجود در `backend/HospitalSystem.Application/DTOs/`
+- ایجاد DTOs جدید در صورت نیاز
+
+**Frontend Types:**
+
+- همگام‌سازی TypeScript interfaces با DTOs بک‌اند
+- `frontend/src/api/services/*Service.ts` - به‌روزرسانی interfaces
+
+### 4. Validation و Error Handling
+
+**Backend:**
+
+- FluentValidation validators برای DTOs جدید
+
+**Frontend:**
+
+- Error handling در API calls
+- Toast notifications برای موفقیت/خطا
+- Loading states
+
+## ساختار پیاده‌سازی
+
+### Phase 1: Backend Services و Controllers
+
+1. ClinicService + ClinicsController
+2. InsuranceService + InsurancesController
+3. ServiceCategoryService + ServiceCategoriesController
+4. ServiceService + ServicesController
+5. ServiceRequestService + ServiceRequestsController
+6. ClinicServicesController
+7. ثبت تمام services در Program.cs
+
+### Phase 2: Frontend API Services
+
+1. به‌روزرسانی service files موجود
+2. ایجاد service files جدید
+3. Type definitions
+
+### Phase 3: Frontend Pages
+
+1. تکمیل صفحات موجود (Clinics, Insurances, ServiceCategories)
+2. ایجاد صفحه Services
+3. ایجاد صفحه ClinicServices
+4. ایجاد صفحه Appointments کامل
+
+### Phase 4: Integration و Testing
+
+1. تست اتصال فرانت به بک‌اند
+2. تست CRUD operations
+3. تست فیلترها و pagination
+4. تست تغییر وضعیت نوبت‌ها
+
+## تصمیم‌گیری‌ها
+
+1. **انجام‌دهنده‌ها**: از `PerformedByUserId` در ServiceRequest استفاده می‌شود که به User (ProviderProfile) اشاره می‌کند.
+
+2. **خدمات کلینیک**: مدیریت کامل (افزودن/حذف/ویرایش) با استفاده از ClinicService entity موجود.
+
+3. **تاریخچه نوبت‌ها**: از AuditLog موجود استفاده می‌شود برای ردیابی تغییرات.
+
+4. **Pagination**: استاندارد با query parameters: `page`, `pageSize`, `sortBy`, `sortDirection`.
+
+5. **فیلترها**: Query parameters برای فیلتر کردن نتایج.
 
 ### To-dos
 
-- [ ] اضافه کردن role manager به UserRole enum
-- [ ] ایجاد entity OtpVerification برای ذخیره OTP
-- [ ] پیاده‌سازی سرویس ارسال OTP با SMS.ir در AuthService
-- [ ] اضافه کردن endpoint های send-otp و verify-otp به AuthController
-- [ ] تغییر صفحه Login برای استفاده از شماره موبایل و OTP
-- [ ] به‌روزرسانی AuthContext برای پشتیبانی از OTP
-- [ ] اضافه کردن متدهای sendOtp و verifyOtp به authService
-- [ ] ایجاد صفحه و کامپوننت‌های مدیریت کلنیک‌ها
-- [ ] ایجاد صفحه و کامپوننت‌های مدیریت بیمه‌ها
-- [ ] ایجاد صفحه و کامپوننت‌های مدیریت دسته‌بندی خدمات
-- [ ] به‌روزرسانی صفحه ثبت پزشک/پرسنل
-- [ ] به‌روزرسانی منو و routing برای صفحات جدید
+- [ ] ایجاد ClinicService و ClinicsController با CRUD کامل + مدیریت خدمات کلینیک
+- [ ] ایجاد InsuranceService و InsurancesController با CRUD کامل
+- [ ] ایجاد ServiceCategoryService و ServiceCategoriesController با CRUD کامل
+- [ ] ایجاد ServiceService و ServicesController با CRUD کامل
+- [ ] ایجاد ServiceRequestService و ServiceRequestsController با CRUD + فیلتر + pagination + تغییر وضعیت
+- [ ] ایجاد ClinicServicesController برای مدیریت خدمات کلینیک
+- [ ] ثبت تمام services جدید در Program.cs (DI container)
+- [ ] به‌روزرسانی و ایجاد تمام API service files در frontend (حذف mock data)
+- [ ] اتصال صفحه ClinicsList و ClinicFormDialog به API واقعی
+- [ ] اتصال صفحه InsurancesList و InsuranceFormDialog به API واقعی
+- [ ] اتصال صفحه ServiceCategoriesList و ServiceCategoryFormDialog به API واقعی
+- [ ] ایجاد صفحه ServicesList و ServiceFormDialog کامل
+- [ ] ایجاد صفحه ClinicServicesList برای مدیریت خدمات هر کلینیک
+- [ ] ایجاد صفحه AppointmentsList کامل با جدول، فیلتر، pagination و تغییر وضعیت
+- [ ] افزودن routes برای صفحات جدید و به‌روزرسانی navigation
+- [ ] ایجاد ClinicService و ClinicsController با CRUD کامل + مدیریت خدمات کلینیک

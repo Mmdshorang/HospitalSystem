@@ -110,6 +110,11 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 builder.Services.AddScoped<IAuthService, HospitalSystem.Infrastructure.Services.AuthService>();
 builder.Services.AddScoped<HospitalSystem.Infrastructure.Services.SpecialtyService>();
 builder.Services.AddScoped<HospitalSystem.Infrastructure.Services.ProviderService>();
+builder.Services.AddScoped<HospitalSystem.Infrastructure.Services.ClinicService>();
+builder.Services.AddScoped<HospitalSystem.Infrastructure.Services.InsuranceService>();
+builder.Services.AddScoped<HospitalSystem.Infrastructure.Services.ServiceCategoryService>();
+builder.Services.AddScoped<HospitalSystem.Infrastructure.Services.ServiceService>();
+builder.Services.AddScoped<HospitalSystem.Infrastructure.Services.ServiceRequestService>();
 
 // OTP services
 // در محیط فعلی از Kavenegar برای ارسال واقعی OTP استفاده می‌کنیم.

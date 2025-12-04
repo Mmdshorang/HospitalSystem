@@ -23,7 +23,7 @@ const InsurancesList = () => {
     });
 
     const createInsurance = useMutation({
-        mutationFn: (payload: InsurancePayload) => insuranceService.create(payload),
+        mutationFn: (payload: CreateInsuranceDto) => insuranceService.create(payload),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['insurances'] });
             toast.success('بیمه جدید ثبت شد');

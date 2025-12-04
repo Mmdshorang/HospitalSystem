@@ -1,11 +1,11 @@
 import { useState } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'react-toastify';
-import { Layers3, Sparkles, Plus } from 'lucide-react';
+import { Sparkles, Plus } from 'lucide-react';
 import {
     serviceCategoryService,
+    type CreateServiceCategoryDto,
     type ServiceCategory,
-    type ServiceCategoryPayload,
 } from '../../../api/services/serviceCategoryService';
 import { Button } from '../../../components/ui/button';
 import { EmptyState } from '../../../components/states/EmptyState';
@@ -20,11 +20,11 @@ const ServiceCategoriesList = () => {
 
     const { data: categories = [], isLoading } = useQuery<ServiceCategory[]>({
         queryKey: ['service-categories'],
-        queryFn: serviceCategoryService.getAll,
+        queryFn: () => serviceCategoryService.getAll(),
     });
 
     const createCategory = useMutation({
-        mutationFn: (payload: ServiceCategoryPayload) => serviceCategoryService.create(payload),
+        mutationFn: (payload: CreateServiceCategoryDto) => serviceCategoryService.create(payload),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['service-categories'] });
             toast.success('دسته‌بندی ثبت شد');
@@ -71,21 +71,15 @@ const ServiceCategoriesList = () => {
                                 <div className="flex items-center justify-between">
                                     <div className="flex items-center gap-3">
                                         <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-primary/10 text-2xl">
-                                            {category.icon ?? iconPalette[index % iconPalette.length]}
+                                            {iconPalette[index % iconPalette.length]}
                                         </div>
                                         <div className="text-right">
                                             <p className="text-lg font-black text-slate-900">{category.name}</p>
                                             <p className="text-xs text-slate-400">
-                                                {category.servicesCount} خدمت تعریف شده
+                                                دسته‌بندی
                                             </p>
                                         </div>
                                     </div>
-                                    <span
-                                        className={`rounded-full px-3 py-1 text-xs font-semibold ${category.isActive ? 'bg-emerald-100 text-emerald-700' : 'bg-rose-100 text-rose-700'
-                                            }`}
-                                    >
-                                        {category.isActive ? 'فعال' : 'متوقف'}
-                                    </span>
                                 </div>
                                 <p className="mt-4 text-sm text-slate-500">{category.description}</p>
                             </article>

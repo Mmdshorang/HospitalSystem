@@ -1,15 +1,15 @@
 import { useState } from 'react';
 import { X } from 'lucide-react';
-import type { InsurancePayload } from '../../../api/services/insuranceService';
+import type { CreateInsuranceDto } from '../../../api/services/insuranceService';
 import { Button } from '../../../components/ui/button';
 
 interface InsuranceFormDialogProps {
     open: boolean;
     onClose: () => void;
-    onSubmit: (values: InsurancePayload) => Promise<void> | void;
+    onSubmit: (values: CreateInsuranceDto) => Promise<void> | void;
 }
 
-const emptyValues: InsurancePayload = {
+const emptyValues: CreateInsuranceDto = {
     name: '',
     description: '',
     coveragePercent: 70,
@@ -17,7 +17,7 @@ const emptyValues: InsurancePayload = {
 };
 
 export const InsuranceFormDialog = ({ open, onClose, onSubmit }: InsuranceFormDialogProps) => {
-    const [values, setValues] = useState<InsurancePayload>(emptyValues);
+    const [values, setValues] = useState<CreateInsuranceDto>(emptyValues);
     const [loading, setLoading] = useState(false);
 
     const handleSubmit = async (event: React.FormEvent) => {
@@ -51,7 +51,7 @@ export const InsuranceFormDialog = ({ open, onClose, onSubmit }: InsuranceFormDi
                         <input
                             className="mt-2 h-12 w-full rounded-2xl border border-slate-200 px-4 text-sm outline-none focus:border-primary"
                             value={values.name}
-                            onChange={(e) => setValues((prev) => ({ ...prev, name: e.target.value }))}
+                            onChange={(e) => setValues((prev: CreateInsuranceDto) => ({ ...prev, name: e.target.value }))}
                             required
                         />
                     </label>
@@ -60,7 +60,7 @@ export const InsuranceFormDialog = ({ open, onClose, onSubmit }: InsuranceFormDi
                         <textarea
                             className="mt-2 min-h-[90px] w-full rounded-2xl border border-slate-200 p-4 text-sm outline-none focus:border-primary"
                             value={values.description}
-                            onChange={(e) => setValues((prev) => ({ ...prev, description: e.target.value }))}
+                            onChange={(e) => setValues((prev: CreateInsuranceDto) => ({ ...prev, description: e.target.value }))}
                             required
                         />
                     </label>
@@ -73,7 +73,7 @@ export const InsuranceFormDialog = ({ open, onClose, onSubmit }: InsuranceFormDi
                             className="mt-2 h-12 w-full rounded-2xl border border-slate-200 px-4 text-sm outline-none focus:border-primary"
                             value={values.coveragePercent}
                             onChange={(e) =>
-                                setValues((prev) => ({ ...prev, coveragePercent: Number(e.target.value) }))
+                                setValues((prev: CreateInsuranceDto) => ({ ...prev, coveragePercent: Number(e.target.value) }))
                             }
                             required
                         />
@@ -82,7 +82,7 @@ export const InsuranceFormDialog = ({ open, onClose, onSubmit }: InsuranceFormDi
                         <input
                             type="checkbox"
                             checked={values.isActive}
-                            onChange={(e) => setValues((prev) => ({ ...prev, isActive: e.target.checked }))}
+                            onChange={(e) => setValues((prev: CreateInsuranceDto) => ({ ...prev, isActive: e.target.checked }))}
                             className="h-4 w-4 rounded border-slate-300"
                         />
                         فعال شود

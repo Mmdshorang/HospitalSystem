@@ -32,6 +32,7 @@ const navigation = [
   { name: 'کلینیک‌ها', href: '/admin/clinics', icon: Building2 },
   { name: 'بیمه‌ها', href: '/admin/insurances', icon: ShieldCheck },
   { name: 'دسته‌بندی خدمات', href: '/admin/service-categories', icon: Layers3 },
+  { name: 'خدمات', href: '/admin/services', icon: Stethoscope },
   { name: 'نوبت‌ها', href: '/appointments', icon: CalendarClock },
 ];
 
