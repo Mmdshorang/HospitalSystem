@@ -1,3 +1,5 @@
+using System.ComponentModel.DataAnnotations;
+
 namespace HospitalSystem.Application.DTOs;
 
 public class ClinicDto
@@ -18,13 +20,26 @@ public class ClinicDto
 
 public class CreateClinicDto
 {
+    [Required(ErrorMessage = "نام کلینیک الزامی است")]
+    [StringLength(200, ErrorMessage = "نام کلینیک نمی‌تواند بیشتر از 200 کاراکتر باشد")]
     public string? Name { get; set; }
+    
+    [StringLength(20, ErrorMessage = "شماره تماس نمی‌تواند بیشتر از 20 کاراکتر باشد")]
     public string? Phone { get; set; }
+    
+    [EmailAddress(ErrorMessage = "فرمت ایمیل معتبر نیست")]
+    [StringLength(200, ErrorMessage = "ایمیل نمی‌تواند بیشتر از 200 کاراکتر باشد")]
     public string? Email { get; set; }
+    
     public long? ManagerId { get; set; }
+    
+    [StringLength(500, ErrorMessage = "آدرس لوگو نمی‌تواند بیشتر از 500 کاراکتر باشد")]
     public string? LogoUrl { get; set; }
+    
     public bool IsActive { get; set; } = true;
+    
     public List<CreateClinicWorkHoursDto>? WorkHours { get; set; }
+    
     public List<CreateClinicAddressDto>? Addresses { get; set; }
 }
 

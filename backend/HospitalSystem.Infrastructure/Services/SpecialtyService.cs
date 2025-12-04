@@ -75,6 +75,19 @@ public class SpecialtyService
 
     public async Task<SpecialtyDto> CreateAsync(CreateSpecialtyDto dto)
     {
+        if (string.IsNullOrWhiteSpace(dto.Name))
+        {
+            throw new InvalidOperationException("نام تخصص الزامی است");
+        }
+
+        var existing = await _context.Specialties
+            .FirstOrDefaultAsync(s => s.Name != null && s.Name.ToLower() == dto.Name.ToLower());
+
+        if (existing != null)
+        {
+            throw new InvalidOperationException($"تخصص با نام '{dto.Name}' از قبل وجود دارد");
+        }
+
         var specialty = new Specialty
         {
             CategoryId = dto.CategoryId,
@@ -110,6 +123,22 @@ public class SpecialtyService
             .FirstOrDefaultAsync(s => s.Id == id);
 
         if (specialty == null) return null;
+
+        if (string.IsNullOrWhiteSpace(dto.Name))
+        {
+            throw new InvalidOperationException("نام تخصص الزامی است");
+        }
+
+        var existing = await _context.Specialties
+            .FirstOrDefaultAsync(s =>
+                s.Id != id &&
+                s.Name != null &&
+                s.Name.ToLower() == dto.Name.ToLower());
+
+        if (existing != null)
+        {
+            throw new InvalidOperationException($"تخصص با نام '{dto.Name}' از قبل وجود دارد");
+        }
 
         specialty.CategoryId = dto.CategoryId;
         specialty.Name = dto.Name;

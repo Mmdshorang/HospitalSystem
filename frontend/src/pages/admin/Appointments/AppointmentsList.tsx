@@ -373,10 +373,24 @@ const AppointmentsList = () => {
         open={isFormDialogOpen}
         onClose={() => setIsFormDialogOpen(false)}
         onSubmit={async (dto) => {
-          await serviceRequestService.create(dto);
-          queryClient.invalidateQueries({ queryKey: ['appointments'] });
-          toast.success('نوبت با موفقیت ثبت شد');
-          setIsFormDialogOpen(false);
+          try {
+            await serviceRequestService.create(dto);
+            await queryClient.invalidateQueries({ queryKey: ['appointments'] });
+            await queryClient.refetchQueries({ queryKey: ['appointments'] });
+            toast.success('نوبت با موفقیت ثبت شد');
+            setIsFormDialogOpen(false);
+          } catch (error: any) {
+            let errorMessage = 'ثبت نوبت با خطا مواجه شد';
+            
+            if (error?.response?.data?.message) {
+              errorMessage = error.response.data.message;
+            } else if (error?.response?.data?.errors && Array.isArray(error.response.data.errors) && error.response.data.errors.length > 0) {
+              errorMessage = error.response.data.errors.join(', ');
+            }
+            
+            toast.error(errorMessage);
+            throw error;
+          }
         }}
       />
     </div>

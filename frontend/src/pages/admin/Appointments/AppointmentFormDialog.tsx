@@ -39,8 +39,8 @@ export const AppointmentFormDialog = ({ open, onClose, onSubmit }: AppointmentFo
   });
 
   const { data: insurances = [] } = useQuery({
-    queryKey: ['insurances'],
-    queryFn: () => insuranceService.getAll(),
+    queryKey: ['insurances', 'active'],
+    queryFn: () => insuranceService.getAll(undefined, true),
   });
 
   const { data: patients = [] } = useQuery({
@@ -158,20 +158,38 @@ export const AppointmentFormDialog = ({ open, onClose, onSubmit }: AppointmentFo
               </select>
             </label>
             <label className="text-sm font-medium text-slate-600">
-              تاریخ و زمان ترجیحی
-              <input
-                type="datetime-local"
+              نوع نوبت
+              <select
                 className="mt-2 h-12 w-full rounded-2xl border border-slate-200 px-4 text-sm outline-none focus:border-primary"
-                value={values.preferredTime ? new Date(values.preferredTime).toISOString().slice(0, 16) : ''}
+                value={values.appointmentType || ''}
                 onChange={(e) =>
                   setValues((prev) => ({
                     ...prev,
-                    preferredTime: e.target.value ? new Date(e.target.value).toISOString() : undefined,
+                    appointmentType: e.target.value ? (e.target.value as 'in_person' | 'online' | 'phone') : undefined,
                   }))
                 }
-              />
+              >
+                <option value="">انتخاب کنید...</option>
+                <option value="in_person">حضوری</option>
+                <option value="online">آنلاین</option>
+                <option value="phone">تلفنی</option>
+              </select>
             </label>
           </div>
+          <label className="text-sm font-medium text-slate-600">
+            تاریخ و زمان ترجیحی
+            <input
+              type="datetime-local"
+              className="mt-2 h-12 w-full rounded-2xl border border-slate-200 px-4 text-sm outline-none focus:border-primary"
+              value={values.preferredTime ? new Date(values.preferredTime).toISOString().slice(0, 16) : ''}
+              onChange={(e) =>
+                setValues((prev) => ({
+                  ...prev,
+                  preferredTime: e.target.value ? new Date(e.target.value).toISOString() : undefined,
+                }))
+              }
+            />
+          </label>
           <label className="text-sm font-medium text-slate-600">
             یادداشت
             <textarea
@@ -191,7 +209,7 @@ export const AppointmentFormDialog = ({ open, onClose, onSubmit }: AppointmentFo
             </Button>
             <Button
               type="submit"
-              className="h-11 rounded-2xl bg-gradient-to-l from-primary-600 to-primary-400 px-10 text-sm font-semibold text-white"
+              className="h-11 rounded-2xl bg-blue-600 hover:bg-blue-700 px-10 text-sm font-semibold text-white shadow-lg shadow-blue-600/30"
               disabled={isSubmitting}
             >
               {isSubmitting ? 'در حال ذخیره...' : 'ثبت نوبت'}

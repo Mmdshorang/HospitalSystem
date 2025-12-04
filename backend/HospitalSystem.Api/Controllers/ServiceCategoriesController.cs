@@ -2,11 +2,13 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization;
 using HospitalSystem.Application.DTOs;
 using HospitalSystem.Infrastructure.Services;
+using Microsoft.EntityFrameworkCore;
+using System.Linq;
 
 namespace HospitalSystem.Api.Controllers;
 
 [ApiController]
-[Route("api/[controller]")]
+[Route("api/service-categories")]
 [Authorize]
 public class ServiceCategoriesController : ControllerBase
 {
@@ -66,15 +68,36 @@ public class ServiceCategoriesController : ControllerBase
     [Authorize(Roles = "admin")]
     public async Task<IActionResult> Create([FromBody] CreateServiceCategoryDto dto)
     {
+        if (!ModelState.IsValid)
+        {
+            var errors = ModelState
+                .Where(x => x.Value?.Errors.Count > 0)
+                .SelectMany(x => x.Value!.Errors)
+                .Select(x => x.ErrorMessage)
+                .ToList();
+            _logger.LogWarning("Service category validation failed: {Errors}", string.Join(", ", errors));
+            return BadRequest(new { message = "اعتبارسنجی ناموفق بود", errors = errors });
+        }
+
         try
         {
             var category = await _serviceCategoryService.CreateAsync(dto);
             return CreatedAtAction(nameof(GetById), new { id = category.Id }, category);
         }
+        catch (InvalidOperationException ex)
+        {
+            _logger.LogWarning(ex, "Business rule violation creating service category: {Message}", ex.Message);
+            return BadRequest(new { message = ex.Message });
+        }
+        catch (DbUpdateException dbEx)
+        {
+            _logger.LogError(dbEx, "Database error creating service category");
+            return StatusCode(500, new { message = "خطای دیتابیس", details = dbEx.InnerException?.Message ?? dbEx.Message });
+        }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error creating service category");
-            return StatusCode(500, new { message = "Internal server error" });
+            _logger.LogError(ex, "Error creating service category: {Message}", ex.Message);
+            return StatusCode(500, new { message = "خطای سرور", details = ex.Message });
         }
     }
 
@@ -85,22 +108,43 @@ public class ServiceCategoriesController : ControllerBase
     [Authorize(Roles = "admin")]
     public async Task<IActionResult> Update(long id, [FromBody] UpdateServiceCategoryDto dto)
     {
+        if (!ModelState.IsValid)
+        {
+            var errors = ModelState
+                .Where(x => x.Value?.Errors.Count > 0)
+                .SelectMany(x => x.Value!.Errors)
+                .Select(x => x.ErrorMessage)
+                .ToList();
+            _logger.LogWarning("Service category validation failed: {Errors}", string.Join(", ", errors));
+            return BadRequest(new { message = "اعتبارسنجی ناموفق بود", errors = errors });
+        }
+
         try
         {
             if (id != dto.Id)
-                return BadRequest(new { message = "ID mismatch" });
+                return BadRequest(new { message = "عدم تطابق شناسه" });
 
             var category = await _serviceCategoryService.UpdateAsync(id, dto);
 
             if (category == null)
-                return NotFound(new { message = "Service category not found" });
+                return NotFound(new { message = "دسته‌بندی یافت نشد" });
 
             return Ok(category);
+        }
+        catch (InvalidOperationException ex)
+        {
+            _logger.LogWarning(ex, "Business rule violation updating service category: {Message}", ex.Message);
+            return BadRequest(new { message = ex.Message });
+        }
+        catch (DbUpdateException dbEx)
+        {
+            _logger.LogError(dbEx, "Database error updating service category");
+            return StatusCode(500, new { message = "خطای دیتابیس", details = dbEx.InnerException?.Message ?? dbEx.Message });
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error updating service category {Id}", id);
-            return StatusCode(500, new { message = "Internal server error" });
+            return StatusCode(500, new { message = "خطای سرور", details = ex.Message });
         }
     }
 

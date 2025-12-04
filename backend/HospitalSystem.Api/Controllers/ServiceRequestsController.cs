@@ -4,11 +4,13 @@ using HospitalSystem.Application.DTOs;
 using HospitalSystem.Domain.Entities.Enums;
 using HospitalSystem.Infrastructure.Services;
 using System.Security.Claims;
+using Microsoft.EntityFrameworkCore;
+using System.Linq;
 
 namespace HospitalSystem.Api.Controllers;
 
 [ApiController]
-[Route("api/[controller]")]
+[Route("api/service-requests")]
 [Authorize]
 public class ServiceRequestsController : ControllerBase
 {
@@ -79,15 +81,46 @@ public class ServiceRequestsController : ControllerBase
     [HttpPost]
     public async Task<IActionResult> Create([FromBody] CreateServiceRequestDto dto)
     {
+        if (!ModelState.IsValid)
+        {
+            var errors = ModelState
+                .Where(x => x.Value?.Errors.Count > 0)
+                .SelectMany(x => x.Value!.Errors)
+                .Select(x => x.ErrorMessage)
+                .ToList();
+            _logger.LogWarning("Service request validation failed: {Errors}", string.Join(", ", errors));
+            return BadRequest(new { message = "اعتبارسنجی ناموفق بود", errors = errors });
+        }
+
+        if (dto == null)
+        {
+            return BadRequest(new { message = "داده‌های ورودی نامعتبر است" });
+        }
+
+        if (dto.PatientId <= 0)
+        {
+            return BadRequest(new { message = "انتخاب بیمار الزامی است" });
+        }
+
         try
         {
             var request = await _serviceRequestService.CreateAsync(dto);
             return CreatedAtAction(nameof(GetById), new { id = request.Id }, request);
         }
+        catch (InvalidOperationException ex)
+        {
+            _logger.LogWarning(ex, "Business rule violation creating service request: {Message}", ex.Message);
+            return BadRequest(new { message = ex.Message });
+        }
+        catch (DbUpdateException dbEx)
+        {
+            _logger.LogError(dbEx, "Database error creating service request");
+            return StatusCode(500, new { message = "خطای دیتابیس", details = dbEx.InnerException?.Message ?? dbEx.Message });
+        }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error creating service request");
-            return StatusCode(500, new { message = "Internal server error" });
+            _logger.LogError(ex, "Error creating service request: {Message}", ex.Message);
+            return StatusCode(500, new { message = "خطای سرور", details = ex.Message });
         }
     }
 

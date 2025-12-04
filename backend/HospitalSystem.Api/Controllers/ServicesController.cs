@@ -6,7 +6,7 @@ using HospitalSystem.Infrastructure.Services;
 namespace HospitalSystem.Api.Controllers;
 
 [ApiController]
-[Route("api/[controller]")]
+[Route("api/services")]
 [Authorize]
 public class ServicesController : ControllerBase
 {

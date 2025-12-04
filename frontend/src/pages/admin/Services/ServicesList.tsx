@@ -27,11 +27,22 @@ const ServicesList = () => {
 
     const createService = useMutation({
         mutationFn: (payload: CreateServiceDto) => serviceService.create(payload),
-        onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ['services'] });
+        onSuccess: async () => {
+            await queryClient.invalidateQueries({ queryKey: ['services'] });
+            await queryClient.refetchQueries({ queryKey: ['services'] });
             toast.success('خدمت جدید ثبت شد');
         },
-        onError: () => toast.error('ثبت خدمت با خطا مواجه شد'),
+        onError: (error: any) => {
+            let errorMessage = 'ثبت خدمت با خطا مواجه شد';
+            
+            if (error?.response?.data?.message) {
+                errorMessage = error.response.data.message;
+            } else if (error?.response?.data?.errors && Array.isArray(error.response.data.errors) && error.response.data.errors.length > 0) {
+                errorMessage = error.response.data.errors.join(', ');
+            }
+            
+            toast.error(errorMessage);
+        },
     });
 
     const deleteService = useMutation({

@@ -6,12 +6,15 @@ import AddDoctorDialog, { type AddDoctorFormValues } from "./AddDoctorDialog";
 import DataTable from "../../../components/DataTable";
 import { providerService, type Provider } from "../../../api/services/providerService";
 import { specialtyService, type Specialty } from "../../../api/services/specialtyService";
+import { clinicService, type Clinic } from "../../../api/services/clinicService";
 import { Button } from "../../../components/ui/button";
 
 const Doctors = () => {
   const [isAddOpen, setIsAddOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedSpecialtyId, setSelectedSpecialtyId] = useState<number | undefined>();
+  const [selectedClinicId, setSelectedClinicId] = useState<number | undefined>();
+  const [selectedStatus, setSelectedStatus] = useState<'all' | 'true' | 'false'>('all');
   const queryClient = useQueryClient();
 
   // Fetch specialties for filter dropdown
@@ -20,10 +23,21 @@ const Doctors = () => {
     queryFn: () => specialtyService.getAll(),
   });
 
+  // Fetch clinics for filter dropdown
+  const { data: clinics = [] } = useQuery<Clinic[]>({
+    queryKey: ["clinics"],
+    queryFn: () => clinicService.getAll(),
+  });
+
   // Fetch providers with filters
   const { data: providers = [], isLoading, error } = useQuery<Provider[]>({
-    queryKey: ["providers", searchTerm, selectedSpecialtyId],
-    queryFn: () => providerService.getAll(searchTerm, selectedSpecialtyId, undefined, true),
+    queryKey: ["providers", searchTerm, selectedSpecialtyId, selectedClinicId, selectedStatus],
+    queryFn: () => providerService.getAll(
+      searchTerm,
+      selectedSpecialtyId,
+      selectedClinicId,
+      selectedStatus === 'all' ? undefined : selectedStatus === 'true'
+    ),
   });
 
   // Create provider mutation
@@ -31,10 +45,10 @@ const Doctors = () => {
     mutationFn: providerService.create,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["providers"] });
-      toast.success("پزشک با موفقیت اضافه شد");
+      toast.success("کادر درمانی با موفقیت اضافه شد");
     },
     onError: (error: any) => {
-      toast.error(error.response?.data?.message || "خطا در افزودن پزشک");
+      toast.error(error.response?.data?.message || "خطا در افزودن کادر درمانی");
     },
   });
 
@@ -43,10 +57,10 @@ const Doctors = () => {
     mutationFn: providerService.delete,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["providers"] });
-      toast.success("پزشک با موفقیت حذف شد");
+      toast.success("کادر درمانی با موفقیت حذف شد");
     },
     onError: (error: any) => {
-      toast.error(error.response?.data?.message || "خطا در حذف پزشک");
+      toast.error(error.response?.data?.message || "خطا در حذف کادر درمانی");
     },
   });
 
@@ -70,7 +84,7 @@ const Doctors = () => {
   };
 
   const handleDelete = (id: number) => {
-    if (window.confirm("آیا از حذف این پزشک اطمینان دارید؟")) {
+    if (window.confirm("آیا از حذف این کادر درمانی اطمینان دارید؟")) {
       deleteMutation.mutate(id);
     }
   };
@@ -79,7 +93,7 @@ const Doctors = () => {
     () => [
       {
         key: "fullName",
-        header: "پزشک",
+        header: "کادر درمانی",
         sortable: true,
         accessor: (row: Provider) => `${row.userFirstName || ""} ${row.userLastName || ""}`,
         cell: (_: unknown, row: Provider) => (
@@ -165,7 +179,7 @@ const Doctors = () => {
   if (error) {
     return (
       <div className="p-4 text-center text-red-600">
-        خطا در بارگذاری اطلاعات پزشکان
+        خطا در بارگذاری اطلاعات کادر درمانی
       </div>
     );
   }
@@ -177,16 +191,16 @@ const Doctors = () => {
           <div className="space-y-3">
             <p className="inline-flex items-center gap-2 rounded-full bg-primary/10 px-4 py-1 text-xs font-semibold text-primary-600">
               <Stethoscope className="h-4 w-4" />
-              شبکه پزشکان
+              شبکه کادر درمانی
             </p>
-            <h1 className="text-3xl font-black text-slate-900">مدیریت پزشکان و پرسنل</h1>
+            <h1 className="text-3xl font-black text-slate-900">مدیریت کادر درمانی</h1>
             <p className="text-sm text-slate-500">
               اطلاعات تخصص، وضعیت و کلینیک مرتبط را به‌روز نگه دارید.
             </p>
             <div className="flex gap-4 text-sm text-slate-500">
               <span className="flex items-center gap-2">
                 <Users2 className="h-4 w-4 text-sky-500" />
-                {providers.length} پزشک ثبت‌شده
+                {providers.length} کادر درمانی ثبت‌شده
               </span>
               <span className="flex items-center gap-2">
                 <Stethoscope className="h-4 w-4 text-emerald-500" />
@@ -199,7 +213,7 @@ const Doctors = () => {
             onClick={() => setIsAddOpen(true)}
           >
             <Plus className="ml-2 h-4 w-4" />
-            افزودن پزشک
+            افزودن کادر درمانی
           </Button>
         </div>
       </section>
@@ -227,6 +241,27 @@ const Doctors = () => {
               {specialty.name}
             </option>
           ))}
+        </select>
+        <select
+          value={selectedClinicId || ""}
+          onChange={(e) => setSelectedClinicId(e.target.value ? Number(e.target.value) : undefined)}
+          className="h-12 w-full rounded-2xl border border-slate-200 px-4 text-sm text-slate-600 outline-none focus:border-primary sm:w-64"
+        >
+          <option value="">همه کلینیک‌ها</option>
+          {clinics.map((clinic) => (
+            <option key={clinic.id} value={clinic.id}>
+              {clinic.name}
+            </option>
+          ))}
+        </select>
+        <select
+          value={selectedStatus}
+          onChange={(e) => setSelectedStatus(e.target.value as 'all' | 'true' | 'false')}
+          className="h-12 w-full rounded-2xl border border-slate-200 px-4 text-sm text-slate-600 outline-none focus:border-primary sm:w-64"
+        >
+          <option value="all">همه وضعیت‌ها</option>
+          <option value="true">فعال</option>
+          <option value="false">غیرفعال</option>
         </select>
       </div>
 

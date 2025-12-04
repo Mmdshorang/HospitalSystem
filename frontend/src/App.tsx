@@ -19,6 +19,7 @@ import ServiceCategoriesList from './pages/admin/ServiceCategories/ServiceCatego
 import ServicesList from './pages/admin/Services/ServicesList';
 import AppointmentsList from './pages/admin/Appointments/AppointmentsList';
 import ClinicServicesList from './pages/admin/ClinicServices/ClinicServicesList';
+import SpecialtiesList from './pages/admin/Specialties/SpecialtiesList';
 import 'react-toastify/dist/ReactToastify.css';
 
 const queryClient = new QueryClient({
@@ -79,6 +80,16 @@ function App() {
                   <ProtectedRoute>
                     <Layout>
                       <ServiceCategoriesList />
+                    </Layout>
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/admin/specialties"
+                element={
+                  <ProtectedRoute>
+                    <Layout>
+                      <SpecialtiesList />
                     </Layout>
                   </ProtectedRoute>
                 }

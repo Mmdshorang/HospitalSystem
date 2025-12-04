@@ -8,7 +8,7 @@ using HospitalSystem.Domain.Entities.Enums;
 namespace HospitalSystem.Api.Controllers;
 
 [ApiController]
-[Route("api/[controller]")]
+[Route("api/auth")]
 [AllowAnonymous]
 public class AuthController : ControllerBase
 {

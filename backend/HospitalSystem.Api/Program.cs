@@ -279,6 +279,9 @@ app.Use(async (context, next) =>
     await next();
 });
 
+// Routing
+app.UseRouting();
+
 // Authentication & Authorization
 app.UseAuthentication();
 app.UseAuthorization();
@@ -476,7 +479,7 @@ try
     Log.Information("Starting Hospital Management System API");
     
     // Use PORT env var if provided (e.g., by Liara), otherwise use ASPNETCORE_URLS or default
-    var port = Environment.GetEnvironmentVariable("PORT") ?? "3000";
+    var port = Environment.GetEnvironmentVariable("PORT") ?? "5000";
     var urls = builder.Configuration["ASPNETCORE_URLS"] ?? $"http://0.0.0.0:{port}";
     
     // Override ASPNETCORE_URLS if PORT is set
@@ -496,10 +499,10 @@ try
     
     if (app.Environment.IsDevelopment())
     {
-        Log.Information("   • API Base URL:      http://localhost:3000");
-        Log.Information("   • Swagger UI:        http://localhost:3000");
-        Log.Information("   • Swagger JSON:      http://localhost:3000/swagger/v1/swagger.json");
-        Log.Information("   • Health Check:      http://localhost:3000/health");
+        Log.Information("   • API Base URL:      http://localhost:5000");
+        Log.Information("   • Swagger UI:        http://localhost:5000");
+        Log.Information("   • Swagger JSON:      http://localhost:5000/swagger/v1/swagger.json");
+        Log.Information("   • Health Check:      http://localhost:5000/health");
     }
     else
     {

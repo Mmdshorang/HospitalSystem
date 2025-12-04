@@ -5,7 +5,7 @@ import { ShieldCheck, BadgeCheck, Plus } from 'lucide-react';
 import {
     insuranceService,
     type Insurance,
-    type InsurancePayload,
+    type CreateInsuranceDto,
 } from '../../../api/services/insuranceService';
 import { Button } from '../../../components/ui/button';
 import { EmptyState } from '../../../components/states/EmptyState';
@@ -18,17 +18,31 @@ const InsurancesList = () => {
     const queryClient = useQueryClient();
 
     const { data: insurances = [], isLoading } = useQuery<Insurance[]>({
-        queryKey: ['insurances'],
-        queryFn: insuranceService.getAll,
+        queryKey: ['insurances', filter],
+        queryFn: () => {
+            const isActive = filter === 'all' ? undefined : filter === 'active';
+            return insuranceService.getAll(undefined, isActive);
+        },
     });
 
     const createInsurance = useMutation({
         mutationFn: (payload: CreateInsuranceDto) => insuranceService.create(payload),
-        onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ['insurances'] });
+        onSuccess: async () => {
+            await queryClient.invalidateQueries({ queryKey: ['insurances'] });
+            await queryClient.refetchQueries({ queryKey: ['insurances'] });
             toast.success('بیمه جدید ثبت شد');
         },
-        onError: () => toast.error('ثبت بیمه با خطا مواجه شد'),
+        onError: (error: any) => {
+            let errorMessage = 'ثبت بیمه با خطا مواجه شد';
+            
+            if (error?.response?.data?.message) {
+                errorMessage = error.response.data.message;
+            } else if (error?.response?.data?.errors && Array.isArray(error.response.data.errors) && error.response.data.errors.length > 0) {
+                errorMessage = error.response.data.errors.join(', ');
+            }
+            
+            toast.error(errorMessage);
+        },
     });
 
     const toggleInsurance = useMutation({
@@ -40,10 +54,8 @@ const InsurancesList = () => {
         onError: () => toast.error('به‌روزرسانی وضعیت بیمه ممکن نشد'),
     });
 
-    const filteredInsurances = useMemo(() => {
-        if (filter === 'all') return insurances;
-        return insurances.filter((insurance) => insurance.isActive === (filter === 'active'));
-    }, [filter, insurances]);
+    // No need for client-side filtering since we're filtering on the server
+    const filteredInsurances = insurances;
 
     return (
         <div className="space-y-8">

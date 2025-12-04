@@ -16,6 +16,7 @@ import {
   Settings2,
   ChevronRight,
   ChevronLeft,
+  GraduationCap,
 } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { Button } from './ui/button';
@@ -27,8 +28,9 @@ interface LayoutProps {
 
 const navigation = [
   { name: 'داشبورد', href: '/', icon: LayoutDashboard },
-  { name: 'پزشکان', href: '/doctors', icon: Stethoscope },
+  { name: 'کادر درمانی', href: '/doctors', icon: Stethoscope },
   { name: 'بیماران', href: '/patients', icon: Users2 },
+  { name: 'تخصص‌ها', href: '/admin/specialties', icon: GraduationCap },
   { name: 'کلینیک‌ها', href: '/admin/clinics', icon: Building2 },
   { name: 'بیمه‌ها', href: '/admin/insurances', icon: ShieldCheck },
   { name: 'دسته‌بندی خدمات', href: '/admin/service-categories', icon: Layers3 },
@@ -41,7 +43,8 @@ const breadcrumbTranslations: Record<string, string> = {
   insurances: 'بیمه‌ها',
   clinics: 'کلینیک‌ها',
   patients: 'بیماران',
-  doctors: 'پزشکان',
+  doctors: 'کادر درمانی',
+  specialties: 'تخصص‌ها',
   appointments: 'نوبت‌ها',
   'service-categories': 'دسته‌بندی خدمات',
   'service-category': 'دسته‌بندی خدمات',

@@ -1,4 +1,7 @@
 import React, { useState } from "react";
+import { useQuery } from "@tanstack/react-query";
+import { specialtyService, type Specialty } from "../../../api/services/specialtyService";
+import { clinicService, type Clinic } from "../../../api/services/clinicService";
 
 export interface AddDoctorFormValues {
   firstName: string;
@@ -35,6 +38,18 @@ const AddDoctorDialog: React.FC<AddDoctorDialogProps> = ({
     degree: "",
     experienceYears: null,
     isActive: true,
+  });
+
+  // Fetch specialties for dropdown
+  const { data: specialties = [] } = useQuery<Specialty[]>({
+    queryKey: ["specialties"],
+    queryFn: () => specialtyService.getAll(),
+  });
+
+  // Fetch clinics for dropdown
+  const { data: clinics = [] } = useQuery<Clinic[]>({
+    queryKey: ["clinics"],
+    queryFn: () => clinicService.getAll(),
   });
 
   const resetAndClose = () => {
@@ -94,7 +109,7 @@ const AddDoctorDialog: React.FC<AddDoctorDialogProps> = ({
       <div className="absolute inset-0 bg-black/30" onClick={resetAndClose} />
       <div className="relative bg-white rounded-lg shadow-xl w-full max-w-2xl mx-4">
         <div className="px-6 py-4 border-b border-gray-200">
-          <h2 className="text-lg font-semibold">افزودن پزشک</h2>
+          <h2 className="text-lg font-semibold">افزودن کادر درمانی</h2>
         </div>
         <form onSubmit={handleSubmit} className="p-6 space-y-4">
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -155,23 +170,35 @@ const AddDoctorDialog: React.FC<AddDoctorDialogProps> = ({
             </div>
             <div>
               <label className="block text-sm text-gray-700 mb-1">تخصص</label>
-              <input
-                name="specializationName"
+              <select
+                name="specialtyId"
                 value={values.specialtyId ?? ""}
                 onChange={handleChange}
-                className="input"
-              />
+                className="h-12 w-full rounded-2xl border border-slate-200 px-4 text-sm outline-none focus:border-primary"
+              >
+                <option value="">انتخاب تخصص...</option>
+                {specialties.map((specialty) => (
+                  <option key={specialty.id} value={specialty.id}>
+                    {specialty.name}
+                  </option>
+                ))}
+              </select>
             </div>
             <div>
               <label className="block text-sm text-gray-700 mb-1">کلینیک</label>
-              <input
+              <select
                 name="clinicId"
                 value={values.clinicId ?? ""}
                 onChange={handleChange}
-                className="input"
-                type="number"
-                min={0}
-              />
+                className="h-12 w-full rounded-2xl border border-slate-200 px-4 text-sm outline-none focus:border-primary"
+              >
+                <option value="">انتخاب کلینیک...</option>
+                {clinics.map((clinic) => (
+                  <option key={clinic.id} value={clinic.id}>
+                    {clinic.name}
+                  </option>
+                ))}
+              </select>
             </div>
             <div>
               <label className="block text-sm text-gray-700 mb-1">مدرک</label>
@@ -219,7 +246,10 @@ const AddDoctorDialog: React.FC<AddDoctorDialogProps> = ({
             >
               انصراف
             </button>
-            <button type="submit" className="btn btn-primary">
+            <button 
+              type="submit" 
+              className="h-11 rounded-2xl bg-blue-600 hover:bg-blue-700 px-10 text-sm font-semibold text-white shadow-lg shadow-blue-600/30 transition-colors"
+            >
               ذخیره
             </button>
           </div>

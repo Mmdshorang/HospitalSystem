@@ -2,11 +2,13 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization;
 using HospitalSystem.Infrastructure.Models;
 using HospitalSystem.Infrastructure.Services;
+using Microsoft.EntityFrameworkCore;
+using System.Linq;
 
 namespace HospitalSystem.Api.Controllers;
 
 [ApiController]
-[Route("api/[controller]")]
+[Route("api/specialties")]
 [Authorize]
 public class SpecialtiesController : ControllerBase
 {
@@ -66,15 +68,36 @@ public class SpecialtiesController : ControllerBase
     [Authorize(Roles = "admin")]
     public async Task<IActionResult> Create([FromBody] CreateSpecialtyDto dto)
     {
+        if (!ModelState.IsValid)
+        {
+            var errors = ModelState
+                .Where(x => x.Value?.Errors.Count > 0)
+                .SelectMany(x => x.Value!.Errors)
+                .Select(x => x.ErrorMessage)
+                .ToList();
+            _logger.LogWarning("Specialty validation failed: {Errors}", string.Join(", ", errors));
+            return BadRequest(new { message = "اعتبارسنجی ناموفق بود", errors = errors });
+        }
+
         try
         {
             var specialty = await _specialtyService.CreateAsync(dto);
             return CreatedAtAction(nameof(GetById), new { id = specialty.Id }, specialty);
         }
+        catch (InvalidOperationException ex)
+        {
+            _logger.LogWarning(ex, "Business rule violation creating specialty: {Message}", ex.Message);
+            return BadRequest(new { message = ex.Message });
+        }
+        catch (DbUpdateException dbEx)
+        {
+            _logger.LogError(dbEx, "Database error creating specialty");
+            return StatusCode(500, new { message = "خطای دیتابیس", details = dbEx.InnerException?.Message ?? dbEx.Message });
+        }
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error creating specialty");
-            return StatusCode(500, new { message = "Internal server error" });
+            return StatusCode(500, new { message = "خطای سرور", details = ex.Message });
         }
     }
 
@@ -85,22 +108,43 @@ public class SpecialtiesController : ControllerBase
     [Authorize(Roles = "admin")]
     public async Task<IActionResult> Update(long id, [FromBody] UpdateSpecialtyDto dto)
     {
+        if (!ModelState.IsValid)
+        {
+            var errors = ModelState
+                .Where(x => x.Value?.Errors.Count > 0)
+                .SelectMany(x => x.Value!.Errors)
+                .Select(x => x.ErrorMessage)
+                .ToList();
+            _logger.LogWarning("Specialty validation failed on update: {Errors}", string.Join(", ", errors));
+            return BadRequest(new { message = "اعتبارسنجی ناموفق بود", errors = errors });
+        }
+
+        if (id != dto.Id)
+            return BadRequest(new { message = "شناسه ارسالی با داده‌ها همخوانی ندارد" });
+
         try
         {
-            if (id != dto.Id)
-                return BadRequest(new { message = "ID mismatch" });
-
             var specialty = await _specialtyService.UpdateAsync(id, dto);
 
             if (specialty == null)
-                return NotFound(new { message = "Specialty not found" });
+                return NotFound(new { message = "تخصص پیدا نشد" });
 
             return Ok(specialty);
+        }
+        catch (InvalidOperationException ex)
+        {
+            _logger.LogWarning(ex, "Business rule violation updating specialty {Id}: {Message}", id, ex.Message);
+            return BadRequest(new { message = ex.Message });
+        }
+        catch (DbUpdateException dbEx)
+        {
+            _logger.LogError(dbEx, "Database error updating specialty {Id}", id);
+            return StatusCode(500, new { message = "خطای دیتابیس", details = dbEx.InnerException?.Message ?? dbEx.Message });
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error updating specialty {Id}", id);
-            return StatusCode(500, new { message = "Internal server error" });
+            return StatusCode(500, new { message = "خطای سرور", details = ex.Message });
         }
     }
 

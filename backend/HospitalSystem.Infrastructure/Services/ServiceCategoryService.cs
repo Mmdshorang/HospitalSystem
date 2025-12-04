@@ -66,6 +66,18 @@ public class ServiceCategoryService
 
     public async Task<ServiceCategoryDto> CreateAsync(CreateServiceCategoryDto dto)
     {
+        // Check for duplicate name (case-insensitive)
+        if (!string.IsNullOrWhiteSpace(dto.Name))
+        {
+            var existingCategory = await _context.ServiceCategories
+                .FirstOrDefaultAsync(sc => sc.Name != null && sc.Name.ToLower() == dto.Name.ToLower());
+
+            if (existingCategory != null)
+            {
+                throw new InvalidOperationException($"دسته‌بندی با نام '{dto.Name}' از قبل وجود دارد");
+            }
+        }
+
         var category = new ServiceCategory
         {
             Name = dto.Name,
@@ -92,6 +104,18 @@ public class ServiceCategoryService
         var category = await _context.ServiceCategories.FindAsync(id);
 
         if (category == null) return null;
+
+        // Check for duplicate name (case-insensitive, excluding current category)
+        if (!string.IsNullOrWhiteSpace(dto.Name))
+        {
+            var existingCategory = await _context.ServiceCategories
+                .FirstOrDefaultAsync(sc => sc.Id != id && sc.Name != null && sc.Name.ToLower() == dto.Name.ToLower());
+
+            if (existingCategory != null)
+            {
+                throw new InvalidOperationException($"دسته‌بندی با نام '{dto.Name}' از قبل وجود دارد");
+            }
+        }
 
         category.Name = dto.Name;
         category.Description = dto.Description;

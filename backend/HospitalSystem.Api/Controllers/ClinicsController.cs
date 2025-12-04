@@ -2,12 +2,12 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization;
 using HospitalSystem.Application.DTOs;
 using HospitalSystem.Infrastructure.Services;
+using System.Security.Claims;
 
 namespace HospitalSystem.Api.Controllers;
 
 [ApiController]
-[Route("api/[controller]")]
-[Authorize]
+[Route("api/clinics")]
 public class ClinicsController : ControllerBase
 {
     private readonly ClinicService _clinicService;
@@ -23,6 +23,7 @@ public class ClinicsController : ControllerBase
     /// Get all clinics with optional filters
     /// </summary>
     [HttpGet]
+    [Authorize]
     public async Task<IActionResult> GetAll(
         [FromQuery] string? searchTerm,
         [FromQuery] string? city,
@@ -44,6 +45,7 @@ public class ClinicsController : ControllerBase
     /// Get clinic by ID
     /// </summary>
     [HttpGet("{id}")]
+    [Authorize]
     public async Task<IActionResult> GetById(long id)
     {
         try
@@ -69,6 +71,30 @@ public class ClinicsController : ControllerBase
     [Authorize(Roles = "admin,manager")]
     public async Task<IActionResult> Create([FromBody] CreateClinicDto dto)
     {
+        // Log user role for debugging (this will only run if authorization passes)
+        var userRole = User.FindFirst(ClaimTypes.Role)?.Value;
+        var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+        _logger.LogInformation("Create clinic request - UserId: {UserId}, Role: {Role}", userId, userRole);
+
+        if (!ModelState.IsValid)
+        {
+            var errors = ModelState
+                .Where(x => x.Value?.Errors.Count > 0)
+                .SelectMany(x => x.Value!.Errors.Select(e => e.ErrorMessage))
+                .ToList();
+            return BadRequest(new { message = "خطا در اعتبارسنجی داده‌ها", errors });
+        }
+
+        if (dto == null)
+        {
+            return BadRequest(new { message = "داده‌های ورودی نامعتبر است" });
+        }
+
+        if (string.IsNullOrWhiteSpace(dto.Name))
+        {
+            return BadRequest(new { message = "نام کلینیک الزامی است" });
+        }
+
         try
         {
             var clinic = await _clinicService.CreateAsync(dto);
@@ -77,7 +103,7 @@ public class ClinicsController : ControllerBase
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error creating clinic");
-            return StatusCode(500, new { message = "Internal server error" });
+            return StatusCode(500, new { message = "خطا در ایجاد کلینیک", error = ex.Message });
         }
     }
 

@@ -63,7 +63,6 @@ export const ServiceCategoryFormDialog = ({
                             className="mt-2 min-h-[90px] w-full rounded-2xl border border-slate-200 p-4 text-sm outline-none focus:border-primary"
                             value={values.description}
                             onChange={(e) => setValues((prev) => ({ ...prev, description: e.target.value }))}
-                            required
                         />
                     </label>
 
@@ -79,7 +78,7 @@ export const ServiceCategoryFormDialog = ({
                         </Button>
                         <Button
                             type="submit"
-                            className="h-11 rounded-2xl from-primary-600 to-primary-400 px-10 text-sm font-semibold text-slate-600 shadow-lg shadow-primary-600/20 hover:from-primary-700 hover:to-primary-500 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                            className="h-11 rounded-2xl bg-blue-600 hover:bg-blue-700 px-10 text-sm font-semibold text-white shadow-lg shadow-blue-600/30"
                             disabled={loading}
                         >
                             {loading ? 'در حال ذخیره...' : 'ثبت دسته‌بندی'}

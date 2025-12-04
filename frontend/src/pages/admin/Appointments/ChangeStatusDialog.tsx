@@ -82,7 +82,7 @@ export const ChangeStatusDialog = ({ open, onClose, appointment, onSubmit }: Cha
             </Button>
             <Button
               type="submit"
-              className="h-11 rounded-2xl bg-gradient-to-l from-primary-600 to-primary-400 px-10 text-sm font-semibold text-white"
+              className="h-11 rounded-2xl bg-blue-600 hover:bg-blue-700 px-10 text-sm font-semibold text-white shadow-lg shadow-blue-600/30"
               disabled={isSubmitting}
             >
               {isSubmitting ? 'در حال تغییر...' : 'تغییر وضعیت'}

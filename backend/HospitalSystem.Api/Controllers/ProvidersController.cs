@@ -2,11 +2,12 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization;
 using HospitalSystem.Infrastructure.Models;
 using HospitalSystem.Infrastructure.Services;
+using System.Security.Claims;
 
 namespace HospitalSystem.Api.Controllers;
 
 [ApiController]
-[Route("api/[controller]")]
+[Route("api/providers")]
 [Authorize]
 public class ProvidersController : ControllerBase
 {
@@ -72,13 +73,20 @@ public class ProvidersController : ControllerBase
     {
         try
         {
+            var userId = GetCurrentUserId();
+            if (!userId.HasValue)
+            {
+                return Unauthorized(new { message = "Invalid token or user not found" });
+            }
+
+            dto.UserId = userId.Value;
             var provider = await _providerService.CreateAsync(dto);
             return CreatedAtAction(nameof(GetById), new { id = provider.Id }, provider);
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error creating provider");
-            return StatusCode(500, new { message = "Internal server error" });
+            return StatusCode(500, new { message = "Internal server error", details = ex.Message });
         }
     }
 
@@ -129,5 +137,15 @@ public class ProvidersController : ControllerBase
             _logger.LogError(ex, "Error deleting provider {Id}", id);
             return StatusCode(500, new { message = "Internal server error" });
         }
+    }
+
+    private long? GetCurrentUserId()
+    {
+        var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+        if (long.TryParse(userIdClaim, out var userId))
+        {
+            return userId;
+        }
+        return null;
     }
 }

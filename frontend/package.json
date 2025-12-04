@@ -4,7 +4,7 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "vite --port 3000",
+    "dev": "vite",
     "build": "tsc && vite build",
     "build:win": "tsc && set NODE_OPTIONS=--max-old-space-size=8192 && vite build",
     "lint:check": "biome check src",

@@ -29,7 +29,17 @@ const ServiceCategoriesList = () => {
             queryClient.invalidateQueries({ queryKey: ['service-categories'] });
             toast.success('دسته‌بندی ثبت شد');
         },
-        onError: () => toast.error('ثبت دسته‌بندی با خطا مواجه شد'),
+        onError: (error: any) => {
+            let errorMessage = 'ثبت دسته‌بندی با خطا مواجه شد';
+            
+            if (error?.response?.data?.message) {
+                errorMessage = error.response.data.message;
+            } else if (error?.response?.data?.errors && Array.isArray(error.response.data.errors) && error.response.data.errors.length > 0) {
+                errorMessage = error.response.data.errors.join(', ');
+            }
+            
+            toast.error(errorMessage);
+        },
     });
 
     return (

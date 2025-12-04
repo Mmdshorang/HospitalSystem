@@ -1,19 +1,16 @@
-import {
-  Activity,
-  CalendarClock,
-  ShieldCheck,
-  Users2,
-  Stethoscope,
-  Building2,
-  ArrowRight,
-} from 'lucide-react';
+import { useMemo } from 'react';
+import { useQuery } from '@tanstack/react-query';
+import { Activity, CalendarClock, Users2, Stethoscope, Building2, ArrowRight } from 'lucide-react';
 import { Button } from '../../../components/ui/button';
-
-const insights = [
-  { label: 'پوشش بیمه', value: '۸۵%', trend: '+۵%', color: 'from-emerald-500 to-emerald-300' },
-  { label: 'رضایت بیماران', value: '۹۲%', trend: '+۲%', color: 'from-sky-500 to-cyan-300' },
-  { label: 'میانگین زمان انتظار', value: '۱۲ دقیقه', trend: '-۳ دقیقه', color: 'from-amber-500 to-orange-300' },
-];
+import { providerService } from '../../../api/services/providerService';
+import { clinicService } from '../../../api/services/clinicService';
+import { insuranceService } from '../../../api/services/insuranceService';
+import { patientService } from '../../../api/services/patientService';
+import {
+  serviceRequestService,
+  type ServiceRequest,
+} from '../../../api/services/serviceRequestService';
+import { PageLoader } from '../../../components/states/PageLoader';
 
 const quickActions = [
   { label: 'ثبت پزشک', href: '/doctors/new' },
@@ -22,20 +19,103 @@ const quickActions = [
   { label: 'ثبت کلینیک', href: '/admin/clinics' },
 ];
 
-const activityFeed = [
-  { id: 1, title: 'ثبت بیمار جدید', detail: 'سمیه نصیری در واحد قلب', time: '۲ دقیقه پیش' },
-  { id: 2, title: 'تایید پزشک', detail: 'دکتر مهدی افشار برای کلینیک آتیه', time: '۴۵ دقیقه پیش' },
-  { id: 3, title: 'درخواست خدمت', detail: 'درخواست MRI برای بیمارستان سینا', time: 'دیروز' },
-];
-
-const appointments = [
-  { id: 1, time: '۰۹:۲۰', clinic: 'کلینیک آفتاب', doctor: 'دکتر راد', patient: 'مهسا صالحی' },
-  { id: 2, time: '۱۰:۱۰', clinic: 'مرکز پارسه', doctor: 'دکتر طاهری', patient: 'بهنام شریفی' },
-  { id: 3, time: '۱۱:۴۵', clinic: 'کلینیک ساحل', doctor: 'دکتر عرب', patient: 'حسن فراهانی' },
-  { id: 4, time: '۱۳:۱۵', clinic: 'کلینیک امید', doctor: 'دکتر میرزایی', patient: 'سارا نعمتی' },
-];
-
 const Home = () => {
+  // Active providers (doctors)
+  const { data: providers = [], isLoading: loadingProviders } = useQuery({
+    queryKey: ['dashboard', 'providers', 'active'],
+    queryFn: () => providerService.getAll(undefined, undefined, undefined, true),
+  });
+
+  // Active clinics
+  const { data: clinics = [], isLoading: loadingClinics } = useQuery({
+    queryKey: ['dashboard', 'clinics', 'active'],
+    queryFn: () => clinicService.getAll(undefined, undefined, true),
+  });
+
+  // Active insurances
+  const { data: insurances = [], isLoading: loadingInsurances } = useQuery({
+    queryKey: ['dashboard', 'insurances', 'active'],
+    queryFn: () => insuranceService.getAll(undefined, true),
+  });
+
+  // Patients (simple count)
+  const { data: patients = [], isLoading: loadingPatients } = useQuery({
+    queryKey: ['dashboard', 'patients'],
+    queryFn: () => patientService.getAll(),
+  });
+
+  // Today range for appointments
+  const { todayStartIso, todayEndIso } = useMemo(() => {
+    const now = new Date();
+    const start = new Date(now);
+    start.setHours(0, 0, 0, 0);
+    const end = new Date(now);
+    end.setHours(23, 59, 59, 999);
+    return {
+      todayStartIso: start.toISOString(),
+      todayEndIso: end.toISOString(),
+    };
+  }, []);
+
+  // Today's appointments (service requests)
+  const {
+    data: todayAppointmentsResult,
+    isLoading: loadingTodayAppointments,
+  } = useQuery({
+    queryKey: ['dashboard', 'appointments', 'today', todayStartIso, todayEndIso],
+    queryFn: () =>
+      serviceRequestService.getAll(
+        1,
+        10,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        todayStartIso,
+        todayEndIso,
+        'createdAt',
+        'asc'
+      ),
+  });
+
+  const todayAppointments: ServiceRequest[] = todayAppointmentsResult?.data ?? [];
+  const todayAppointmentsCount = todayAppointmentsResult?.totalCount ?? 0;
+
+  // Recent activity (latest service requests)
+  const {
+    data: recentRequestsResult,
+    isLoading: loadingRecent,
+  } = useQuery({
+    queryKey: ['dashboard', 'service-requests', 'recent'],
+    queryFn: () => serviceRequestService.getAll(1, 5, undefined, undefined, undefined, undefined, undefined, undefined, 'createdAt', 'desc'),
+  });
+
+  const recentRequests: ServiceRequest[] = recentRequestsResult?.data ?? [];
+
+  const isAnyLoading =
+    loadingProviders || loadingClinics || loadingInsurances || loadingPatients;
+
+  const insights = [
+    {
+      label: 'تعداد بیمه‌های فعال',
+      value: insurances.length.toString(),
+      trend: '',
+      color: 'from-emerald-500 to-emerald-300',
+    },
+    {
+      label: 'تعداد بیماران ثبت‌شده',
+      value: patients.length.toString(),
+      trend: '',
+      color: 'from-sky-500 to-cyan-300',
+    },
+    {
+      label: 'نوبت‌های امروز',
+      value: todayAppointmentsCount.toString(),
+      trend: '',
+      color: 'from-amber-500 to-orange-300',
+    },
+  ];
+
   return (
     <div className="space-y-8">
       <section className="rounded-[32px] border border-slate-100 bg-white px-8 py-10 shadow-sm shadow-slate-200/60">
@@ -52,33 +132,57 @@ const Home = () => {
             </p>
             <div className="flex flex-wrap gap-2 text-xs text-slate-500">
               <span className="rounded-full border border-slate-100 bg-slate-50 px-3 py-1">امنیت تاییدشده</span>
-            
+
             </div>
           </div>
           <div className="grid gap-4 text-right sm:grid-cols-3">
-            {insights.map((item) => (
-              <div
-                key={item.label}
-                className="rounded-3xl border border-slate-100 bg-slate-50 p-4 shadow-inner"
-              >
-                <p className="text-xs text-slate-500">{item.label}</p>
-                <p className="mt-2 text-2xl font-black text-slate-900">{item.value}</p>
-                <p className="text-xs text-emerald-500">{item.trend}</p>
-                <div className="mt-3 h-2 rounded-full bg-white">
-                  <div className={`h-full rounded-full bg-gradient-to-l ${item.color}`} />
+            {isAnyLoading ? (
+              <PageLoader />
+            ) : (
+              insights.map((item) => (
+                <div
+                  key={item.label}
+                  className="rounded-3xl border border-slate-100 bg-slate-50 p-4 shadow-inner"
+                >
+                  <p className="text-xs text-slate-500">{item.label}</p>
+                  <p className="mt-2 text-2xl font-black text-slate-900">{item.value}</p>
+                  {item.trend && <p className="text-xs text-emerald-500">{item.trend}</p>}
+                  <div className="mt-3 h-2 rounded-full bg-white">
+                    <div className={`h-full rounded-full bg-linear-to-l ${item.color}`} />
+                  </div>
                 </div>
-              </div>
-            ))}
+              ))
+            )}
           </div>
         </div>
       </section>
 
       <section className="grid gap-6 md:grid-cols-2 xl:grid-cols-4">
         {[
-          { label: 'پزشکان فعال', value: '۲۸', icon: Stethoscope, accent: 'text-sky-500' },
-          { label: 'بیماران امروز', value: '۱۸۴', icon: Users2, accent: 'text-emerald-500' },
-          { label: 'کلینیک‌های تایید شده', value: '۱۲', icon: Building2, accent: 'text-purple-500' },
-          { label: 'نوبت‌های امروز', value: '۳۲۴', icon: CalendarClock, accent: 'text-amber-500' },
+          {
+            label: 'پزشکان فعال',
+            value: loadingProviders ? '...' : providers.length.toString(),
+            icon: Stethoscope,
+            accent: 'text-sky-500',
+          },
+          {
+            label: 'بیماران ثبت‌شده',
+            value: loadingPatients ? '...' : patients.length.toString(),
+            icon: Users2,
+            accent: 'text-emerald-500',
+          },
+          {
+            label: 'کلینیک‌های فعال',
+            value: loadingClinics ? '...' : clinics.length.toString(),
+            icon: Building2,
+            accent: 'text-purple-500',
+          },
+          {
+            label: 'نوبت‌های امروز',
+            value: loadingTodayAppointments ? '...' : todayAppointmentsCount.toString(),
+            icon: CalendarClock,
+            accent: 'text-amber-500',
+          },
         ].map((item) => (
           <article
             key={item.label}
@@ -110,18 +214,37 @@ const Home = () => {
             </Button>
           </div>
           <div className="mt-6 space-y-4">
-            {activityFeed.map((item) => (
-              <div key={item.id} className="flex items-center gap-4 rounded-2xl border border-slate-100 p-4">
-                <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-primary/10 text-primary-600">
-                  <Activity className="h-5 w-5" />
+            {loadingRecent ? (
+              <PageLoader />
+            ) : recentRequests.length === 0 ? (
+              <p className="text-sm text-slate-500">فعلاً فعالیتی ثبت نشده است.</p>
+            ) : (
+              recentRequests.map((item) => (
+                <div
+                  key={item.id}
+                  className="flex items-center gap-4 rounded-2xl border border-slate-100 p-4"
+                >
+                  <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-primary/10 text-primary-600">
+                    <Activity className="h-5 w-5" />
+                  </div>
+                  <div className="flex-1 text-right">
+                    <p className="text-sm font-semibold text-slate-900">
+                      {item.serviceName || 'درخواست خدمت'}
+                    </p>
+                    <p className="text-xs text-slate-500">
+                      {item.patientName || 'بیمار نامشخص'}{' '}
+                      {item.clinicName ? `· ${item.clinicName}` : ''}
+                    </p>
+                  </div>
+                  <span className="text-xs text-slate-400">
+                    {new Date(item.createdAt).toLocaleTimeString('fa-IR', {
+                      hour: '2-digit',
+                      minute: '2-digit',
+                    })}
+                  </span>
                 </div>
-                <div className="flex-1 text-right">
-                  <p className="text-sm font-semibold text-slate-900">{item.title}</p>
-                  <p className="text-xs text-slate-500">{item.detail}</p>
-                </div>
-                <span className="text-xs text-slate-400">{item.time}</span>
-              </div>
-            ))}
+              ))
+            )}
           </div>
         </article>
 
@@ -159,20 +282,39 @@ const Home = () => {
             </Button>
           </div>
           <div className="mt-6 space-y-4">
-            {appointments.map((appt) => (
-              <div
-                key={appt.id}
-                className="flex items-center justify-between rounded-2xl border border-slate-100 px-4 py-3 text-sm"
-              >
-                <span className="font-semibold text-slate-900">{appt.time}</span>
-                <div className="text-right">
-                  <p className="font-semibold text-slate-800">{appt.patient}</p>
-                  <p className="text-xs text-slate-500">
-                    {appt.doctor} · {appt.clinic}
-                  </p>
+            {loadingTodayAppointments ? (
+              <PageLoader />
+            ) : todayAppointments.length === 0 ? (
+              <p className="text-sm text-slate-500">امروز نوبتی ثبت نشده است.</p>
+            ) : (
+              todayAppointments.map((appt) => (
+                <div
+                  key={appt.id}
+                  className="flex items-center justify-between rounded-2xl border border-slate-100 px-4 py-3 text-sm"
+                >
+                  <span className="font-semibold text-slate-900">
+                    {appt.preferredTime
+                      ? new Date(appt.preferredTime).toLocaleTimeString('fa-IR', {
+                        hour: '2-digit',
+                        minute: '2-digit',
+                      })
+                      : new Date(appt.createdAt).toLocaleTimeString('fa-IR', {
+                        hour: '2-digit',
+                        minute: '2-digit',
+                      })}
+                  </span>
+                  <div className="text-right">
+                    <p className="font-semibold text-slate-800">
+                      {appt.patientName || 'بیمار نامشخص'}
+                    </p>
+                    <p className="text-xs text-slate-500">
+                      {(appt.serviceName || 'خدمت نامشخص')}{' '}
+                      {appt.clinicName ? `· ${appt.clinicName}` : ''}
+                    </p>
+                  </div>
                 </div>
-              </div>
-            ))}
+              ))
+            )}
           </div>
         </article>
 
