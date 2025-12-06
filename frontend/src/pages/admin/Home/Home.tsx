@@ -1,46 +1,54 @@
-import { useMemo } from 'react';
-import { useQuery } from '@tanstack/react-query';
-import { Activity, CalendarClock, Users2, Stethoscope, Building2, ArrowRight } from 'lucide-react';
-import { Button } from '../../../components/ui/button';
-import { providerService } from '../../../api/services/providerService';
-import { clinicService } from '../../../api/services/clinicService';
-import { insuranceService } from '../../../api/services/insuranceService';
-import { patientService } from '../../../api/services/patientService';
+import { useMemo } from "react";
+import { useQuery } from "@tanstack/react-query";
+import {
+  Activity,
+  CalendarClock,
+  Users2,
+  Stethoscope,
+  Building2,
+  ArrowRight,
+} from "lucide-react";
+import { Button } from "../../../components/ui/button";
+import { providerService } from "../../../api/services/providerService";
+import { clinicService } from "../../../api/services/clinicService";
+import { insuranceService } from "../../../api/services/insuranceService";
+import { patientService } from "../../../api/services/patientService";
 import {
   serviceRequestService,
   type ServiceRequest,
-} from '../../../api/services/serviceRequestService';
-import { PageLoader } from '../../../components/states/PageLoader';
+} from "../../../api/services/serviceRequestService";
+import { PageLoader } from "../../../components/states/PageLoader";
 
 const quickActions = [
-  { label: 'ثبت پزشک', href: '/doctors/new' },
-  { label: 'ایجاد نوبت', href: '/appointments' },
-  { label: 'افزودن بیمه', href: '/admin/insurances' },
-  { label: 'ثبت کلینیک', href: '/admin/clinics' },
+  { label: "ثبت پزشک", href: "/doctors/new" },
+  { label: "ایجاد نوبت", href: "/appointments" },
+  { label: "افزودن بیمه", href: "/admin/insurances" },
+  { label: "ثبت کلینیک", href: "/admin/clinics" },
 ];
 
 const Home = () => {
   // Active providers (doctors)
   const { data: providers = [], isLoading: loadingProviders } = useQuery({
-    queryKey: ['dashboard', 'providers', 'active'],
-    queryFn: () => providerService.getAll(undefined, undefined, undefined, true),
+    queryKey: ["dashboard", "providers", "active"],
+    queryFn: () =>
+      providerService.getAll(undefined, undefined, undefined, true),
   });
 
   // Active clinics
   const { data: clinics = [], isLoading: loadingClinics } = useQuery({
-    queryKey: ['dashboard', 'clinics', 'active'],
+    queryKey: ["dashboard", "clinics", "active"],
     queryFn: () => clinicService.getAll(undefined, undefined, true),
   });
 
   // Active insurances
   const { data: insurances = [], isLoading: loadingInsurances } = useQuery({
-    queryKey: ['dashboard', 'insurances', 'active'],
+    queryKey: ["dashboard", "insurances", "active"],
     queryFn: () => insuranceService.getAll(undefined, true),
   });
 
   // Patients (simple count)
   const { data: patients = [], isLoading: loadingPatients } = useQuery({
-    queryKey: ['dashboard', 'patients'],
+    queryKey: ["dashboard", "patients"],
     queryFn: () => patientService.getAll(),
   });
 
@@ -58,36 +66,50 @@ const Home = () => {
   }, []);
 
   // Today's appointments (service requests)
-  const {
-    data: todayAppointmentsResult,
-    isLoading: loadingTodayAppointments,
-  } = useQuery({
-    queryKey: ['dashboard', 'appointments', 'today', todayStartIso, todayEndIso],
-    queryFn: () =>
-      serviceRequestService.getAll(
-        1,
-        10,
-        undefined,
-        undefined,
-        undefined,
-        undefined,
+  const { data: todayAppointmentsResult, isLoading: loadingTodayAppointments } =
+    useQuery({
+      queryKey: [
+        "dashboard",
+        "appointments",
+        "today",
         todayStartIso,
         todayEndIso,
-        'createdAt',
-        'asc'
-      ),
-  });
+      ],
+      queryFn: () =>
+        serviceRequestService.getAll(
+          1,
+          10,
+          undefined,
+          undefined,
+          undefined,
+          undefined,
+          todayStartIso,
+          todayEndIso,
+          "createdAt",
+          "asc"
+        ),
+    });
 
-  const todayAppointments: ServiceRequest[] = todayAppointmentsResult?.data ?? [];
+  const todayAppointments: ServiceRequest[] =
+    todayAppointmentsResult?.data ?? [];
   const todayAppointmentsCount = todayAppointmentsResult?.totalCount ?? 0;
 
   // Recent activity (latest service requests)
-  const {
-    data: recentRequestsResult,
-    isLoading: loadingRecent,
-  } = useQuery({
-    queryKey: ['dashboard', 'service-requests', 'recent'],
-    queryFn: () => serviceRequestService.getAll(1, 5, undefined, undefined, undefined, undefined, undefined, undefined, 'createdAt', 'desc'),
+  const { data: recentRequestsResult, isLoading: loadingRecent } = useQuery({
+    queryKey: ["dashboard", "service-requests", "recent"],
+    queryFn: () =>
+      serviceRequestService.getAll(
+        1,
+        5,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        "createdAt",
+        "desc"
+      ),
   });
 
   const recentRequests: ServiceRequest[] = recentRequestsResult?.data ?? [];
@@ -97,22 +119,22 @@ const Home = () => {
 
   const insights = [
     {
-      label: 'تعداد بیمه‌های فعال',
+      label: "تعداد بیمه‌های فعال",
       value: insurances.length.toString(),
-      trend: '',
-      color: 'from-emerald-500 to-emerald-300',
+      trend: "",
+      color: "from-emerald-500 to-emerald-300",
     },
     {
-      label: 'تعداد بیماران ثبت‌شده',
+      label: "تعداد بیماران ثبت‌شده",
       value: patients.length.toString(),
-      trend: '',
-      color: 'from-sky-500 to-cyan-300',
+      trend: "",
+      color: "from-sky-500 to-cyan-300",
     },
     {
-      label: 'نوبت‌های امروز',
+      label: "نوبت‌های امروز",
       value: todayAppointmentsCount.toString(),
-      trend: '',
-      color: 'from-amber-500 to-orange-300',
+      trend: "",
+      color: "from-amber-500 to-orange-300",
     },
   ];
 
@@ -128,12 +150,9 @@ const Home = () => {
               داشبورد یکپارچه مدیریت بیمارستان
             </h1>
             <p className="text-sm text-slate-500">
-              وضعیت نوبت‌ها، پوشش بیمه، ظرفیت کلینیک‌ها و عملکرد پزشکان در یک نگاه.
+              وضعیت نوبت‌ها، پوشش بیمه، ظرفیت کلینیک‌ها و عملکرد پزشکان در یک
+              نگاه.
             </p>
-            <div className="flex flex-wrap gap-2 text-xs text-slate-500">
-              <span className="rounded-full border border-slate-100 bg-slate-50 px-3 py-1">امنیت تاییدشده</span>
-
-            </div>
           </div>
           <div className="grid gap-4 text-right sm:grid-cols-3">
             {isAnyLoading ? (
@@ -144,11 +163,19 @@ const Home = () => {
                   key={item.label}
                   className="rounded-3xl border border-slate-100 bg-slate-50 p-4 shadow-inner"
                 >
-                  <p className="text-xs text-slate-500">{item.label}</p>
-                  <p className="mt-2 text-2xl font-black text-slate-900">{item.value}</p>
-                  {item.trend && <p className="text-xs text-emerald-500">{item.trend}</p>}
+                  <p className="text-xs text-center text-slate-500">
+                    {item.label}
+                  </p>
+                  <p className="mt-2 text-2xl text-center font-black text-slate-900">
+                    {item.value}
+                  </p>
+                  {item.trend && (
+                    <p className="text-xs text-emerald-500">{item.trend}</p>
+                  )}
                   <div className="mt-3 h-2 rounded-full bg-white">
-                    <div className={`h-full rounded-full bg-linear-to-l ${item.color}`} />
+                    <div
+                      className={`h-full rounded-full bg-linear-to-l ${item.color}`}
+                    />
                   </div>
                 </div>
               ))
@@ -160,28 +187,30 @@ const Home = () => {
       <section className="grid gap-6 md:grid-cols-2 xl:grid-cols-4">
         {[
           {
-            label: 'پزشکان فعال',
-            value: loadingProviders ? '...' : providers.length.toString(),
+            label: "پزشکان فعال",
+            value: loadingProviders ? "..." : providers.length.toString(),
             icon: Stethoscope,
-            accent: 'text-sky-500',
+            accent: "text-sky-500",
           },
           {
-            label: 'بیماران ثبت‌شده',
-            value: loadingPatients ? '...' : patients.length.toString(),
+            label: "بیماران ثبت‌شده",
+            value: loadingPatients ? "..." : patients.length.toString(),
             icon: Users2,
-            accent: 'text-emerald-500',
+            accent: "text-emerald-500",
           },
           {
-            label: 'کلینیک‌های فعال',
-            value: loadingClinics ? '...' : clinics.length.toString(),
+            label: "کلینیک‌های فعال",
+            value: loadingClinics ? "..." : clinics.length.toString(),
             icon: Building2,
-            accent: 'text-purple-500',
+            accent: "text-purple-500",
           },
           {
-            label: 'نوبت‌های امروز',
-            value: loadingTodayAppointments ? '...' : todayAppointmentsCount.toString(),
+            label: "نوبت‌های امروز",
+            value: loadingTodayAppointments
+              ? "..."
+              : todayAppointmentsCount.toString(),
             icon: CalendarClock,
-            accent: 'text-amber-500',
+            accent: "text-amber-500",
           },
         ].map((item) => (
           <article
@@ -192,10 +221,16 @@ const Home = () => {
               <div className={`rounded-2xl bg-slate-100 p-3 ${item.accent}`}>
                 <item.icon className="h-5 w-5" />
               </div>
-              <span className="text-xs font-semibold text-slate-400">امروز</span>
+              <span className="text-xs font-semibold text-slate-400">
+                امروز
+              </span>
             </div>
-            <p className="mt-6 text-3xl font-black text-slate-900">{item.value}</p>
-            <p className="text-sm text-slate-500">{item.label}</p>
+            <div className="flex justify-between">
+              <p className="text-sm mt-7 text-slate-500">{item.label}</p>
+              <p className="mt-6 text-3xl font-black text-slate-900">
+                {item.value}
+              </p>
+            </div>
           </article>
         ))}
       </section>
@@ -207,9 +242,14 @@ const Home = () => {
               <p className="text-xs font-semibold uppercase tracking-[0.4em] text-slate-400">
                 activity
               </p>
-              <h3 className="text-xl font-black text-slate-900">آخرین فعالیت‌ها</h3>
+              <h3 className="text-xl font-black text-slate-900">
+                آخرین فعالیت‌ها
+              </h3>
             </div>
-            <Button variant="ghost" className="text-xs text-slate-500 hover:text-slate-900">
+            <Button
+              variant="ghost"
+              className="text-xs text-slate-500 hover:text-slate-900"
+            >
               مشاهده بیشتر
             </Button>
           </div>
@@ -217,7 +257,9 @@ const Home = () => {
             {loadingRecent ? (
               <PageLoader />
             ) : recentRequests.length === 0 ? (
-              <p className="text-sm text-slate-500">فعلاً فعالیتی ثبت نشده است.</p>
+              <p className="text-sm text-slate-500">
+                فعلاً فعالیتی ثبت نشده است.
+              </p>
             ) : (
               recentRequests.map((item) => (
                 <div
@@ -229,17 +271,17 @@ const Home = () => {
                   </div>
                   <div className="flex-1 text-right">
                     <p className="text-sm font-semibold text-slate-900">
-                      {item.serviceName || 'درخواست خدمت'}
+                      {item.serviceName || "درخواست خدمت"}
                     </p>
                     <p className="text-xs text-slate-500">
-                      {item.patientName || 'بیمار نامشخص'}{' '}
-                      {item.clinicName ? `· ${item.clinicName}` : ''}
+                      {item.patientName || "بیمار نامشخص"}{" "}
+                      {item.clinicName ? `· ${item.clinicName}` : ""}
                     </p>
                   </div>
                   <span className="text-xs text-slate-400">
-                    {new Date(item.createdAt).toLocaleTimeString('fa-IR', {
-                      hour: '2-digit',
-                      minute: '2-digit',
+                    {new Date(item.createdAt).toLocaleTimeString("fa-IR", {
+                      hour: "2-digit",
+                      minute: "2-digit",
                     })}
                   </span>
                 </div>
@@ -252,7 +294,9 @@ const Home = () => {
           <p className="text-xs font-semibold uppercase tracking-[0.4em] text-slate-400">
             quick
           </p>
-          <h3 className="mt-1 text-xl font-black text-slate-900">عملیات سریع</h3>
+          <h3 className="mt-1 text-xl font-black text-slate-900">
+            عملیات سریع
+          </h3>
           <div className="mt-6 space-y-3">
             {quickActions.map((action) => (
               <a
@@ -275,9 +319,14 @@ const Home = () => {
               <p className="text-xs font-semibold uppercase tracking-[0.4em] text-slate-400">
                 today
               </p>
-              <h3 className="text-xl font-black text-slate-900">نوبت‌های امروز</h3>
+              <h3 className="text-xl font-black text-slate-900">
+                نوبت‌های امروز
+              </h3>
             </div>
-            <Button variant="ghost" className="text-xs text-slate-500 hover:text-slate-900">
+            <Button
+              variant="ghost"
+              className="text-xs text-slate-500 hover:text-slate-900"
+            >
               تقویم کامل
             </Button>
           </div>
@@ -285,7 +334,9 @@ const Home = () => {
             {loadingTodayAppointments ? (
               <PageLoader />
             ) : todayAppointments.length === 0 ? (
-              <p className="text-sm text-slate-500">امروز نوبتی ثبت نشده است.</p>
+              <p className="text-sm text-slate-500">
+                امروز نوبتی ثبت نشده است.
+              </p>
             ) : (
               todayAppointments.map((appt) => (
                 <div
@@ -294,22 +345,25 @@ const Home = () => {
                 >
                   <span className="font-semibold text-slate-900">
                     {appt.preferredTime
-                      ? new Date(appt.preferredTime).toLocaleTimeString('fa-IR', {
-                        hour: '2-digit',
-                        minute: '2-digit',
-                      })
-                      : new Date(appt.createdAt).toLocaleTimeString('fa-IR', {
-                        hour: '2-digit',
-                        minute: '2-digit',
-                      })}
+                      ? new Date(appt.preferredTime).toLocaleTimeString(
+                          "fa-IR",
+                          {
+                            hour: "2-digit",
+                            minute: "2-digit",
+                          }
+                        )
+                      : new Date(appt.createdAt).toLocaleTimeString("fa-IR", {
+                          hour: "2-digit",
+                          minute: "2-digit",
+                        })}
                   </span>
                   <div className="text-right">
                     <p className="font-semibold text-slate-800">
-                      {appt.patientName || 'بیمار نامشخص'}
+                      {appt.patientName || "بیمار نامشخص"}
                     </p>
                     <p className="text-xs text-slate-500">
-                      {(appt.serviceName || 'خدمت نامشخص')}{' '}
-                      {appt.clinicName ? `· ${appt.clinicName}` : ''}
+                      {appt.serviceName || "خدمت نامشخص"}{" "}
+                      {appt.clinicName ? `· ${appt.clinicName}` : ""}
                     </p>
                   </div>
                 </div>

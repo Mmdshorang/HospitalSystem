@@ -58,11 +58,7 @@ const ClinicsList = () => {
             <section className="rounded-[32px] border border-slate-100 bg-white px-8 py-10 shadow-sm shadow-slate-200/60">
                 <div className="flex flex-wrap items-center justify-between gap-6">
                     <div className="space-y-3">
-                        <span className="inline-flex items-center gap-2 rounded-full bg-primary/5 px-4 py-1 text-xs font-semibold text-primary-600">
-                            <Sparkles className="h-4 w-4" />
-                            شبکه کلینیک‌ها
-                        </span>
-                        <h2 className="text-3xl font-black text-slate-900">مدیریت مدرن کلینیک‌ها</h2>
+                        <h2 className="text-3xl font-black text-slate-900">مدیریت کلینیک‌ها</h2>
                         <p className="text-sm text-slate-500">
                             وضعیت تایید، ظرفیت و سلامت عملیاتی تمامی کلینیک‌ها در یک نگاه.
                         </p>
@@ -110,7 +106,7 @@ const ClinicsList = () => {
                             <option value="false">غیرفعال</option>
                         </select>
                         <Button
-                            className="h-12 rounded-2xl bg-gradient-to-l from-primary-600 to-primary-400 px-6 text-sm font-semibold shadow-lg shadow-primary/30"
+                            className="h-11 rounded-2xl bg-blue-600 hover:bg-blue-700 px-10 text-sm font-semibold text-white shadow-lg shadow-blue-600/30 transition-colors"
                             onClick={() => setIsDialogOpen(true)}
                         >
                             افزودن کلینیک
@@ -164,18 +160,12 @@ const ClinicsList = () => {
                                                 {clinic.phone || 'ندارد'}
                                             </p>
                                         </div>
-                                        <div className="rounded-2xl bg-white/70 px-4 py-3 text-slate-600">
-                                            <p>ایمیل</p>
-                                            <p className="mt-1 text-sm font-black text-emerald-600">
-                                                {clinic.email || 'ندارد'}
-                                            </p>
-                                        </div>
                                     </div>
 
                                     <div className="mt-4 flex justify-end">
                                         <button
                                             onClick={() => navigate(`/admin/clinics/${clinic.id}/services`)}
-                                            className="flex items-center gap-2 rounded-2xl bg-primary/10 px-4 py-2 text-sm font-semibold text-primary-600 transition hover:bg-primary/20"
+                                            className="flex items-center gap-2 h-11 rounded-2xl bg-blue-100 hover:bg-blue-200 px-10 text-sm font-semibold shadow-blue-600/30 transition-colors"
                                         >
                                             <Settings className="h-4 w-4" />
                                             مدیریت خدمات

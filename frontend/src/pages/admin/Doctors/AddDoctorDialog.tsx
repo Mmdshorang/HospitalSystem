@@ -1,7 +1,13 @@
 import React, { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { specialtyService, type Specialty } from "../../../api/services/specialtyService";
-import { clinicService, type Clinic } from "../../../api/services/clinicService";
+import {
+  specialtyService,
+  type Specialty,
+} from "../../../api/services/specialtyService";
+import {
+  clinicService,
+  type Clinic,
+} from "../../../api/services/clinicService";
 
 export interface AddDoctorFormValues {
   firstName: string;
@@ -174,7 +180,7 @@ const AddDoctorDialog: React.FC<AddDoctorDialogProps> = ({
                 name="specialtyId"
                 value={values.specialtyId ?? ""}
                 onChange={handleChange}
-                className="h-12 w-full rounded-2xl border border-slate-200 px-4 text-sm outline-none focus:border-primary"
+                className="h-10 w-full rounded-lg border border-slate-200 px-4 text-sm outline-none focus:border-primary"
               >
                 <option value="">انتخاب تخصص...</option>
                 {specialties.map((specialty) => (
@@ -190,7 +196,7 @@ const AddDoctorDialog: React.FC<AddDoctorDialogProps> = ({
                 name="clinicId"
                 value={values.clinicId ?? ""}
                 onChange={handleChange}
-                className="h-12 w-full rounded-2xl border border-slate-200 px-4 text-sm outline-none focus:border-primary"
+                className="h-10 w-full rounded-lg border border-slate-200 px-4 text-sm outline-none focus:border-primary"
               >
                 <option value="">انتخاب کلینیک...</option>
                 {clinics.map((clinic) => (
@@ -241,13 +247,13 @@ const AddDoctorDialog: React.FC<AddDoctorDialogProps> = ({
           <div className="flex items-center justify-end gap-3 pt-4 border-t border-gray-100">
             <button
               type="button"
-              className="btn btn-ghost"
+              className="btn btn-ghost h-11 rounded-2xl bg-red-600 hover:bg-red-700 px-10 text-sm font-semibold text-white shadow-lg shadow-blue-600/30 transition-colors"
               onClick={resetAndClose}
             >
               انصراف
             </button>
-            <button 
-              type="submit" 
+            <button
+              type="submit"
               className="h-11 rounded-2xl bg-blue-600 hover:bg-blue-700 px-10 text-sm font-semibold text-white shadow-lg shadow-blue-600/30 transition-colors"
             >
               ذخیره

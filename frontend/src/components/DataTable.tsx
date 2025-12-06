@@ -72,28 +72,28 @@ function DataTable<T>({
   const pageRows = sortedData.slice(start, end);
 
   return (
-    <div className="card">
+    <div className="bg-white shadow-lg rounded-2xl border border-gray-200 overflow-hidden">
       <div className="overflow-x-auto">
-        <table className="min-w-full divide-y divide-gray-200">
-          <thead className="bg-gray-50">
+        <table className="min-w-full">
+          <thead className="bg-gray-100 border-b">
             <tr>
               {columns.map((col) => (
                 <th
                   key={col.key}
-                  className={`px-6 py-3 text-right text-xs font-medium text-gray-600 uppercase tracking-wider select-none ${
+                  className={`px-6 py-4 text-right text-sm font-semibold text-gray-700 whitespace-nowrap ${
                     col.className ?? ""
                   }`}
                 >
                   <button
                     type="button"
-                    className={`inline-flex items-center gap-1 ${
+                    className={`inline-flex items-center gap-1 transition ${
                       col.sortable ? "hover:text-gray-900" : "cursor-default"
                     }`}
                     onClick={() => handleSort(col)}
                   >
                     <span>{col.header}</span>
                     {col.sortable && sortKey === col.key && (
-                      <span className="text-gray-400">
+                      <span className="text-gray-500 text-xs">
                         {sortAsc ? "▲" : "▼"}
                       </span>
                     )}
@@ -102,11 +102,12 @@ function DataTable<T>({
               ))}
             </tr>
           </thead>
-          <tbody className="bg-white divide-y divide-gray-200">
+
+          <tbody className="divide-y">
             {loading ? (
               <tr>
                 <td
-                  className="px-6 py-8 text-center text-gray-500"
+                  className="px-6 py-10 text-center text-gray-500"
                   colSpan={columns.length}
                 >
                   در حال بارگذاری...
@@ -115,7 +116,7 @@ function DataTable<T>({
             ) : pageRows.length === 0 ? (
               <tr>
                 <td
-                  className="px-6 py-8 text-center text-gray-500"
+                  className="px-6 py-10 text-center text-gray-500"
                   colSpan={columns.length}
                 >
                   {emptyMessage}
@@ -123,7 +124,10 @@ function DataTable<T>({
               </tr>
             ) : (
               pageRows.map((row, idx) => (
-                <tr key={rowKey ? rowKey(row, idx) : String(idx)}>
+                <tr
+                  key={rowKey ? rowKey(row, idx) : String(idx)}
+                  className="transition hover:bg-gray-50"
+                >
                   {columns.map((col) => {
                     const value = col.accessor
                       ? col.accessor(row)
@@ -131,7 +135,7 @@ function DataTable<T>({
                     return (
                       <td
                         key={col.key}
-                        className={`px-6 py-4 whitespace-nowrap ${
+                        className={`px-6 py-4 text-gray-700 whitespace-nowrap ${
                           col.className ?? ""
                         }`}
                       >
@@ -146,11 +150,12 @@ function DataTable<T>({
         </table>
       </div>
 
-      <div className="flex flex-col sm:flex-row items-center justify-between gap-3 px-4 py-3">
+      {/* Pagination Section */}
+      <div className="flex flex-col sm:flex-row items-center justify-between gap-4 px-6 py-4 bg-gray-50 border-t">
         <div className="flex items-center gap-2 text-sm text-gray-600">
           <span>نمایش</span>
           <select
-            className="select"
+            className="px-2 py-1 border rounded-lg bg-white shadow-inner focus:ring focus:ring-blue-200"
             value={pageSize}
             onChange={(e) => {
               const ps = Number(e.target.value);
@@ -164,22 +169,24 @@ function DataTable<T>({
               </option>
             ))}
           </select>
-          <span>رکورد در هر صفحه</span>
+          <span>رکورد</span>
         </div>
 
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 text-sm">
           <button
-            className="btn btn-ghost"
+            className="px-3 py-1 rounded-lg border transition hover:bg-gray-100 disabled:opacity-40"
             disabled={currentPage <= 1}
             onClick={() => setPage((p) => Math.max(1, p - 1))}
           >
             قبلی
           </button>
-          <span className="text-sm text-gray-700">
+
+          <span className="text-gray-700">
             صفحه {currentPage} از {totalPages}
           </span>
+
           <button
-            className="btn btn-ghost"
+            className="px-3 py-1 rounded-lg border transition hover:bg-gray-100 disabled:opacity-40"
             disabled={currentPage >= totalPages}
             onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
           >
