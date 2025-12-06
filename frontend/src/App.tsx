@@ -6,7 +6,7 @@ import { AuthProvider } from './contexts/AuthContext';
 import ProtectedRoute from './components/ProtectedRoute';
 import Layout from './components/Layout';
 import Dashboard from './pages/admin/Home/Home';
-import Patients from './pages/Patients';
+import Patients from './pages/admin/Patients/PatientsList';
 import Doctors from './pages/admin/Doctors/DoctorsList';
 import Appointments from './pages/Appointments';
 import PatientForm from './pages/PatientForm';
@@ -27,7 +27,6 @@ const queryClient = new QueryClient({
     queries: {
       retry: 1,
       refetchOnWindowFocus: false,
-      staleTime: 5 * 60 * 1000, // 5 minutes
     },
   },
 });

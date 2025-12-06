@@ -12,7 +12,6 @@ import { EmptyState } from '../../../components/states/EmptyState';
 import { PageLoader } from '../../../components/states/PageLoader';
 import { SpecialtyFormDialog } from './SpecialtyFormDialog';
 
-const iconPalette = ['🫀', '🧠', '🦴', '🦷', '👁️', '🫁'];
 
 const SpecialtiesList = () => {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
@@ -125,9 +124,6 @@ const SpecialtiesList = () => {
               >
                 <div className="flex items-start justify-between gap-3">
                   <div className="flex items-center gap-3">
-                    <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-primary/10 text-2xl">
-                      {iconPalette[index % iconPalette.length]}
-                    </div>
                     <div className="text-right">
                       <p className="text-lg font-black text-slate-900">{specialty.name}</p>
                       {specialty.categoryName && (
@@ -137,7 +133,7 @@ const SpecialtiesList = () => {
                   </div>
                   <button
                     type="button"
-                    className="rounded-2xl border border-rose-50 bg-rose-50 px-3 py-1 text-xs font-semibold text-rose-600 opacity-0 shadow-sm transition group-hover:opacity-100 hover:bg-rose-100"
+                    className="rounded-2xl border border-rose-50 bg-rose-50 px-3 py-1 text-xs font-semibold text-rose-600 shadow-sm transition hover:bg-rose-100"
                     onClick={() => handleDelete(specialty.id)}
                   >
                     <span className="inline-flex items-center gap-1">

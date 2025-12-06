@@ -10,6 +10,8 @@ export interface AddPatientFormValues {
   insuranceNumber?: string | null;
   address?: string | null;
   isActive: boolean;
+  RelationshipToPatient?: string | null;
+  PhoneRelationshipToPatient?: string | null;
 }
 
 interface AddPatientDialogProps {
@@ -33,6 +35,8 @@ const AddPatientDialog: React.FC<AddPatientDialogProps> = ({
     insuranceNumber: null,
     address: null,
     isActive: true,
+    RelationshipToPatient: null,
+    PhoneRelationshipToPatient: null,
   });
 
   const resetAndClose = () => {
@@ -46,6 +50,8 @@ const AddPatientDialog: React.FC<AddPatientDialogProps> = ({
       insuranceNumber: null,
       address: null,
       isActive: true,
+      RelationshipToPatient: null,
+      PhoneRelationshipToPatient: null,
     });
     onClose();
   };
@@ -83,7 +89,9 @@ const AddPatientDialog: React.FC<AddPatientDialogProps> = ({
         <form onSubmit={handleSubmit} className="p-6 space-y-4">
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm text-gray-700 mb-1">نام</label>
+              <label className="block text-sm text-gray-700 mb-1">
+                نام بیمار
+              </label>
               <input
                 name="firstName"
                 value={values.firstName}
@@ -94,7 +102,7 @@ const AddPatientDialog: React.FC<AddPatientDialogProps> = ({
             </div>
             <div>
               <label className="block text-sm text-gray-700 mb-1">
-                نام خانوادگی
+                نام خانوادگی بیمار
               </label>
               <input
                 name="lastName"
@@ -106,7 +114,9 @@ const AddPatientDialog: React.FC<AddPatientDialogProps> = ({
             </div>
 
             <div>
-              <label className="block text-sm text-gray-700 mb-1">کد ملی</label>
+              <label className="block text-sm text-gray-700 mb-1">
+                کد ملی بیمار
+              </label>
               <input
                 name="nationalId"
                 value={values.nationalId ?? ""}
@@ -117,7 +127,7 @@ const AddPatientDialog: React.FC<AddPatientDialogProps> = ({
 
             <div>
               <label className="block text-sm text-gray-700 mb-1">
-                شماره تماس
+                شماره تماس بیمار
               </label>
               <input
                 name="phone"
@@ -129,7 +139,7 @@ const AddPatientDialog: React.FC<AddPatientDialogProps> = ({
 
             <div>
               <label className="block text-sm text-gray-700 mb-1">
-                تاریخ تولد
+                تاریخ تولد بیمار
               </label>
               <input
                 name="birthDate"
@@ -141,7 +151,9 @@ const AddPatientDialog: React.FC<AddPatientDialogProps> = ({
             </div>
 
             <div>
-              <label className="block text-sm text-gray-700 mb-1">جنسیت</label>
+              <label className="block text-sm text-gray-700 mb-1">
+                جنسیت بیمار
+              </label>
               <select
                 name="gender"
                 value={values.gender ?? ""}
@@ -153,6 +165,30 @@ const AddPatientDialog: React.FC<AddPatientDialogProps> = ({
                 <option value="female">زن</option>
                 <option value="other">سایر</option>
               </select>
+            </div>
+            <div>
+              <label className="block text-sm text-gray-700 mb-1">
+                نام همراه بیمار
+              </label>
+              <input
+                name="firstName"
+                value={values.RelationshipToPatient ?? ""}
+                onChange={handleChange}
+                className="input"
+                required
+              />
+            </div>
+            <div>
+              <label className="block text-sm text-gray-700 mb-1">
+                شماره تماس اضطراری بیمار
+              </label>
+              <input
+                name="firstName"
+                value={values.RelationshipToPatient ?? ""}
+                onChange={handleChange}
+                className="input"
+                required
+              />
             </div>
 
             <div className="sm:col-span-2">
@@ -167,7 +203,7 @@ const AddPatientDialog: React.FC<AddPatientDialogProps> = ({
 
             <div>
               <label className="block text-sm text-gray-700 mb-1">
-                شماره بیمه
+                شماره بیمه بیمار
               </label>
               <input
                 name="insuranceNumber"
@@ -195,13 +231,13 @@ const AddPatientDialog: React.FC<AddPatientDialogProps> = ({
           <div className="flex items-center justify-end gap-3 pt-4 border-t border-gray-100">
             <button
               type="button"
-              className="btn btn-ghost"
+              className="btn btn-ghost h-11 rounded-2xl bg-red-600 hover:bg-red-700 px-10 text-sm font-semibold text-white shadow-lg shadow-blue-600/30 transition-colors"
               onClick={resetAndClose}
             >
               انصراف
             </button>
-            <button 
-              type="submit" 
+            <button
+              type="submit"
               className="h-11 rounded-2xl bg-blue-600 hover:bg-blue-700 px-10 text-sm font-semibold text-white shadow-lg shadow-blue-600/30 transition-colors"
             >
               ذخیره
