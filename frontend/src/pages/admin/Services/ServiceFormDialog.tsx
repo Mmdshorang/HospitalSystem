@@ -152,7 +152,7 @@ export const ServiceFormDialog = ({ open, onClose, onSubmit }: ServiceFormDialog
                         <Button
                             type="button"
                             variant="outline"
-                            className="h-11 rounded-2xl border-slate-200 px-6 text-sm text-slate-600"
+                            className="flex h-11 rounded-2xl bg-linear-to-l from-red-600 to-red-500 px-8 text-sm font-semibold text-white shadow-lg shadow-blue-500/30 transition hover:shadow-xl hover:shadow-blue-500/40 hover:from-red-700 hover:to-red-600"
                             onClick={onClose}
                         >
                             انصراف

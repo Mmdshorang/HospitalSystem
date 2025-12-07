@@ -9,7 +9,7 @@ export interface PhoneInputProps extends React.InputHTMLAttributes<HTMLInputElem
 }
 
 export const PhoneInput = React.forwardRef<HTMLInputElement, PhoneInputProps>(
-    ({ className, label, helperText, error, prefix = '+98', ...props }, ref) => {
+    ({ className, label, helperText, error, prefix = '98+', ...props }, ref) => {
         return (
             <label className={cn('flex flex-col gap-2 text-right', className)}>
                 {label && <span className="text-sm font-medium text-gray-700">{label}</span>}
@@ -19,9 +19,6 @@ export const PhoneInput = React.forwardRef<HTMLInputElement, PhoneInputProps>(
                         error ? 'border-red-400 ring-1 ring-red-100' : 'border-gray-200'
                     )}
                 >
-                    <span className="flex items-center justify-center border-l border-gray-100 px-4 text-sm font-semibold text-gray-500">
-                        {prefix}
-                    </span>
                     <input
                         ref={ref}
                         type="tel"
@@ -30,6 +27,9 @@ export const PhoneInput = React.forwardRef<HTMLInputElement, PhoneInputProps>(
                         dir="ltr"
                         {...props}
                     />
+                    <span className="flex items-center justify-center border-l border-gray-100 px-4 text-sm font-semibold text-gray-500">
+                        {prefix}
+                    </span>
                 </div>
                 {(error || helperText) && (
                     <span className={cn('text-xs', error ? 'text-red-500' : 'text-gray-500')}>

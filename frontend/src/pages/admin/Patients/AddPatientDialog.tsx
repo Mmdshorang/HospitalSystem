@@ -1,6 +1,7 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 
 export interface AddPatientFormValues {
+  id?: string | null;
   firstName: string;
   lastName: string;
   phone?: string | null;
@@ -18,12 +19,14 @@ interface AddPatientDialogProps {
   isOpen: boolean;
   onClose: () => void;
   onSubmit: (values: AddPatientFormValues) => void;
+  initialValues?: Partial<AddPatientFormValues> | null;
 }
 
 const AddPatientDialog: React.FC<AddPatientDialogProps> = ({
   isOpen,
   onClose,
   onSubmit,
+  initialValues = null,
 }) => {
   const [values, setValues] = useState<AddPatientFormValues>({
     firstName: "",
@@ -34,10 +37,36 @@ const AddPatientDialog: React.FC<AddPatientDialogProps> = ({
     gender: null,
     insuranceNumber: null,
     address: null,
+    id: null,
     isActive: true,
     RelationshipToPatient: null,
     PhoneRelationshipToPatient: null,
   });
+
+  useEffect(() => {
+    if (isOpen && initialValues) {
+      setValues(
+        (prev) => ({ ...prev, ...initialValues } as AddPatientFormValues)
+      );
+    }
+    if (!isOpen) {
+      // reset when closed
+      setValues({
+        firstName: "",
+        lastName: "",
+        phone: null,
+        nationalId: null,
+        birthDate: null,
+        gender: null,
+        insuranceNumber: null,
+        address: null,
+        id: null,
+        isActive: true,
+        RelationshipToPatient: null,
+        PhoneRelationshipToPatient: null,
+      });
+    }
+  }, [isOpen, initialValues]);
 
   const resetAndClose = () => {
     setValues({
@@ -49,6 +78,7 @@ const AddPatientDialog: React.FC<AddPatientDialogProps> = ({
       gender: null,
       insuranceNumber: null,
       address: null,
+      id: null,
       isActive: true,
       RelationshipToPatient: null,
       PhoneRelationshipToPatient: null,
@@ -84,7 +114,9 @@ const AddPatientDialog: React.FC<AddPatientDialogProps> = ({
       <div className="absolute inset-0 bg-black/30" onClick={resetAndClose} />
       <div className="relative bg-white rounded-lg shadow-xl w-full max-w-2xl mx-4">
         <div className="px-6 py-4 border-b border-gray-200">
-          <h2 className="text-lg font-semibold">افزودن بیمار</h2>
+          <h2 className="text-lg font-semibold">
+            {values.id ? "ویرایش بیمار" : "افزودن بیمار"}
+          </h2>
         </div>
         <form onSubmit={handleSubmit} className="p-6 space-y-4">
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -171,11 +203,10 @@ const AddPatientDialog: React.FC<AddPatientDialogProps> = ({
                 نام همراه بیمار
               </label>
               <input
-                name="firstName"
+                name="RelationshipToPatient"
                 value={values.RelationshipToPatient ?? ""}
                 onChange={handleChange}
                 className="input"
-                required
               />
             </div>
             <div>
@@ -183,11 +214,10 @@ const AddPatientDialog: React.FC<AddPatientDialogProps> = ({
                 شماره تماس اضطراری بیمار
               </label>
               <input
-                name="firstName"
-                value={values.RelationshipToPatient ?? ""}
+                name="PhoneRelationshipToPatient"
+                value={values.PhoneRelationshipToPatient ?? ""}
                 onChange={handleChange}
                 className="input"
-                required
               />
             </div>
 
