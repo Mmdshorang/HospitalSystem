@@ -1,9 +1,10 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { X } from "lucide-react";
 import { toast } from "react-toastify";
 import type {
   CreateClinicDto,
   CreateClinicAddress,
+  Clinic,
 } from "../../../api/services/clinicService";
 import { Button } from "../../../components/ui/button";
 
@@ -11,6 +12,7 @@ interface ClinicFormDialogProps {
   open: boolean;
   onClose: () => void;
   onSubmit: (values: CreateClinicDto) => Promise<void> | void;
+  initialValues?: Clinic | null;
 }
 
 const defaultAddress: CreateClinicAddress = {
@@ -30,6 +32,7 @@ export const ClinicFormDialog = ({
   open,
   onClose,
   onSubmit,
+  initialValues,
 }: ClinicFormDialogProps) => {
   const [values, setValues] = useState<CreateClinicDto>(defaultValues);
   const [address, setAddress] = useState<CreateClinicAddress>(defaultAddress);
@@ -148,6 +151,39 @@ export const ClinicFormDialog = ({
     }
   };
 
+  useEffect(() => {
+    if (open && initialValues) {
+      // populate form with initial clinic data for editing
+      setValues({
+        name: initialValues.name || "",
+        phone: initialValues.phone || "",
+        isActive: initialValues.isActive,
+        managerId: initialValues.managerId,
+        logoUrl: initialValues.logoUrl,
+      });
+
+      if (initialValues.addresses && initialValues.addresses.length > 0) {
+        const a = initialValues.addresses[0];
+        setAddress({
+          street: a.street || "",
+          city: a.city || "",
+          state: a.state || "",
+          postalCode: a.postalCode || "",
+          country: a.country || "",
+        });
+      } else {
+        setAddress(defaultAddress);
+      }
+    }
+
+    if (!open) {
+      // reset when dialog closes
+      setValues(defaultValues);
+      setAddress(defaultAddress);
+      setError(null);
+    }
+  }, [open, initialValues]);
+
   if (!open) return null;
 
   return (
@@ -162,10 +198,12 @@ export const ClinicFormDialog = ({
         </button>
         <div className="space-y-1 text-right pr-0 sm:pr-0">
           <h3 className="text-xl sm:text-2xl font-black text-slate-900">
-            افزودن کلینیک جدید
+            {initialValues ? "ویرایش کلینیک" : "افزودن کلینیک جدید"}
           </h3>
           <p className="text-xs sm:text-sm text-slate-500">
-            اطلاعات کلینیک را تکمیل کنید
+            {initialValues
+              ? "تغییرات را اعمال کنید"
+              : "اطلاعات کلینیک را تکمیل کنید"}
           </p>
         </div>
         <form
@@ -295,7 +333,13 @@ export const ClinicFormDialog = ({
               className="h-11 w-full sm:w-auto rounded-2xl bg-gradient-to-l from-blue-600 to-blue-500 px-6 sm:px-10 text-sm font-semibold text-white shadow-lg shadow-blue-500/30 transition hover:shadow-xl hover:shadow-blue-500/40 hover:from-blue-700 hover:to-blue-600"
               disabled={isSubmitting}
             >
-              {isSubmitting ? "در حال ذخیره..." : "ثبت کلینیک"}
+              {isSubmitting
+                ? initialValues
+                  ? "در حال ذخیره..."
+                  : "در حال ذخیره..."
+                : initialValues
+                ? "ذخیره تغییرات"
+                : "ثبت کلینیک"}
             </Button>
           </div>
         </form>

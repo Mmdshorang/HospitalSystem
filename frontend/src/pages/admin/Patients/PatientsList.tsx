@@ -19,6 +19,7 @@ interface Patient {
 
 const Doctors = () => {
   const [isAddOpen, setIsAddOpen] = useState(false);
+  const [selectedPatient, setSelectedPatient] = useState<Patient | null>(null);
   const [doctors, setDoctors] = useState<Patient[]>([
     {
       id: "1",
@@ -43,6 +44,28 @@ const Doctors = () => {
   ]);
 
   const handleAddDoctor = (form: AddPatientFormValues) => {
+    // if form includes id -> update existing patient
+    if (form.id) {
+      setDoctors((prev) =>
+        prev.map((d) =>
+          d.id === form.id
+            ? {
+                ...d,
+                firstName: form.firstName,
+                lastName: form.lastName,
+                phone: form.phone || "",
+                dateOfBirth: form.birthDate || d.dateOfBirth,
+                address: form.address || d.address,
+                gender: form.gender || d.gender,
+                nationalId: form.nationalId || d.nationalId,
+              }
+            : d
+        )
+      );
+      setSelectedPatient(null);
+      return;
+    }
+
     const newDoctor: Patient = {
       id: String(Date.now()),
       firstName: form.firstName,
@@ -121,7 +144,10 @@ const Doctors = () => {
             <button
               className="text-indigo-600 hover:text-indigo-900"
               title="ویرایش"
-              onClick={() => console.log("edit", row.id)}
+              onClick={() => {
+                setSelectedPatient(row);
+                setIsAddOpen(true);
+              }}
             >
               <Edit className="h-5 w-5" />
             </button>
@@ -169,8 +195,29 @@ const Doctors = () => {
         </div>
         <AddPatientDialog
           isOpen={isAddOpen}
-          onClose={() => setIsAddOpen(false)}
+          onClose={() => {
+            setIsAddOpen(false);
+            setSelectedPatient(null);
+          }}
           onSubmit={handleAddDoctor}
+          initialValues={
+            selectedPatient
+              ? {
+                  id: selectedPatient.id,
+                  firstName: selectedPatient.firstName,
+                  lastName: selectedPatient.lastName,
+                  phone: selectedPatient.phone,
+                  nationalId: selectedPatient.nationalId,
+                  birthDate: selectedPatient.dateOfBirth,
+                  address: selectedPatient.address,
+                  gender: selectedPatient.gender as
+                    | "male"
+                    | "female"
+                    | "other"
+                    | null,
+                }
+              : undefined
+          }
         />
       </div>
     </div>
