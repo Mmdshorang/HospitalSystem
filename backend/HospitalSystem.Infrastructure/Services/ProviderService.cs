@@ -127,6 +127,21 @@ public class ProviderService
 
     public async Task<ProviderProfileDto> CreateAsync(CreateProviderProfileDto dto)
     {
+        // Validate that the User exists
+        var userExists = await _context.Users.AnyAsync(u => u.Id == dto.UserId);
+        if (!userExists)
+        {
+            throw new InvalidOperationException($"User with Id {dto.UserId} not found");
+        }
+
+        // Check if provider profile already exists for this user
+        var existingProvider = await _context.ProviderProfiles
+            .FirstOrDefaultAsync(p => p.UserId == dto.UserId);
+        if (existingProvider != null)
+        {
+            throw new InvalidOperationException($"Provider profile already exists for User with Id {dto.UserId}");
+        }
+
         var provider = new ProviderProfile
         {
             UserId = dto.UserId,

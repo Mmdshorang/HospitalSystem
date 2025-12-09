@@ -73,15 +73,18 @@ public class ProvidersController : ControllerBase
     {
         try
         {
-            var userId = GetCurrentUserId();
-            if (!userId.HasValue)
+            if (dto.UserId <= 0)
             {
-                return Unauthorized(new { message = "Invalid token or user not found" });
+                return BadRequest(new { message = "UserId is required and must be greater than 0" });
             }
 
-            dto.UserId = userId.Value;
             var provider = await _providerService.CreateAsync(dto);
             return CreatedAtAction(nameof(GetById), new { id = provider.Id }, provider);
+        }
+        catch (InvalidOperationException ex)
+        {
+            _logger.LogWarning(ex, "Business logic error creating provider: {Message}", ex.Message);
+            return BadRequest(new { message = ex.Message });
         }
         catch (Exception ex)
         {

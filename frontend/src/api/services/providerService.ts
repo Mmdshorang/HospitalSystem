@@ -62,7 +62,16 @@ export const providerService = {
     if (isActive !== undefined) params.append('isActive', isActive.toString());
 
     const response = await apiClient.get(`/api/providers?${params.toString()}`);
-    return response.data;
+    console.log("Provider service response:", response.data);
+    console.log("Is array?", Array.isArray(response.data));
+    
+    // Ensure we return an array
+    if (Array.isArray(response.data)) {
+      return response.data;
+    }
+    // If it's not an array, return empty array or wrap it
+    console.warn("Response data is not an array:", response.data);
+    return [];
   },
 
   // Get provider by ID

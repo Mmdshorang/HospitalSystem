@@ -7,6 +7,7 @@ import DataTable from "../../../components/DataTable";
 import { providerService, type Provider } from "../../../api/services/providerService";
 import { specialtyService, type Specialty } from "../../../api/services/specialtyService";
 import { clinicService, type Clinic } from "../../../api/services/clinicService";
+import { authService } from "../../../api/services/authService";
 import { Button } from "../../../components/ui/button";
 
 const Doctors = () => {
@@ -32,19 +33,32 @@ const Doctors = () => {
   // Fetch providers with filters
   const { data: providers = [], isLoading, error } = useQuery<Provider[]>({
     queryKey: ["providers", searchTerm, selectedSpecialtyId, selectedClinicId, selectedStatus],
-    queryFn: () => providerService.getAll(
-      searchTerm,
-      selectedSpecialtyId,
-      selectedClinicId,
-      selectedStatus === 'all' ? undefined : selectedStatus === 'true'
-    ),
+    queryFn: async () => {
+      try {
+        const result = await providerService.getAll(
+          searchTerm,
+          selectedSpecialtyId,
+          selectedClinicId,
+          selectedStatus === 'all' ? undefined : selectedStatus === 'true'
+        );
+        console.log("Providers fetched:", result);
+        return result;
+      } catch (err) {
+        console.error("Error fetching providers:", err);
+        throw err;
+      }
+    },
   });
 
   // Create provider mutation
   const createMutation = useMutation({
     mutationFn: providerService.create,
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["providers"] });
+      // Invalidate all provider queries to refresh the list (including filtered queries)
+      queryClient.invalidateQueries({
+        queryKey: ["providers"],
+        exact: false // This will invalidate all queries that start with ["providers"]
+      });
       toast.success("کادر درمانی با موفقیت اضافه شد");
     },
     onError: (error: any) => {
@@ -64,23 +78,46 @@ const Doctors = () => {
     },
   });
 
-  const handleAddDoctor = (form: AddDoctorFormValues) => {
-    if (!form.userId) {
-      toast.error("شناسه کاربر (UserId) الزامی است");
-      return;
+  const handleAddDoctor = async (form: AddDoctorFormValues) => {
+    // Save current admin token to restore it later
+    const currentToken = authService.getToken();
+
+    try {
+      // First, create the User with doctor role
+      const registerResponse = await authService.register({
+        email: form.email,
+        password: form.password,
+        confirmPassword: form.confirmPassword,
+        firstName: form.firstName,
+        lastName: form.lastName,
+        phone: form.phone || undefined,
+        nationalCode: form.nationalId || undefined,
+        role: "doctor",
+      });
+
+      // Restore the admin token (register overwrites it)
+      if (currentToken) {
+        localStorage.setItem("authToken", currentToken);
+      }
+
+      // Then, create the Provider using the created User's ID
+      await createMutation.mutateAsync({
+        userId: registerResponse.user.id,
+        clinicId: form.clinicId || undefined,
+        specialtyId: form.specialtyId || undefined,
+        degree: form.degree || undefined,
+        experienceYears: form.experienceYears || undefined,
+        isActive: form.isActive,
+      });
+
+      setIsAddOpen(false);
+    } catch (error: any) {
+      // Restore the admin token in case of error
+      if (currentToken) {
+        localStorage.setItem("authToken", currentToken);
+      }
+      toast.error(error.response?.data?.message || "خطا در ایجاد کاربر یا کادر درمانی");
     }
-
-    createMutation.mutate({
-      userId: form.userId,
-      clinicId: form.clinicId || undefined,
-      specialtyId: form.specialtyId || undefined,
-      degree: form.degree || undefined,
-      experienceYears: form.experienceYears || undefined,
-      sharePercent: form.sharePercent || undefined,
-      isActive: form.isActive,
-    });
-
-    setIsAddOpen(false);
   };
 
   const handleDelete = (id: number) => {
@@ -177,9 +214,10 @@ const Doctors = () => {
   );
 
   if (error) {
+    console.error("Providers query error:", error);
     return (
       <div className="p-4 text-center text-red-600">
-        خطا در بارگذاری اطلاعات کادر درمانی
+        خطا در بارگذاری اطلاعات کادر درمانی: {error instanceof Error ? error.message : "خطای نامشخص"}
       </div>
     );
   }
@@ -268,6 +306,14 @@ const Doctors = () => {
       <div className="px-0">
         {isLoading ? (
           <div className="text-center py-12 text-gray-500">در حال بارگذاری...</div>
+        ) : providers.length === 0 ? (
+          <div className="text-center py-12 text-gray-500">
+            هیچ کادر درمانی ثبت نشده است.
+            <br />
+            <span className="text-xs text-gray-400">
+              Debug: providers count = {providers.length}
+            </span>
+          </div>
         ) : (
           <DataTable
             data={providers}
