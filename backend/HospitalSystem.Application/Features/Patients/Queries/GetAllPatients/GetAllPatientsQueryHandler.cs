@@ -30,7 +30,6 @@ public class GetAllPatientsQueryHandler : IRequestHandler<GetAllPatientsQuery, I
             BirthDate = user.BirthDate,
             Gender = user.Gender?.ToString(),
             Phone = user.Phone,
-            Email = user.Email,
             AvatarUrl = user.AvatarUrl,
             IsActive = user.IsActive,
             PatientProfileId = user.PatientProfile?.Id,

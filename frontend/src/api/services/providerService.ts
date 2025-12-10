@@ -13,7 +13,7 @@ export interface Provider {
   userId: number;
   userFirstName?: string;
   userLastName?: string;
-  userEmail?: string;
+  userPhone?: string;
   clinicId?: number;
   clinicName?: string;
   specialtyId?: number;

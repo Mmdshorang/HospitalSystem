@@ -8,35 +8,30 @@ public class CreatePatientDtoValidator : AbstractValidator<CreatePatientDto>
     public CreatePatientDtoValidator()
     {
         RuleFor(x => x.FirstName)
-            .NotEmpty().WithMessage("First name is required")
-            .MaximumLength(100).WithMessage("First name cannot exceed 100 characters");
+            .NotEmpty().WithMessage("نام الزامی است")
+            .MaximumLength(100).WithMessage("طول نام حداکثر ۱۰۰ کاراکتر است");
 
         RuleFor(x => x.LastName)
-            .NotEmpty().WithMessage("Last name is required")
-            .MaximumLength(100).WithMessage("Last name cannot exceed 100 characters");
+            .NotEmpty().WithMessage("نام خانوادگی الزامی است")
+            .MaximumLength(100).WithMessage("طول نام خانوادگی حداکثر ۱۰۰ کاراکتر است");
 
         RuleFor(x => x.NationalCode)
-            .NotEmpty().WithMessage("National code is required")
-            .MaximumLength(20).WithMessage("National code cannot exceed 20 characters");
-
-        RuleFor(x => x.Email)
-            .NotEmpty().WithMessage("Email is required")
-            .EmailAddress().WithMessage("Invalid email format")
-            .MaximumLength(100).WithMessage("Email cannot exceed 100 characters");
+            .NotEmpty().WithMessage("کد ملی الزامی است")
+            .MaximumLength(20).WithMessage("طول کد ملی حداکثر ۲۰ کاراکتر است");
 
         RuleFor(x => x.Phone)
-            .NotEmpty().WithMessage("Phone is required")
-            .MaximumLength(20).WithMessage("Phone cannot exceed 20 characters");
+            .NotEmpty().WithMessage("شماره موبایل الزامی است")
+            .MaximumLength(20).WithMessage("طول شماره موبایل حداکثر ۲۰ کاراکتر است");
 
         RuleFor(x => x.Password)
-            .NotEmpty().WithMessage("Password is required")
-            .MinimumLength(6).WithMessage("Password must be at least 6 characters");
+            .NotEmpty().WithMessage("رمز عبور الزامی است")
+            .MinimumLength(6).WithMessage("طول رمز عبور حداقل ۶ کاراکتر است");
 
         RuleFor(x => x.BloodType)
-            .MaximumLength(10).WithMessage("Blood type cannot exceed 10 characters");
+            .MaximumLength(10).WithMessage("طول گروه خونی حداکثر ۱۰ کاراکتر است");
 
         RuleFor(x => x.BirthDate)
-            .LessThan(DateTime.Now).WithMessage("Birth date must be in the past")
+            .LessThan(DateTime.Now).WithMessage("تاریخ تولد باید گذشته باشد")
             .When(x => x.BirthDate.HasValue);
     }
 }

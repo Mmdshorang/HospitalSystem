@@ -179,35 +179,6 @@ const DoctorForm = () => {
             </div>
           </div>
 
-          {/* <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                ایمیل
-              </label>
-              <input
-                type="email"
-                name="email"
-                value={formData.email}
-                onChange={handleInputChange}
-                className="input"
-                required
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                تلفن
-              </label>
-              <input
-                type="tel"
-                name="phone"
-                value={formData.phone}
-                onChange={handleInputChange}
-                className="input"
-                required
-              />
-            </div>
-          </div> */}
-
           {/* <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
               محل مطب

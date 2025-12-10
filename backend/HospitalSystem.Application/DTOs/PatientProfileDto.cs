@@ -7,7 +7,7 @@ public class PatientProfileDto
     // User info can be included separately to avoid circular reference
     public string? UserFirstName { get; set; }
     public string? UserLastName { get; set; }
-    public string? UserEmail { get; set; }
+    public string? UserPhone { get; set; }
     public string? BloodType { get; set; }
     public decimal? Height { get; set; }
     public decimal? Weight { get; set; }

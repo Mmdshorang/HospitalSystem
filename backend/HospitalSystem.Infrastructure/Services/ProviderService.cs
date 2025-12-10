@@ -33,7 +33,7 @@ public class ProviderService
             query = query.Where(p =>
                 (p.User != null && p.User.FirstName != null && p.User.FirstName.ToLower().Contains(searchLower)) ||
                 (p.User != null && p.User.LastName != null && p.User.LastName.ToLower().Contains(searchLower)) ||
-                (p.User != null && p.User.Email != null && p.User.Email.ToLower().Contains(searchLower)) ||
+                (p.User != null && p.User.Phone != null && p.User.Phone.ToLower().Contains(searchLower)) ||
                 (p.Specialty != null && p.Specialty.Name != null && p.Specialty.Name.ToLower().Contains(searchLower))
             );
         }
@@ -64,7 +64,7 @@ public class ProviderService
             UserId = p.UserId,
             UserFirstName = p.User?.FirstName,
             UserLastName = p.User?.LastName,
-            UserEmail = p.User?.Email,
+            UserPhone = p.User?.Phone,
             ClinicId = p.ClinicId,
             ClinicName = p.Clinic?.Name,
             SpecialtyId = p.SpecialtyId,
@@ -103,7 +103,7 @@ public class ProviderService
             UserId = provider.UserId,
             UserFirstName = provider.User?.FirstName,
             UserLastName = provider.User?.LastName,
-            UserEmail = provider.User?.Email,
+            UserPhone = provider.User?.Phone,
             ClinicId = provider.ClinicId,
             ClinicName = provider.Clinic?.Name,
             SpecialtyId = provider.SpecialtyId,
@@ -199,7 +199,7 @@ public class ProviderService
             UserId = provider.UserId,
             UserFirstName = provider.User?.FirstName,
             UserLastName = provider.User?.LastName,
-            UserEmail = provider.User?.Email,
+            UserPhone = provider.User?.Phone,
             ClinicId = provider.ClinicId,
             ClinicName = provider.Clinic?.Name,
             SpecialtyId = provider.SpecialtyId,
@@ -254,7 +254,7 @@ public class ProviderService
             UserId = provider.UserId,
             UserFirstName = provider.User?.FirstName,
             UserLastName = provider.User?.LastName,
-            UserEmail = provider.User?.Email,
+            UserPhone = provider.User?.Phone,
             ClinicId = provider.ClinicId,
             ClinicName = provider.Clinic?.Name,
             SpecialtyId = provider.SpecialtyId,

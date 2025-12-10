@@ -50,7 +50,7 @@ public class CreateProviderCommandHandler : IRequestHandler<CreateProviderComman
             UserId = provider.UserId,
             UserFirstName = provider.User?.FirstName,
             UserLastName = provider.User?.LastName,
-            UserEmail = provider.User?.Email,
+            UserPhone = provider.User?.Phone,
             ClinicId = provider.ClinicId,
             ClinicName = provider.Clinic?.Name,
             SpecialtyId = provider.SpecialtyId,

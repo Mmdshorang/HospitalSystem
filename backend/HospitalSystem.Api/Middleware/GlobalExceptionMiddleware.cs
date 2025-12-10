@@ -34,7 +34,7 @@ public class GlobalExceptionMiddleware
         context.Response.ContentType = "application/json";
         
         var statusCode = HttpStatusCode.InternalServerError;
-        string message = "An error occurred while processing your request";
+        string message = "خطایی در پردازش درخواست رخ داد";
         string details = exception.Message;
 
         // Handle database connection errors
@@ -44,8 +44,8 @@ public class GlobalExceptionMiddleware
                 npgsqlEx.SqlState, npgsqlEx.Message);
             
             statusCode = HttpStatusCode.ServiceUnavailable;
-            message = "Database connection error";
-            details = "Unable to connect to the database. Please try again later.";
+            message = "خطا در اتصال به پایگاه داده";
+            details = "امکان اتصال به پایگاه داده وجود ندارد. لطفاً مجدداً تلاش کنید.";
             
             // Log connection details (without sensitive info)
             if (npgsqlEx.InnerException != null)
@@ -60,13 +60,13 @@ public class GlobalExceptionMiddleware
             if (dbEx.InnerException is NpgsqlException innerNpgsql)
             {
                 statusCode = HttpStatusCode.ServiceUnavailable;
-                message = "Database operation failed";
-                details = "Unable to complete the database operation. Please try again later.";
+                message = "خطا در عملیات پایگاه داده";
+                details = "انجام عملیات پایگاه داده ممکن نشد. لطفاً مجدداً تلاش کنید.";
             }
             else
             {
                 statusCode = HttpStatusCode.BadRequest;
-                message = "Database operation failed";
+                message = "خطا در عملیات پایگاه داده";
                 details = dbEx.Message;
             }
         }
@@ -74,8 +74,8 @@ public class GlobalExceptionMiddleware
         {
             _logger.LogError(exception, "Operation timeout");
             statusCode = HttpStatusCode.RequestTimeout;
-            message = "Request timeout";
-            details = "The operation took too long to complete. Please try again.";
+            message = "زمان درخواست به پایان رسید";
+            details = "اجرای عملیات طولانی شد. لطفاً دوباره تلاش کنید.";
         }
 
         context.Response.StatusCode = (int)statusCode;

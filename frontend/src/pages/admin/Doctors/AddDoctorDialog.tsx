@@ -12,7 +12,6 @@ import {
 export interface AddDoctorFormValues {
   firstName: string;
   lastName: string;
-  email: string;
   password: string;
   confirmPassword: string;
   phone: string;
@@ -39,7 +38,6 @@ const AddDoctorDialog: React.FC<AddDoctorDialogProps> = ({
   const [values, setValues] = useState<AddDoctorFormValues>({
     firstName: "",
     lastName: "",
-    email: "",
     password: "",
     confirmPassword: "",
     phone: "",
@@ -68,7 +66,6 @@ const AddDoctorDialog: React.FC<AddDoctorDialogProps> = ({
     setValues({
       firstName: "",
       lastName: "",
-      email: "",
       password: "",
       confirmPassword: "",
       phone: "",
@@ -112,7 +109,7 @@ const AddDoctorDialog: React.FC<AddDoctorDialogProps> = ({
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!values.firstName || !values.lastName || !values.email || !values.password || !values.confirmPassword || !values.licenseNumber) return;
+    if (!values.firstName || !values.lastName || !values.phone || !values.password || !values.confirmPassword || !values.licenseNumber) return;
     if (values.password !== values.confirmPassword) {
       alert("رمز عبور و تکرار آن مطابقت ندارند");
       return;
@@ -149,19 +146,6 @@ const AddDoctorDialog: React.FC<AddDoctorDialogProps> = ({
               <input
                 name="lastName"
                 value={values.lastName}
-                onChange={handleChange}
-                className="input"
-                required
-              />
-            </div>
-            <div>
-              <label className="block text-sm text-gray-700 mb-1">
-                ایمیل
-              </label>
-              <input
-                name="email"
-                type="email"
-                value={values.email}
                 onChange={handleChange}
                 className="input"
                 required

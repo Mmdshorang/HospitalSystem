@@ -58,7 +58,6 @@ namespace HospitalSystem.Infrastructure.Data
                 entity.Property(e => e.LastName).HasMaxLength(255);
                 entity.Property(e => e.NationalCode).HasMaxLength(10);
                 entity.Property(e => e.Phone).HasMaxLength(20);
-                entity.Property(e => e.Email).HasMaxLength(100);
                 entity.Property(e => e.PasswordHash).HasMaxLength(255);
                 entity.Property(e => e.AvatarUrl).HasMaxLength(255);
                 entity.Property(e => e.IsActive).HasDefaultValue(true);
@@ -92,7 +91,6 @@ namespace HospitalSystem.Infrastructure.Data
 
                 
                 // Indexes
-                entity.HasIndex(e => e.Email);
                 entity.HasIndex(e => e.NationalCode);
                 
                 // Relationships

@@ -5,7 +5,6 @@ import { toast } from 'react-toastify';
 
 const Register: React.FC = () => {
   const [formData, setFormData] = useState({
-    email: '',
     password: '',
     confirmPassword: '',
     firstName: '',
@@ -39,7 +38,7 @@ const Register: React.FC = () => {
     try {
       // Map frontend form data to backend RegisterRequest format
       const registerData: any = {
-        email: formData.email,
+        phone: formData.phone,
         password: formData.password,
         confirmPassword: formData.confirmPassword,
         firstName: formData.firstName,
@@ -48,9 +47,6 @@ const Register: React.FC = () => {
       };
 
       // Add optional fields only if they have values
-      if (formData.phone && formData.phone.trim()) {
-        registerData.phone = formData.phone.trim();
-      }
       if (formData.nationalCode && formData.nationalCode.trim()) {
         registerData.nationalCode = formData.nationalCode.trim();
       }
@@ -142,35 +138,20 @@ const Register: React.FC = () => {
             </div>
           </div>
 
-          <div>
-            <label htmlFor="email" className="block text-sm font-medium text-gray-700">
-              ایمیل *
-            </label>
-            <input
-              id="email"
-              name="email"
-              type="email"
-              required
-              value={formData.email}
-              onChange={handleChange}
-              className="mt-1 appearance-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
-              placeholder="ایمیل"
-            />
-          </div>
-
           <div className="grid grid-cols-2 gap-4">
             <div>
               <label htmlFor="phone" className="block text-sm font-medium text-gray-700">
-                شماره تلفن
+                شماره موبایل *
               </label>
               <input
                 id="phone"
                 name="phone"
                 type="tel"
+                required
                 value={formData.phone}
                 onChange={handleChange}
                 className="mt-1 appearance-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
-                placeholder="شماره تلفن"
+                placeholder="شماره موبایل"
               />
             </div>
             <div>

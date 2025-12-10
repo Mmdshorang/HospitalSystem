@@ -12,7 +12,6 @@ public class PatientDto
     public DateTime? BirthDate { get; set; }
     public string? Gender { get; set; }
     public string Phone { get; set; } = string.Empty;
-    public string Email { get; set; } = string.Empty;
     public string? AvatarUrl { get; set; }
     public bool IsActive { get; set; }
     
@@ -39,7 +38,6 @@ public class CreatePatientDto
     public DateTime? BirthDate { get; set; }
     public string? Gender { get; set; }
     public string Phone { get; set; } = string.Empty;
-    public string Email { get; set; } = string.Empty;
     public string Password { get; set; } = string.Empty;
     public string? AvatarUrl { get; set; }
     

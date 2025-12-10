@@ -23,9 +23,9 @@ public class CreatePatientCommandHandler : IRequestHandler<CreatePatientCommand,
     public async Task<PatientDto> Handle(CreatePatientCommand request, CancellationToken cancellationToken)
     {
         // Check if user already exists
-        if (await _context.Users.AnyAsync(u => u.Email == request.Patient.Email || u.NationalCode == request.Patient.NationalCode, cancellationToken))
+        if (await _context.Users.AnyAsync(u => u.Phone == request.Patient.Phone || u.NationalCode == request.Patient.NationalCode, cancellationToken))
         {
-            throw new InvalidOperationException("User with this email or national code already exists");
+            throw new InvalidOperationException("کاربری با این شماره موبایل یا کد ملی موجود است");
         }
 
         // Create User
@@ -35,7 +35,6 @@ public class CreatePatientCommandHandler : IRequestHandler<CreatePatientCommand,
             LastName = request.Patient.LastName,
             NationalCode = request.Patient.NationalCode,
             Phone = request.Patient.Phone,
-            Email = request.Patient.Email,
             PasswordHash = HashPassword(request.Patient.Password),
             Role = UserRole.patient,
             Gender = !string.IsNullOrEmpty(request.Patient.Gender) && Enum.TryParse<GenderType>(request.Patient.Gender, true, out var gender) ? gender : null,
@@ -77,7 +76,6 @@ public class CreatePatientCommandHandler : IRequestHandler<CreatePatientCommand,
             BirthDate = user.BirthDate,
             Gender = user.Gender?.ToString(),
             Phone = user.Phone,
-            Email = user.Email,
             AvatarUrl = user.AvatarUrl,
             IsActive = user.IsActive,
             PatientProfileId = patientProfile.Id,

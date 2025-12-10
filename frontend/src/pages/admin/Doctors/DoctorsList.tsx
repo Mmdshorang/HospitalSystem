@@ -85,12 +85,11 @@ const Doctors = () => {
     try {
       // First, create the User with doctor role
       const registerResponse = await authService.register({
-        email: form.email,
+        phone: form.phone,
         password: form.password,
         confirmPassword: form.confirmPassword,
         firstName: form.firstName,
         lastName: form.lastName,
-        phone: form.phone || undefined,
         nationalCode: form.nationalId || undefined,
         role: "doctor",
       });
@@ -139,7 +138,7 @@ const Doctors = () => {
               {row.userFirstName} {row.userLastName}
             </div>
             <div className="text-sm text-gray-500">
-              {row.userEmail || "-"}
+              {row.userPhone || "-"}
             </div>
           </div>
         ),
@@ -247,7 +246,7 @@ const Doctors = () => {
             </div>
           </div>
           <Button
-            className="h-12 rounded-2xl bg-gradient-to-l from-blue-600 to-blue-500 px-8 text-sm font-semibold text-white shadow-lg shadow-blue-500/30 transition hover:shadow-xl hover:shadow-blue-500/40 hover:from-blue-700 hover:to-blue-600"
+            className="h-12 rounded-2xl bg-linear-to-l from-blue-600 to-blue-500 px-8 text-sm font-semibold text-white shadow-lg shadow-blue-500/30 transition hover:shadow-xl hover:shadow-blue-500/40 hover:from-blue-700 hover:to-blue-600"
             onClick={() => setIsAddOpen(true)}
           >
             <Plus className="ml-2 h-4 w-4" />
@@ -262,7 +261,7 @@ const Doctors = () => {
           <Search className="absolute right-4 top-1/2 h-5 w-5 -translate-y-1/2 text-slate-400" />
           <input
             type="text"
-            placeholder="جستجوی نام، ایمیل یا تخصص..."
+            placeholder="جستجوی نام، شماره یا تخصص..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             className="h-12 w-full rounded-2xl border border-slate-200 pr-12 pl-4 text-sm outline-none focus:border-primary"

@@ -23,14 +23,14 @@ public class GetAllProvidersQueryHandler : IRequestHandler<GetAllProvidersQuery,
             .Include(p => p.WorkSchedules)
             .AsQueryable();
 
-        // Search by user name, email, or specialty
+        // Search by user name, phone, or specialty
         if (!string.IsNullOrWhiteSpace(request.SearchTerm))
         {
             var searchLower = request.SearchTerm.ToLower();
             query = query.Where(p =>
                 (p.User != null && p.User.FirstName != null && p.User.FirstName.ToLower().Contains(searchLower)) ||
                 (p.User != null && p.User.LastName != null && p.User.LastName.ToLower().Contains(searchLower)) ||
-                (p.User != null && p.User.Email != null && p.User.Email.ToLower().Contains(searchLower)) ||
+                (p.User != null && p.User.Phone != null && p.User.Phone.ToLower().Contains(searchLower)) ||
                 (p.Specialty != null && p.Specialty.Name != null && p.Specialty.Name.ToLower().Contains(searchLower))
             );
         }
@@ -64,7 +64,7 @@ public class GetAllProvidersQueryHandler : IRequestHandler<GetAllProvidersQuery,
             UserId = p.UserId,
             UserFirstName = p.User?.FirstName,
             UserLastName = p.User?.LastName,
-            UserEmail = p.User?.Email,
+            UserPhone = p.User?.Phone,
             ClinicId = p.ClinicId,
             ClinicName = p.Clinic?.Name,
             SpecialtyId = p.SpecialtyId,

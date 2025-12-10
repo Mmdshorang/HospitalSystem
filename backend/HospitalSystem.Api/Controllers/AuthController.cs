@@ -34,12 +34,12 @@ public class AuthController : ControllerBase
         }
         catch (UnauthorizedAccessException)
         {
-            return Unauthorized(new { message = "Invalid credentials" });
+                return Unauthorized(new { message = "شماره موبایل یا رمز عبور نادرست است" });
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error during login");
-            return StatusCode(500, "Internal server error");
+                return StatusCode(500, new { message = "خطای داخلی سرور" });
         }
     }
 
@@ -61,13 +61,13 @@ public class AuthController : ControllerBase
                     .ToList();
                 
                 _logger.LogWarning("Registration validation failed: {Errors}", string.Join(", ", errors));
-                return BadRequest(new { message = "Validation failed", errors = errors });
+                return BadRequest(new { message = "اطلاعات ارسالی معتبر نیست", errors = errors });
             }
 
             // Validate password confirmation manually (Compare attribute might not work with JSON)
             if (request.Password != request.ConfirmPassword)
             {
-                return BadRequest(new { message = "Password and confirm password do not match" });
+                return BadRequest(new { message = "رمز عبور و تکرار آن یکسان نیست" });
             }
 
             // Ensure role defaults to patient (already set in DTO, but double-check)
@@ -98,7 +98,7 @@ public class AuthController : ControllerBase
             {
                 errorDetails += $" | Inner: {ex.InnerException.Message}";
             }
-            return StatusCode(500, new { message = "Internal server error", details = errorDetails });
+            return StatusCode(500, new { message = "خطای داخلی سرور", details = errorDetails });
         }
     }
 

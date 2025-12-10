@@ -9,7 +9,6 @@ public class UserDto
     public string LastName { get; set; } = string.Empty;
     public string NationalCode { get; set; } = string.Empty;
     public string Phone { get; set; } = string.Empty;
-    public string Email { get; set; } = string.Empty;
     public UserRole Role { get; set; }
     public GenderType? Gender { get; set; }
     public DateTime? BirthDate { get; set; }
@@ -29,7 +28,6 @@ public class CreateUserDto
     public string LastName { get; set; } = string.Empty;
     public string NationalCode { get; set; } = string.Empty;
     public string Phone { get; set; } = string.Empty;
-    public string Email { get; set; } = string.Empty;
     public string Password { get; set; } = string.Empty;
     public UserRole Role { get; set; }
     public GenderType? Gender { get; set; }
@@ -45,7 +43,6 @@ public class UpdateUserDto
     public string LastName { get; set; } = string.Empty;
     public string NationalCode { get; set; } = string.Empty;
     public string Phone { get; set; } = string.Empty;
-    public string Email { get; set; } = string.Empty;
     public GenderType? Gender { get; set; }
     public DateTime? BirthDate { get; set; }
     public string? AvatarUrl { get; set; }

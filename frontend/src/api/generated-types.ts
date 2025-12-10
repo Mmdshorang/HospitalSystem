@@ -2,17 +2,16 @@
 // This file should be regenerated when backend DTOs change
 
 export interface LoginRequest {
-  email: string;
+  phone: string;
   password: string;
 }
 
 export interface RegisterRequest {
-  email: string;
+  phone: string;
   password: string;
   confirmPassword: string;
   firstName: string;
   lastName: string;
-  phone?: string;
   nationalCode?: string;
   gender?: string;
   birthDate?: string;
@@ -36,7 +35,6 @@ export interface VerifyOtpRequest {
 
 export interface UserInfo {
   id: number;
-  email: string;
   role: string;
   firstName: string;
   lastName: string;
@@ -56,7 +54,6 @@ export interface Patient {
   nationalId: string;
   dateOfBirth: string;
   phoneNumber: string;
-  email: string;
   address: string;
   bloodType: string;
   emergencyContact: string;
@@ -71,7 +68,6 @@ export interface CreatePatient {
   nationalId: string;
   dateOfBirth: string;
   phoneNumber: string;
-  email: string;
   address: string;
   bloodType: string;
   emergencyContact: string;
@@ -85,7 +81,6 @@ export interface UpdatePatient {
   nationalId: string;
   dateOfBirth: string;
   phoneNumber: string;
-  email: string;
   address: string;
   bloodType: string;
   emergencyContact: string;
@@ -100,7 +95,6 @@ export interface Doctor {
   licenseNumber: string;
   specialization: string;
   phoneNumber: string;
-  email: string;
   officeLocation: string;
   workingHoursStart: string;
   workingHoursEnd: string;
@@ -115,7 +109,6 @@ export interface CreateDoctor {
   licenseNumber: string;
   specialization: string;
   phoneNumber: string;
-  email: string;
   officeLocation: string;
   workingHoursStart: string;
   workingHoursEnd: string;
@@ -129,7 +122,6 @@ export interface UpdateDoctor {
   licenseNumber: string;
   specialization: string;
   phoneNumber: string;
-  email: string;
   officeLocation: string;
   workingHoursStart: string;
   workingHoursEnd: string;

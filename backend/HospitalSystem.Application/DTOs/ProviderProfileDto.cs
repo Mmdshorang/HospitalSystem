@@ -7,7 +7,7 @@ public class ProviderProfileDto
     // User info can be included separately to avoid circular reference
     public string? UserFirstName { get; set; }
     public string? UserLastName { get; set; }
-    public string? UserEmail { get; set; }
+    public string? UserPhone { get; set; }
     public long? ClinicId { get; set; }
     public string? ClinicName { get; set; }
     public long? SpecialtyId { get; set; }

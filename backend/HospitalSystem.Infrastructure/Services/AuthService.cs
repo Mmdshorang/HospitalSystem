@@ -41,12 +41,14 @@ public class AuthService : IAuthService
 
     public async Task<AuthResponse> LoginAsync(LoginRequest request)
     {
+        var normalizedPhone = NormalizePhone(request.Phone);
+
         var user = await _context.Users
-            .FirstOrDefaultAsync(u => u.Email == request.Email && u.IsActive && u.DeletedAt == null);
+            .FirstOrDefaultAsync(u => u.Phone == normalizedPhone && u.IsActive && u.DeletedAt == null);
 
         if (user == null || !VerifyPassword(request.Password, user.PasswordHash))
         {
-            throw new UnauthorizedAccessException("Invalid credentials");
+            throw new UnauthorizedAccessException("شماره موبایل یا رمز عبور نادرست است");
         }
 
         var token = GenerateJwtToken(user);
@@ -57,7 +59,6 @@ public class AuthService : IAuthService
             User = new UserInfo
             {
                 Id = user.Id,
-                Email = user.Email,
                 Role = user.Role.ToString(),
                 FirstName = user.FirstName,
                 LastName = user.LastName,
@@ -73,9 +74,15 @@ public class AuthService : IAuthService
 
     public async Task<AuthResponse> RegisterAsync(RegisterRequest request)
     {
-        if (await _context.Users.AnyAsync(u => u.Email == request.Email))
+        var normalizedPhone = NormalizePhone(request.Phone);
+        if (string.IsNullOrWhiteSpace(normalizedPhone))
         {
-            throw new InvalidOperationException("User with this email already exists");
+            throw new InvalidOperationException("شماره موبایل الزامی است");
+        }
+
+        if (await _context.Users.AnyAsync(u => u.Phone == normalizedPhone))
+        {
+            throw new InvalidOperationException("حسابی با این شماره موبایل وجود دارد");
         }
 
         // Ensure role is valid (default to patient if not set)
@@ -131,12 +138,11 @@ public class AuthService : IAuthService
 
         var user = new User
         {
-            Email = request.Email,
             PasswordHash = HashPassword(request.Password),
             FirstName = request.FirstName,
             LastName = request.LastName,
             NationalCode = request.NationalCode ?? "",
-            Phone = request.Phone ?? "",
+            Phone = normalizedPhone,
             Gender = gender, // Will be null if not provided or invalid
             BirthDate = birthDate,
             Role = role,
@@ -169,7 +175,6 @@ public class AuthService : IAuthService
             User = new UserInfo
             {
                 Id = user.Id,
-                Email = user.Email,
                 Role = user.Role.ToString(),
                 FirstName = user.FirstName,
                 LastName = user.LastName,
@@ -226,7 +231,6 @@ public class AuthService : IAuthService
         return new UserInfo
         {
             Id = user.Id,
-            Email = user.Email,
             Role = user.Role.ToString(),
             FirstName = user.FirstName,
             LastName = user.LastName,
@@ -375,7 +379,7 @@ public class AuthService : IAuthService
         var claims = new[]
         {
             new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
-            new Claim(ClaimTypes.Email, user.Email),
+            new Claim(ClaimTypes.MobilePhone, user.Phone ?? string.Empty),
             new Claim(ClaimTypes.Role, user.Role.ToString()),
             new Claim("exp", DateTimeOffset.UtcNow.AddMinutes(60).ToUnixTimeSeconds().ToString(), ClaimValueTypes.Integer64)
         };
@@ -470,7 +474,6 @@ public class AuthService : IAuthService
             User = new UserInfo
             {
                 Id = user.Id,
-                Email = user.Email,
                 Role = user.Role.ToString(),
                 FirstName = user.FirstName,
                 LastName = user.LastName,
