@@ -34,7 +34,6 @@ public class RegisterRequest
     public string LastName { get; set; } = string.Empty;
     
     public string? NationalCode { get; set; }
-    public string? Phone { get; set; }
     public GenderType? Gender { get; set; }
     public DateTime? BirthDate { get; set; }
     
