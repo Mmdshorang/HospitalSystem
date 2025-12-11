@@ -31,8 +31,7 @@ public class ClinicService
             var searchLower = searchTerm.ToLower();
             query = query.Where(c =>
                 (c.Name != null && c.Name.ToLower().Contains(searchLower)) ||
-                (c.Phone != null && c.Phone.Contains(searchTerm)) ||
-                (c.Email != null && c.Email.ToLower().Contains(searchLower))
+                (c.Phone != null && c.Phone.Contains(searchTerm))
             );
         }
 
@@ -72,7 +71,6 @@ public class ClinicService
         {
             Name = dto.Name,
             Phone = dto.Phone,
-            Email = dto.Email,
             ManagerId = dto.ManagerId,
             LogoUrl = dto.LogoUrl,
             IsActive = dto.IsActive,
@@ -134,7 +132,6 @@ public class ClinicService
 
         clinic.Name = dto.Name;
         clinic.Phone = dto.Phone;
-        clinic.Email = dto.Email;
         clinic.ManagerId = dto.ManagerId;
         clinic.LogoUrl = dto.LogoUrl;
         clinic.IsActive = dto.IsActive;
@@ -278,7 +275,6 @@ public class ClinicService
             Id = clinic.Id,
             Name = clinic.Name,
             Phone = clinic.Phone,
-            Email = clinic.Email,
             ManagerId = clinic.ManagerId,
             ManagerName = clinic.Manager != null ? $"{clinic.Manager.FirstName} {clinic.Manager.LastName}" : null,
             LogoUrl = clinic.LogoUrl,

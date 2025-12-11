@@ -1,8 +1,8 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import {
-  ShieldCheck,
+
   Smartphone,
   Clock4,
   ArrowRight,
@@ -201,7 +201,12 @@ const Login: React.FC = () => {
           </section>
 
           <section className="relative flex h-full flex-col justify-between text-white">
-            <img src="OTP.svg" alt="" />
+            <img
+              src="/OTP.svg"
+              alt="ورود امن با کد تایید"
+              loading="lazy"
+              className="h-full w-full object-contain"
+            />
           </section>
         </div>
       </div>

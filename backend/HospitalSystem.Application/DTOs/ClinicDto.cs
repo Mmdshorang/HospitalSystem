@@ -7,7 +7,6 @@ public class ClinicDto
     public long Id { get; set; }
     public string? Name { get; set; }
     public string? Phone { get; set; }
-    public string? Email { get; set; }
     public long? ManagerId { get; set; }
     public string? ManagerName { get; set; }
     public string? LogoUrl { get; set; }
@@ -27,10 +26,6 @@ public class CreateClinicDto
     [StringLength(20, ErrorMessage = "شماره تماس نمی‌تواند بیشتر از 20 کاراکتر باشد")]
     public string? Phone { get; set; }
     
-    [EmailAddress(ErrorMessage = "فرمت ایمیل معتبر نیست")]
-    [StringLength(200, ErrorMessage = "ایمیل نمی‌تواند بیشتر از 200 کاراکتر باشد")]
-    public string? Email { get; set; }
-    
     public long? ManagerId { get; set; }
     
     [StringLength(500, ErrorMessage = "آدرس لوگو نمی‌تواند بیشتر از 500 کاراکتر باشد")]
@@ -48,7 +43,6 @@ public class UpdateClinicDto
     public long Id { get; set; }
     public string? Name { get; set; }
     public string? Phone { get; set; }
-    public string? Email { get; set; }
     public long? ManagerId { get; set; }
     public string? LogoUrl { get; set; }
     public bool IsActive { get; set; } = true;

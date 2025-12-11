@@ -4,15 +4,15 @@ export interface AddPatientFormValues {
   id?: string | null;
   firstName: string;
   lastName: string;
-  phone?: string | null;
-  nationalId?: string | null;
-  birthDate?: string | null;
+  nationalId: string;
+  dateOfBirth: string;
+  phoneNumber: string;
+  address: string;
+  bloodType: string;
+  emergencyContact: string;
+  emergencyPhone: string;
   gender?: "male" | "female" | "other" | null;
-  insuranceNumber?: string | null;
-  address?: string | null;
   isActive: boolean;
-  RelationshipToPatient?: string | null;
-  PhoneRelationshipToPatient?: string | null;
 }
 
 interface AddPatientDialogProps {
@@ -31,22 +31,25 @@ const AddPatientDialog: React.FC<AddPatientDialogProps> = ({
   const [values, setValues] = useState<AddPatientFormValues>({
     firstName: "",
     lastName: "",
-    phone: null,
-    nationalId: null,
-    birthDate: null,
+    nationalId: "",
+    dateOfBirth: "",
+    phoneNumber: "",
+    address: "",
+    bloodType: "",
+    emergencyContact: "",
+    emergencyPhone: "",
     gender: null,
-    insuranceNumber: null,
-    address: null,
     id: null,
     isActive: true,
-    RelationshipToPatient: null,
-    PhoneRelationshipToPatient: null,
   });
 
   useEffect(() => {
     if (isOpen && initialValues) {
       setValues(
-        (prev) => ({ ...prev, ...initialValues } as AddPatientFormValues)
+        (prev) => ({
+          ...prev,
+          ...initialValues,
+        } as AddPatientFormValues)
       );
     }
     if (!isOpen) {
@@ -54,16 +57,16 @@ const AddPatientDialog: React.FC<AddPatientDialogProps> = ({
       setValues({
         firstName: "",
         lastName: "",
-        phone: null,
-        nationalId: null,
-        birthDate: null,
+        nationalId: "",
+        dateOfBirth: "",
+        phoneNumber: "",
+        address: "",
+        bloodType: "",
+        emergencyContact: "",
+        emergencyPhone: "",
         gender: null,
-        insuranceNumber: null,
-        address: null,
         id: null,
         isActive: true,
-        RelationshipToPatient: null,
-        PhoneRelationshipToPatient: null,
       });
     }
   }, [isOpen, initialValues]);
@@ -72,16 +75,16 @@ const AddPatientDialog: React.FC<AddPatientDialogProps> = ({
     setValues({
       firstName: "",
       lastName: "",
-      phone: null,
-      nationalId: null,
-      birthDate: null,
+      nationalId: "",
+      dateOfBirth: "",
+      phoneNumber: "",
+      address: "",
+      bloodType: "",
+      emergencyContact: "",
+      emergencyPhone: "",
       gender: null,
-      insuranceNumber: null,
-      address: null,
       id: null,
       isActive: true,
-      RelationshipToPatient: null,
-      PhoneRelationshipToPatient: null,
     });
     onClose();
   };
@@ -92,7 +95,7 @@ const AddPatientDialog: React.FC<AddPatientDialogProps> = ({
     >
   ) => {
     const { name, value } = e.target;
-    setValues((prev) => ({ ...prev, [name]: value === "" ? null : value }));
+    setValues((prev) => ({ ...prev, [name]: value }));
   };
 
   const handleCheckbox = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -103,6 +106,8 @@ const AddPatientDialog: React.FC<AddPatientDialogProps> = ({
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!values.firstName || !values.lastName) return;
+    if (!values.nationalId || !values.phoneNumber || !values.dateOfBirth)
+      return;
     onSubmit(values);
     resetAndClose();
   };
@@ -151,9 +156,10 @@ const AddPatientDialog: React.FC<AddPatientDialogProps> = ({
               </label>
               <input
                 name="nationalId"
-                value={values.nationalId ?? ""}
+                value={values.nationalId}
                 onChange={handleChange}
                 className="input"
+                required
               />
             </div>
 
@@ -162,10 +168,11 @@ const AddPatientDialog: React.FC<AddPatientDialogProps> = ({
                 شماره تماس بیمار
               </label>
               <input
-                name="phone"
-                value={values.phone ?? ""}
+                name="phoneNumber"
+                value={values.phoneNumber}
                 onChange={handleChange}
                 className="input"
+                required
               />
             </div>
 
@@ -174,11 +181,12 @@ const AddPatientDialog: React.FC<AddPatientDialogProps> = ({
                 تاریخ تولد بیمار
               </label>
               <input
-                name="birthDate"
-                value={values.birthDate ?? ""}
+                name="dateOfBirth"
+                value={values.dateOfBirth}
                 onChange={handleChange}
                 className="input"
                 type="date"
+                required
               />
             </div>
 
@@ -225,9 +233,10 @@ const AddPatientDialog: React.FC<AddPatientDialogProps> = ({
               <label className="block text-sm text-gray-700 mb-1">آدرس</label>
               <textarea
                 name="address"
-                value={values.address ?? ""}
+                value={values.address}
                 onChange={handleChange}
                 className="input h-24"
+                required
               />
             </div>
 
@@ -236,10 +245,36 @@ const AddPatientDialog: React.FC<AddPatientDialogProps> = ({
                 شماره بیمه بیمار
               </label>
               <input
-                name="insuranceNumber"
-                value={values.insuranceNumber ?? ""}
+                name="bloodType"
+                value={values.bloodType}
                 onChange={handleChange}
                 className="input"
+                placeholder="مثال: O+"
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm text-gray-700 mb-1">
+                تماس اضطراری
+              </label>
+              <input
+                name="emergencyContact"
+                value={values.emergencyContact}
+                onChange={handleChange}
+                className="input"
+                required
+              />
+            </div>
+            <div>
+              <label className="block text-sm text-gray-700 mb-1">
+                شماره تماس اضطراری
+              </label>
+              <input
+                name="emergencyPhone"
+                value={values.emergencyPhone}
+                onChange={handleChange}
+                className="input"
+                required
               />
             </div>
 

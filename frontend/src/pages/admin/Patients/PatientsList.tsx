@@ -1,81 +1,141 @@
 import { Plus, Edit, Trash2 } from "lucide-react";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import AddPatientDialog, {
   type AddPatientFormValues,
 } from "./AddPatientDialog";
 import DataTable from "../../../components/DataTable";
 import { Button } from "../../../components/ui/button";
+import { patientService } from "../../../api/services/patientService";
 
-interface Patient {
+type Patient = {
   id: string;
   firstName: string;
   lastName: string;
-  nationalId?: string;
-  phone: string;
+  nationalId: string;
+  phoneNumber: string;
   dateOfBirth: string;
   address: string;
   gender?: string;
-}
+  bloodType?: string;
+  emergencyContact?: string;
+  emergencyPhone?: string;
+};
 
 const Doctors = () => {
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const [isAddOpen, setIsAddOpen] = useState(false);
   const [selectedPatient, setSelectedPatient] = useState<Patient | null>(null);
-  const [doctors, setDoctors] = useState<Patient[]>([
-    {
-      id: "1",
-      firstName: "محمد",
-      lastName: "کنعانی",
-      nationalId: "0012345678",
-      phone: "09123456789",
-      dateOfBirth: "1378/4/6",
-      address: "دزفول",
-      gender: "male",
-    },
-    {
-      id: "2",
-      firstName: "محمد",
-      lastName: "شرنگ",
-      nationalId: "0098765432",
-      phone: "09123456790",
-      dateOfBirth: "1378/4/6",
-      address: "دزفول",
-      gender: "male",
-    },
-  ]);
+  const [patients, setPatients] = useState<Patient[]>([]);
 
-  const handleAddDoctor = (form: AddPatientFormValues) => {
-    // if form includes id -> update existing patient
-    if (form.id) {
-      setDoctors((prev) =>
-        prev.map((d) =>
-          d.id === form.id
-            ? {
-                ...d,
+  useEffect(() => {
+    const fetchPatients = async () => {
+      setLoading(true);
+      setError(null);
+      try {
+        const result = await patientService.getAll();
+        setPatients(
+          result.map((p) => ({
+            id: String(p.id),
+            firstName: p.firstName,
+            lastName: p.lastName,
+            nationalId: p.nationalId,
+            phoneNumber: p.phoneNumber,
+            dateOfBirth: p.dateOfBirth || "",
+            address: p.address || "",
+            bloodType: p.bloodType,
+            emergencyContact: p.emergencyContact,
+            emergencyPhone: p.emergencyPhone,
+          }))
+        );
+      } catch (err) {
+        console.error(err);
+        setError("خطا در دریافت لیست بیماران");
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchPatients();
+  }, []);
+
+  const handleAddDoctor = async (form: AddPatientFormValues) => {
+    try {
+      if (form.id) {
+        await patientService.update(form.id, {
+          id: form.id,
+          firstName: form.firstName,
+          lastName: form.lastName,
+          nationalId: form.nationalId,
+          dateOfBirth: form.dateOfBirth,
+          phoneNumber: form.phoneNumber,
+          address: form.address,
+          bloodType: form.bloodType,
+          emergencyContact: form.emergencyContact,
+          emergencyPhone: form.emergencyPhone,
+        });
+        setPatients((prev) =>
+          prev.map((p) =>
+            p.id === form.id
+              ? {
+                ...p,
                 firstName: form.firstName,
                 lastName: form.lastName,
-                phone: form.phone || "",
-                dateOfBirth: form.birthDate || d.dateOfBirth,
-                address: form.address || d.address,
-                gender: form.gender || d.gender,
-                nationalId: form.nationalId || d.nationalId,
+                nationalId: form.nationalId,
+                phoneNumber: form.phoneNumber,
+                dateOfBirth: form.dateOfBirth,
+                address: form.address,
+                bloodType: form.bloodType,
+                emergencyContact: form.emergencyContact,
+                emergencyPhone: form.emergencyPhone,
               }
-            : d
-        )
-      );
-      setSelectedPatient(null);
-      return;
-    }
+              : p
+          )
+        );
+        setSelectedPatient(null);
+        return;
+      }
 
-    const newDoctor: Patient = {
-      id: String(Date.now()),
-      firstName: form.firstName,
-      lastName: form.lastName,
-      phone: form.phone || "",
-      dateOfBirth: form.birthDate || "",
-      address: form.address || "",
-      gender: form.gender || undefined,
-    };
-    setDoctors((prev) => [newDoctor, ...prev]);
+      const created = await patientService.create({
+        firstName: form.firstName,
+        lastName: form.lastName,
+        nationalId: form.nationalId,
+        dateOfBirth: form.dateOfBirth,
+        phoneNumber: form.phoneNumber,
+        address: form.address,
+        bloodType: form.bloodType,
+        emergencyContact: form.emergencyContact,
+        emergencyPhone: form.emergencyPhone,
+      });
+
+      setPatients((prev) => [
+        {
+          id: String(created.id),
+          firstName: created.firstName,
+          lastName: created.lastName,
+          nationalId: created.nationalId,
+          phoneNumber: created.phoneNumber,
+          dateOfBirth: created.dateOfBirth,
+          address: created.address,
+          bloodType: created.bloodType,
+          emergencyContact: created.emergencyContact,
+          emergencyPhone: created.emergencyPhone,
+        },
+        ...prev,
+      ]);
+    } catch (err) {
+      console.error(err);
+      setError("خطا در ذخیره اطلاعات بیمار");
+    }
+  };
+
+  const handleDelete = async (id: string) => {
+    try {
+      await patientService.delete(id);
+      setPatients((prev) => prev.filter((p) => p.id !== id));
+    } catch (err) {
+      console.error(err);
+      setError("خطا در حذف بیمار");
+    }
   };
 
   const columns = useMemo(
@@ -110,19 +170,17 @@ const Doctors = () => {
       },
       {
         key: "gender",
-        header: "جنسیت",
+        header: "گروه خونی",
         sortable: true,
-        accessor: (row: Patient) => row.gender,
+        accessor: (row: Patient) => row.bloodType || "-",
         cell: (value: unknown) => (
-          <span className="text-sm text-gray-500">
-            {String(value) === "male" ? "مرد" : "زن"}
-          </span>
+          <span className="text-sm text-gray-500">{String(value)}</span>
         ),
       },
       {
         key: "phone",
         header: "تماس",
-        accessor: (row: Patient) => row.phone,
+        accessor: (row: Patient) => row.phoneNumber,
         cell: (value: unknown) => (
           <div className="text-sm text-gray-500">{String(value)}</div>
         ),
@@ -154,9 +212,7 @@ const Doctors = () => {
             <button
               className="text-red-600 hover:text-red-900"
               title="حذف"
-              onClick={() =>
-                setDoctors((prev) => prev.filter((d) => d.id !== row.id))
-              }
+              onClick={() => handleDelete(row.id)}
             >
               <Trash2 className="h-5 w-5" />
             </button>
@@ -164,7 +220,7 @@ const Doctors = () => {
         ),
       },
     ],
-    [setDoctors]
+    [handleDelete]
   );
 
   return (
@@ -187,10 +243,16 @@ const Doctors = () => {
 
       <div className="mt-5">
         <div className="px-0">
+          {error && (
+            <div className="mb-4 rounded-lg bg-red-50 px-4 py-3 text-sm text-red-700">
+              {error}
+            </div>
+          )}
           <DataTable
-            data={doctors}
+            data={patients}
             columns={columns}
             rowKey={(row) => (row as Patient).id}
+            loading={loading}
           />
         </div>
         <AddPatientDialog
@@ -203,19 +265,22 @@ const Doctors = () => {
           initialValues={
             selectedPatient
               ? {
-                  id: selectedPatient.id,
-                  firstName: selectedPatient.firstName,
-                  lastName: selectedPatient.lastName,
-                  phone: selectedPatient.phone,
-                  nationalId: selectedPatient.nationalId,
-                  birthDate: selectedPatient.dateOfBirth,
-                  address: selectedPatient.address,
-                  gender: selectedPatient.gender as
-                    | "male"
-                    | "female"
-                    | "other"
-                    | null,
-                }
+                id: selectedPatient.id,
+                firstName: selectedPatient.firstName,
+                lastName: selectedPatient.lastName,
+                phoneNumber: selectedPatient.phoneNumber,
+                nationalId: selectedPatient.nationalId,
+                dateOfBirth: selectedPatient.dateOfBirth,
+                address: selectedPatient.address,
+                gender: selectedPatient.gender as
+                  | "male"
+                  | "female"
+                  | "other"
+                  | null,
+                bloodType: selectedPatient.bloodType || "",
+                emergencyContact: selectedPatient.emergencyContact || "",
+                emergencyPhone: selectedPatient.emergencyPhone || "",
+              }
               : undefined
           }
         />

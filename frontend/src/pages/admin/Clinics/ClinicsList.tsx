@@ -267,7 +267,7 @@ const ClinicsList = () => {
           if (selectedClinicForEdit) {
             await updateClinic.mutateAsync({
               id: selectedClinicForEdit.id,
-              payload: values as any,
+              payload: { ...values, id: selectedClinicForEdit.id },
             });
             setSelectedClinicForEdit(null);
           } else {

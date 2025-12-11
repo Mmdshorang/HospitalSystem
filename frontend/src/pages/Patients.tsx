@@ -1,37 +1,46 @@
-import { Plus, Edit, Trash2, Eye } from 'lucide-react';
+import { Plus, Edit, Trash2, Eye } from "lucide-react";
+import { useEffect, useState } from "react";
+import { patientService } from "../api/services/patientService";
 
 interface Patient {
   id: string;
   firstName: string;
   lastName: string;
-  email: string;
-  phone: string;
-  dateOfBirth: string;
-  address: string;
+  phoneNumber: string;
+  dateOfBirth?: string;
+  address?: string;
 }
 
 const Patients = () => {
-  // Mock data for simple patients list
-  const patients: Patient[] = [
-    {
-      id: '1',
-      firstName: 'احمد',
-      lastName: 'محمدی',
-      email: 'ahmad.mohammadi@email.com',
-      phone: '+98 912 345 6789',
-      dateOfBirth: '1365-03-15',
-      address: 'تهران، خیابان ولیعصر، پلاک 123',
-    },
-    {
-      id: '2',
-      firstName: 'فاطمه',
-      lastName: 'احمدی',
-      email: 'fateme.ahmadi@email.com',
-      phone: '+98 912 345 6790',
-      dateOfBirth: '1370-07-22',
-      address: 'تهران، خیابان کریمخان، پلاک 456',
-    },
-  ];
+  const [patients, setPatients] = useState<Patient[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const fetchPatients = async () => {
+      setLoading(true);
+      setError(null);
+      try {
+        const result = await patientService.getAll();
+        setPatients(
+          result.map((p) => ({
+            id: String(p.id),
+            firstName: p.firstName,
+            lastName: p.lastName,
+            phoneNumber: p.phoneNumber,
+            dateOfBirth: p.dateOfBirth,
+            address: p.address,
+          }))
+        );
+      } catch (err) {
+        console.error(err);
+        setError("خطا در دریافت لیست بیماران");
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchPatients();
+  }, []);
 
   return (
     <div>
@@ -52,6 +61,11 @@ const Patients = () => {
         <div className="px-6 py-4 border-b border-gray-200">
           <h3 className="text-lg font-medium text-gray-900">لیست بیماران</h3>
         </div>
+        {error && (
+          <div className="px-6 pt-4 text-sm text-red-700 bg-red-50">
+            {error}
+          </div>
+        )}
         <div className="overflow-x-auto">
           <table className="min-w-full divide-y divide-gray-200">
             <thead className="bg-gray-50">
@@ -71,7 +85,7 @@ const Patients = () => {
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
-              {patients.map((patient) => (
+              {(loading ? [] : patients).map((patient) => (
                 <tr key={patient.id}>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div>
@@ -82,11 +96,12 @@ const Patients = () => {
                     </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm text-gray-900">{patient.email}</div>
-                    <div className="text-sm text-gray-500">{patient.phone}</div>
+                    <div className="text-sm text-gray-500">
+                      {patient.phoneNumber || "-"}
+                    </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                    {patient.dateOfBirth}
+                    {patient.dateOfBirth || "-"}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                     <div className="flex space-x-2 space-x-reverse">

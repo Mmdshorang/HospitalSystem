@@ -27,7 +27,7 @@ export interface AddDoctorFormValues {
 interface AddDoctorDialogProps {
   isOpen: boolean;
   onClose: () => void;
-  onSubmit: (values: AddDoctorFormValues) => void;
+  onSubmit: (values: AddDoctorFormValues) => Promise<void>;
 }
 
 const AddDoctorDialog: React.FC<AddDoctorDialogProps> = ({
@@ -35,6 +35,7 @@ const AddDoctorDialog: React.FC<AddDoctorDialogProps> = ({
   onClose,
   onSubmit,
 }) => {
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [values, setValues] = useState<AddDoctorFormValues>({
     firstName: "",
     lastName: "",
@@ -88,17 +89,17 @@ const AddDoctorDialog: React.FC<AddDoctorDialogProps> = ({
       ...prev,
       [name]:
         name === "experienceYears" ||
-        name === "userId" ||
-        name === "clinicId" ||
-        name === "specialtyId"
+          name === "userId" ||
+          name === "clinicId" ||
+          name === "specialtyId"
           ? value === ""
             ? null
             : Number(value)
           : name === "sharePercent"
-          ? value === ""
-            ? null
-            : Number(value)
-          : value,
+            ? value === ""
+              ? null
+              : Number(value)
+            : value,
     }));
   };
 
@@ -107,15 +108,23 @@ const AddDoctorDialog: React.FC<AddDoctorDialogProps> = ({
     setValues((prev) => ({ ...prev, [name]: checked }));
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!values.firstName || !values.lastName || !values.phone || !values.password || !values.confirmPassword || !values.licenseNumber) return;
     if (values.password !== values.confirmPassword) {
       alert("رمز عبور و تکرار آن مطابقت ندارند");
       return;
     }
-    onSubmit(values);
-    resetAndClose();
+    try {
+      setIsSubmitting(true);
+      await onSubmit(values);
+      resetAndClose();
+    } catch (error) {
+      // Errors are handled upstream (toast), keep dialog open for correction
+      console.error("Failed to add doctor:", error);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   if (!isOpen) return null;
@@ -293,8 +302,9 @@ const AddDoctorDialog: React.FC<AddDoctorDialogProps> = ({
             <button
               type="submit"
               className="h-11 rounded-2xl bg-blue-600 hover:bg-blue-700 px-10 text-sm font-semibold text-white shadow-lg shadow-blue-600/30 transition-colors"
+              disabled={isSubmitting}
             >
-              ذخیره
+              {isSubmitting ? "در حال ذخیره..." : "ذخیره"}
             </button>
           </div>
         </form>

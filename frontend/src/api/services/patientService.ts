@@ -5,27 +5,31 @@ export interface PatientListItem {
   id: number;
   firstName: string;
   lastName: string;
-  nationalCode: string;
-  phone: string;
-  email: string;
+  nationalId: string;
+  phoneNumber: string;
+  dateOfBirth?: string;
+  address?: string;
+  bloodType?: string;
+  emergencyContact?: string;
+  emergencyPhone?: string;
 }
 
 export const patientService = {
   // Get all patients
   getAll: async (): Promise<PatientListItem[]> => {
-    try {
-      const response = await apiClient.get<any[]>("/api/patients");
-      return response.data.map((p: any) => ({
-        id: p.id || Number(p.id),
-        firstName: p.firstName || "",
-        lastName: p.lastName || "",
-        nationalCode: p.nationalCode || p.nationalId || "",
-        phone: p.phone || p.phoneNumber || "",
-        email: p.email || "",
-      }));
-    } catch {
-      return [];
-    }
+    const response = await apiClient.get<any[]>("/api/patients");
+    return (response.data || []).map((p: any) => ({
+      id: p.id || Number(p.id),
+      firstName: p.firstName || "",
+      lastName: p.lastName || "",
+      nationalId: p.nationalId || p.nationalCode || "",
+      phoneNumber: p.phoneNumber || p.phone || "",
+      dateOfBirth: p.dateOfBirth || p.birthDate || "",
+      address: p.address || "",
+      bloodType: p.bloodType || "",
+      emergencyContact: p.emergencyContact || "",
+      emergencyPhone: p.emergencyPhone || "",
+    }));
   },
 
   // Create new patient

@@ -204,7 +204,6 @@ namespace HospitalSystem.Infrastructure.Data
                 entity.Property(e => e.Id).ValueGeneratedOnAdd();
                 entity.Property(e => e.Name).HasMaxLength(150);
                 entity.Property(e => e.Phone).HasMaxLength(20);
-                entity.Property(e => e.Email).HasMaxLength(100);
                 entity.Property(e => e.LogoUrl).HasMaxLength(255);
                 entity.Property(e => e.IsActive).HasDefaultValue(true);
                 entity.Property(e => e.CreatedAt).HasDefaultValueSql("NOW()");

@@ -4,7 +4,6 @@ export interface Clinic {
   id: number;
   name?: string;
   phone?: string;
-  email?: string;
   managerId?: number;
   managerName?: string;
   logoUrl?: string;
@@ -37,7 +36,6 @@ export interface ClinicAddress {
 export interface CreateClinicDto {
   name?: string;
   phone?: string;
-  email?: string;
   managerId?: number;
   logoUrl?: string;
   isActive?: boolean;
@@ -64,7 +62,6 @@ export interface UpdateClinicDto {
   id: number;
   name?: string;
   phone?: string;
-  email?: string;
   managerId?: number;
   logoUrl?: string;
   isActive?: boolean;

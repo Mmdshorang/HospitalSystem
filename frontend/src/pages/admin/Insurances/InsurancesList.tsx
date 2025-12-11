@@ -246,19 +246,22 @@ const InsurancesList = () => {
           setIsDialogOpen(false);
           setSelectedInsurance(null);
         }}
-        onSubmit={(values) => {
-          if (selectedInsurance) {
-            return updateInsurance
-              .mutateAsync({ id: selectedInsurance.id, ...values })
-              .then(() => {
-                setIsDialogOpen(false);
-                setSelectedInsurance(null);
+        onSubmit={async (values) => {
+          try {
+            if (selectedInsurance) {
+              await updateInsurance.mutateAsync({
+                id: selectedInsurance.id,
+                ...values,
               });
+              setSelectedInsurance(null);
+            } else {
+              await createInsurance.mutateAsync(values);
+            }
+            setIsDialogOpen(false);
+          } catch (error) {
+            // error is already toasted in mutation onError, keep dialog open
+            console.error("Insurance submit error", error);
           }
-
-          return createInsurance
-            .mutateAsync(values)
-            .then(() => setIsDialogOpen(false));
         }}
       />
     </div>

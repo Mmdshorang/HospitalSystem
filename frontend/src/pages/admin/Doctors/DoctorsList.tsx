@@ -116,6 +116,8 @@ const Doctors = () => {
         localStorage.setItem("authToken", currentToken);
       }
       toast.error(error.response?.data?.message || "خطا در ایجاد کاربر یا کادر درمانی");
+      // Re-throw so the dialog stays open for corrections
+      throw error;
     }
   };
 
