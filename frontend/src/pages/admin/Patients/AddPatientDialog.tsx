@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import JalaliDatePicker from "@/components/DatePicker/DatePicker";
 
 export interface AddPatientFormValues {
   id?: string | null;
@@ -46,10 +47,11 @@ const AddPatientDialog: React.FC<AddPatientDialogProps> = ({
   useEffect(() => {
     if (isOpen && initialValues) {
       setValues(
-        (prev) => ({
-          ...prev,
-          ...initialValues,
-        } as AddPatientFormValues)
+        (prev) =>
+          ({
+            ...prev,
+            ...initialValues,
+          } as AddPatientFormValues)
       );
     }
     if (!isOpen) {
@@ -124,7 +126,7 @@ const AddPatientDialog: React.FC<AddPatientDialogProps> = ({
           </h2>
         </div>
         <form onSubmit={handleSubmit} className="p-6 space-y-4">
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             <div>
               <label className="block text-sm text-gray-700 mb-1">
                 نام بیمار
@@ -180,13 +182,11 @@ const AddPatientDialog: React.FC<AddPatientDialogProps> = ({
               <label className="block text-sm text-gray-700 mb-1">
                 تاریخ تولد بیمار
               </label>
-              <input
-                name="dateOfBirth"
+              <JalaliDatePicker
                 value={values.dateOfBirth}
-                onChange={handleChange}
-                className="input"
-                type="date"
-                required
+                onChange={(val) =>
+                  setValues((prev) => ({ ...prev, dateOfBirth: val ?? "" }))
+                }
               />
             </div>
 

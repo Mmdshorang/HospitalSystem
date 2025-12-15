@@ -40,6 +40,7 @@ const navigation = [
 ];
 
 const breadcrumbTranslations: Record<string, string> = {
+  home: "داشبورد",
   admin: "مدیریت",
   insurances: "بیمه‌ها",
   clinics: "کلینیک‌ها",
@@ -49,6 +50,7 @@ const breadcrumbTranslations: Record<string, string> = {
   appointments: "نوبت‌ها",
   "service-categories": "دسته‌بندی خدمات",
   "service-category": "دسته‌بندی خدمات",
+  services: "خدمات",
   new: "جدید",
   edit: "ویرایش",
 };
@@ -61,15 +63,18 @@ const Layout = ({ children }: LayoutProps) => {
 
   const breadcrumbs = useMemo(() => {
     const segments = location.pathname.split("/").filter(Boolean);
-    const crumbs = segments.map((segment, index) => {
+    // Remove "admin" if it's the first segment
+    const filteredSegments =
+      segments[0] === "admin" ? segments.slice(1) : segments;
+    const crumbs = filteredSegments.map((segment, index) => {
       const translatedSegment =
         breadcrumbTranslations[segment] || segment.replace(/-/g, " ");
       return {
         label: translatedSegment,
-        href: "/" + segments.slice(0, index + 1).join("/"),
+        href: "/" + filteredSegments.slice(0, index + 1).join("/"),
       };
     });
-    return crumbs.length ? crumbs : [{ label: "خانه", href: "/" }];
+    return crumbs.length ? crumbs : [{ label: breadcrumbTranslations.home, href: "/" }];
   }, [location.pathname]);
 
   return (
@@ -265,7 +270,7 @@ const Layout = ({ children }: LayoutProps) => {
                 <Menu className="h-5 w-5" />
               </button>
               <div>
-                <nav className="flex items-center gap-2 text-xs text-slate-400">
+                {/* <nav className="flex items-center gap-2 text-xs text-slate-400">
                   <Link to="/">خانه</Link>
                   {breadcrumbs.map((crumb) => (
                     <span
@@ -278,11 +283,9 @@ const Layout = ({ children }: LayoutProps) => {
                       </Link>
                     </span>
                   ))}
-                </nav>
+                </nav> */}
                 <h1 className="text-xl font-black text-slate-900">
-                  {navigation.find((item) =>
-                    location.pathname.startsWith(item.href)
-                  )?.name || "داشبورد"}
+                  {breadcrumbs.map((item) => item.label).join(" / ")}
                 </h1>
               </div>
             </div>

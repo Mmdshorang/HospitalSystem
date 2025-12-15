@@ -310,10 +310,6 @@ const Doctors = () => {
         ) : providers.length === 0 ? (
           <div className="text-center py-12 text-gray-500">
             هیچ کادر درمانی ثبت نشده است.
-            <br />
-            <span className="text-xs text-gray-400">
-              Debug: providers count = {providers.length}
-            </span>
           </div>
         ) : (
           <DataTable

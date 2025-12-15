@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { ArrowLeft } from 'lucide-react';
+import JalaliDatePicker from '../components/DatePicker/DatePicker';
 
 const PatientForm = () => {
   const [formData, setFormData] = useState({
@@ -88,13 +89,17 @@ const PatientForm = () => {
             <label className="block text-sm font-medium text-gray-700 mb-2">
               تاریخ تولد
             </label>
-            <input
-              type="date"
-              name="dateOfBirth"
-              value={formData.dateOfBirth}
-              onChange={handleInputChange}
-              className="input"
-              required
+            <JalaliDatePicker
+              value={formData.dateOfBirth || null}
+              onChange={(val) =>
+                setFormData((prev) => ({
+                  ...prev,
+                  dateOfBirth: val ?? '',
+                }))
+              }
+              placeholder="انتخاب تاریخ"
+              className="w-full"
+              inputClassName="input"
             />
           </div>
 

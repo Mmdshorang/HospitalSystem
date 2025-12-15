@@ -1,38 +1,36 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\mmdsk\\Desktop\\hospital-system\\backend\\HospitalSystem.Api\\HospitalSystem.Api.csproj": {}
+    "C:\\Users\\as\\Desktop\\HospitalSystem\\backend\\HospitalSystem.Api\\HospitalSystem.Api.csproj": {}
   },
   "projects": {
-    "C:\\Users\\mmdsk\\Desktop\\hospital-system\\backend\\HospitalSystem.Api\\HospitalSystem.Api.csproj": {
+    "C:\\Users\\as\\Desktop\\HospitalSystem\\backend\\HospitalSystem.Api\\HospitalSystem.Api.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\mmdsk\\Desktop\\hospital-system\\backend\\HospitalSystem.Api\\HospitalSystem.Api.csproj",
+        "projectUniqueName": "C:\\Users\\as\\Desktop\\HospitalSystem\\backend\\HospitalSystem.Api\\HospitalSystem.Api.csproj",
         "projectName": "HospitalSystem.Api",
-        "projectPath": "C:\\Users\\mmdsk\\Desktop\\hospital-system\\backend\\HospitalSystem.Api\\HospitalSystem.Api.csproj",
-        "packagesPath": "C:\\Users\\mmdsk\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\mmdsk\\Desktop\\hospital-system\\backend\\HospitalSystem.Api\\obj\\",
+        "projectPath": "C:\\Users\\as\\Desktop\\HospitalSystem\\backend\\HospitalSystem.Api\\HospitalSystem.Api.csproj",
+        "packagesPath": "C:\\Users\\as\\.nuget\\packages\\",
+        "outputPath": "C:\\Users\\as\\Desktop\\HospitalSystem\\backend\\HospitalSystem.Api\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
-          "C:\\Users\\mmdsk\\AppData\\Roaming\\NuGet\\NuGet.Config",
-          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
+          "C:\\Users\\as\\AppData\\Roaming\\NuGet\\NuGet.Config"
         ],
         "originalTargetFrameworks": [
           "net8.0"
         ],
         "sources": {
-          "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
           "https://api.nuget.org/v3/index.json": {}
         },
         "frameworks": {
           "net8.0": {
             "targetAlias": "net8.0",
             "projectReferences": {
-              "C:\\Users\\mmdsk\\Desktop\\hospital-system\\backend\\HospitalSystem.Domain\\HospitalSystem.Domain.csproj": {
-                "projectPath": "C:\\Users\\mmdsk\\Desktop\\hospital-system\\backend\\HospitalSystem.Domain\\HospitalSystem.Domain.csproj"
+              "C:\\Users\\as\\Desktop\\HospitalSystem\\backend\\HospitalSystem.Domain\\HospitalSystem.Domain.csproj": {
+                "projectPath": "C:\\Users\\as\\Desktop\\HospitalSystem\\backend\\HospitalSystem.Domain\\HospitalSystem.Domain.csproj"
               },
-              "C:\\Users\\mmdsk\\Desktop\\hospital-system\\backend\\HospitalSystem.Infrastructure\\HospitalSystem.Infrastructure.csproj": {
-                "projectPath": "C:\\Users\\mmdsk\\Desktop\\hospital-system\\backend\\HospitalSystem.Infrastructure\\HospitalSystem.Infrastructure.csproj"
+              "C:\\Users\\as\\Desktop\\HospitalSystem\\backend\\HospitalSystem.Infrastructure\\HospitalSystem.Infrastructure.csproj": {
+                "projectPath": "C:\\Users\\as\\Desktop\\HospitalSystem\\backend\\HospitalSystem.Infrastructure\\HospitalSystem.Infrastructure.csproj"
               }
             }
           }
@@ -203,36 +201,34 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\8.0.121/PortableRuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\8.0.122/PortableRuntimeIdentifierGraph.json"
         }
       }
     },
-    "C:\\Users\\mmdsk\\Desktop\\hospital-system\\backend\\HospitalSystem.Application\\HospitalSystem.Application.csproj": {
+    "C:\\Users\\as\\Desktop\\HospitalSystem\\backend\\HospitalSystem.Application\\HospitalSystem.Application.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\mmdsk\\Desktop\\hospital-system\\backend\\HospitalSystem.Application\\HospitalSystem.Application.csproj",
+        "projectUniqueName": "C:\\Users\\as\\Desktop\\HospitalSystem\\backend\\HospitalSystem.Application\\HospitalSystem.Application.csproj",
         "projectName": "HospitalSystem.Application",
-        "projectPath": "C:\\Users\\mmdsk\\Desktop\\hospital-system\\backend\\HospitalSystem.Application\\HospitalSystem.Application.csproj",
-        "packagesPath": "C:\\Users\\mmdsk\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\mmdsk\\Desktop\\hospital-system\\backend\\HospitalSystem.Application\\obj\\",
+        "projectPath": "C:\\Users\\as\\Desktop\\HospitalSystem\\backend\\HospitalSystem.Application\\HospitalSystem.Application.csproj",
+        "packagesPath": "C:\\Users\\as\\.nuget\\packages\\",
+        "outputPath": "C:\\Users\\as\\Desktop\\HospitalSystem\\backend\\HospitalSystem.Application\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
-          "C:\\Users\\mmdsk\\AppData\\Roaming\\NuGet\\NuGet.Config",
-          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
+          "C:\\Users\\as\\AppData\\Roaming\\NuGet\\NuGet.Config"
         ],
         "originalTargetFrameworks": [
           "net8.0"
         ],
         "sources": {
-          "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
           "https://api.nuget.org/v3/index.json": {}
         },
         "frameworks": {
           "net8.0": {
             "targetAlias": "net8.0",
             "projectReferences": {
-              "C:\\Users\\mmdsk\\Desktop\\hospital-system\\backend\\HospitalSystem.Domain\\HospitalSystem.Domain.csproj": {
-                "projectPath": "C:\\Users\\mmdsk\\Desktop\\hospital-system\\backend\\HospitalSystem.Domain\\HospitalSystem.Domain.csproj"
+              "C:\\Users\\as\\Desktop\\HospitalSystem\\backend\\HospitalSystem.Domain\\HospitalSystem.Domain.csproj": {
+                "projectPath": "C:\\Users\\as\\Desktop\\HospitalSystem\\backend\\HospitalSystem.Domain\\HospitalSystem.Domain.csproj"
               }
             }
           }
@@ -284,28 +280,26 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\8.0.121/PortableRuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\8.0.122/PortableRuntimeIdentifierGraph.json"
         }
       }
     },
-    "C:\\Users\\mmdsk\\Desktop\\hospital-system\\backend\\HospitalSystem.Domain\\HospitalSystem.Domain.csproj": {
+    "C:\\Users\\as\\Desktop\\HospitalSystem\\backend\\HospitalSystem.Domain\\HospitalSystem.Domain.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\mmdsk\\Desktop\\hospital-system\\backend\\HospitalSystem.Domain\\HospitalSystem.Domain.csproj",
+        "projectUniqueName": "C:\\Users\\as\\Desktop\\HospitalSystem\\backend\\HospitalSystem.Domain\\HospitalSystem.Domain.csproj",
         "projectName": "HospitalSystem.Domain",
-        "projectPath": "C:\\Users\\mmdsk\\Desktop\\hospital-system\\backend\\HospitalSystem.Domain\\HospitalSystem.Domain.csproj",
-        "packagesPath": "C:\\Users\\mmdsk\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\mmdsk\\Desktop\\hospital-system\\backend\\HospitalSystem.Domain\\obj\\",
+        "projectPath": "C:\\Users\\as\\Desktop\\HospitalSystem\\backend\\HospitalSystem.Domain\\HospitalSystem.Domain.csproj",
+        "packagesPath": "C:\\Users\\as\\.nuget\\packages\\",
+        "outputPath": "C:\\Users\\as\\Desktop\\HospitalSystem\\backend\\HospitalSystem.Domain\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
-          "C:\\Users\\mmdsk\\AppData\\Roaming\\NuGet\\NuGet.Config",
-          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
+          "C:\\Users\\as\\AppData\\Roaming\\NuGet\\NuGet.Config"
         ],
         "originalTargetFrameworks": [
           "net8.0"
         ],
         "sources": {
-          "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
           "https://api.nuget.org/v3/index.json": {}
         },
         "frameworks": {
@@ -345,39 +339,37 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\8.0.121/PortableRuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\8.0.122/PortableRuntimeIdentifierGraph.json"
         }
       }
     },
-    "C:\\Users\\mmdsk\\Desktop\\hospital-system\\backend\\HospitalSystem.Infrastructure\\HospitalSystem.Infrastructure.csproj": {
+    "C:\\Users\\as\\Desktop\\HospitalSystem\\backend\\HospitalSystem.Infrastructure\\HospitalSystem.Infrastructure.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\mmdsk\\Desktop\\hospital-system\\backend\\HospitalSystem.Infrastructure\\HospitalSystem.Infrastructure.csproj",
+        "projectUniqueName": "C:\\Users\\as\\Desktop\\HospitalSystem\\backend\\HospitalSystem.Infrastructure\\HospitalSystem.Infrastructure.csproj",
         "projectName": "HospitalSystem.Infrastructure",
-        "projectPath": "C:\\Users\\mmdsk\\Desktop\\hospital-system\\backend\\HospitalSystem.Infrastructure\\HospitalSystem.Infrastructure.csproj",
-        "packagesPath": "C:\\Users\\mmdsk\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\mmdsk\\Desktop\\hospital-system\\backend\\HospitalSystem.Infrastructure\\obj\\",
+        "projectPath": "C:\\Users\\as\\Desktop\\HospitalSystem\\backend\\HospitalSystem.Infrastructure\\HospitalSystem.Infrastructure.csproj",
+        "packagesPath": "C:\\Users\\as\\.nuget\\packages\\",
+        "outputPath": "C:\\Users\\as\\Desktop\\HospitalSystem\\backend\\HospitalSystem.Infrastructure\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
-          "C:\\Users\\mmdsk\\AppData\\Roaming\\NuGet\\NuGet.Config",
-          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
+          "C:\\Users\\as\\AppData\\Roaming\\NuGet\\NuGet.Config"
         ],
         "originalTargetFrameworks": [
           "net8.0"
         ],
         "sources": {
-          "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
           "https://api.nuget.org/v3/index.json": {}
         },
         "frameworks": {
           "net8.0": {
             "targetAlias": "net8.0",
             "projectReferences": {
-              "C:\\Users\\mmdsk\\Desktop\\hospital-system\\backend\\HospitalSystem.Application\\HospitalSystem.Application.csproj": {
-                "projectPath": "C:\\Users\\mmdsk\\Desktop\\hospital-system\\backend\\HospitalSystem.Application\\HospitalSystem.Application.csproj"
+              "C:\\Users\\as\\Desktop\\HospitalSystem\\backend\\HospitalSystem.Application\\HospitalSystem.Application.csproj": {
+                "projectPath": "C:\\Users\\as\\Desktop\\HospitalSystem\\backend\\HospitalSystem.Application\\HospitalSystem.Application.csproj"
               },
-              "C:\\Users\\mmdsk\\Desktop\\hospital-system\\backend\\HospitalSystem.Domain\\HospitalSystem.Domain.csproj": {
-                "projectPath": "C:\\Users\\mmdsk\\Desktop\\hospital-system\\backend\\HospitalSystem.Domain\\HospitalSystem.Domain.csproj"
+              "C:\\Users\\as\\Desktop\\HospitalSystem\\backend\\HospitalSystem.Domain\\HospitalSystem.Domain.csproj": {
+                "projectPath": "C:\\Users\\as\\Desktop\\HospitalSystem\\backend\\HospitalSystem.Domain\\HospitalSystem.Domain.csproj"
               }
             }
           }
@@ -449,7 +441,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\8.0.121/PortableRuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\8.0.122/PortableRuntimeIdentifierGraph.json"
         }
       }
     }

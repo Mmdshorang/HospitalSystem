@@ -217,7 +217,7 @@ export default function JalaliDatePicker({
       {open && (
         <div
           ref={popupRef}
-          className={`absolute z-50 w-80 bg-blue-100 dark:bg-gray-700 rounded-xl shadow-lg ring-1 ring-black ring-opacity-5 p-2 transition-transform duration-150`}
+          className={`absolute z-50 w-80 bg-blue-100 rounded-xl shadow-lg ring-1 ring-black ring-opacity-5 p-2 transition-transform duration-150`}
           style={{
             position: "absolute",
             right: 0,
@@ -239,7 +239,7 @@ export default function JalaliDatePicker({
               <ChevronRight className="w-5 h-5" />
             </button>
 
-            <div className="font-semibold text-gray-800 dark:text-amber-50 text-sm">
+            <div className="font-semibold text-gray-800 text-sm">
               {calendarMonth.format("jMMMM jYYYY")}
             </div>
 
@@ -254,7 +254,7 @@ export default function JalaliDatePicker({
           </div>
 
           {/* Weekdays */}
-          <div className="grid grid-cols-7 text-center text-xs text-gray-500 dark:text-indigo-300 mb-1">
+          <div className="grid grid-cols-7 text-center text-xs text-gray-500 mb-1">
             {["ش", "ی", "د", "س", "چ", "پ", "ج"].map((w) => (
               <div key={w} className="py-1 font-medium">
                 {w}
@@ -280,7 +280,7 @@ export default function JalaliDatePicker({
                   onClick={() => d && selectDate(d)}
                   className={`h-7 flex items-center justify-center rounded-full transition
                     ${!d ? "opacity-0 pointer-events-none" : ""}
-                    ${isDisabled ? "text-gray-300 cursor-not-allowed" : "dark:hover:bg-blue-500 hover:bg-blue-300"}
+                    ${isDisabled ? "text-gray-300 cursor-not-allowed" : "hover:bg-blue-300"}
                     ${isToday ? "ring-2 ring-indigo-300" : ""}
                     ${isSelected ? "bg-indigo-500 text-white hover:bg-indigo-600" : ""}
                   `}
@@ -304,7 +304,7 @@ export default function JalaliDatePicker({
                 setCalendarMonth(m);
                 setOpen(false);
               }}
-              className="text-xs text-indigo-600 dark:text-blue-500 font-bold hover:underline"
+              className="text-xs text-indigo-600 font-bold hover:underline"
             >
               امروز
             </button>
