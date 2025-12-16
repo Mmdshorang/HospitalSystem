@@ -1,5 +1,6 @@
 using HospitalSystem.Application.DTOs;
 using HospitalSystem.Domain.Entities;
+using HospitalSystem.Domain.Entities.Enums;
 using HospitalSystem.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
@@ -21,6 +22,7 @@ public class ServiceService
     {
         var query = _context.Services
             .Include(s => s.Category)
+            .Include(s => s.ParentService)
             .AsQueryable();
 
         if (!string.IsNullOrWhiteSpace(searchTerm))
@@ -52,6 +54,11 @@ public class ServiceService
             DurationMinutes = s.DurationMinutes,
             IsInPerson = s.IsInPerson,
             RequiresDoctor = s.RequiresDoctor,
+            IsActive = s.IsActive,
+            ImageUrl = s.ImageUrl,
+            ParentServiceId = s.ParentServiceId,
+            ParentServiceName = s.ParentService?.Name,
+            DeliveryType = s.DeliveryType.ToString(),
             CreatedAt = s.CreatedAt,
             UpdatedAt = s.UpdatedAt
         });
@@ -61,6 +68,7 @@ public class ServiceService
     {
         var service = await _context.Services
             .Include(s => s.Category)
+            .Include(s => s.ParentService)
             .FirstOrDefaultAsync(s => s.Id == id);
 
         if (service == null) return null;
@@ -76,6 +84,11 @@ public class ServiceService
             DurationMinutes = service.DurationMinutes,
             IsInPerson = service.IsInPerson,
             RequiresDoctor = service.RequiresDoctor,
+            IsActive = service.IsActive,
+            ImageUrl = service.ImageUrl,
+            ParentServiceId = service.ParentServiceId,
+            ParentServiceName = service.ParentService?.Name,
+            DeliveryType = service.DeliveryType.ToString(),
             CreatedAt = service.CreatedAt,
             UpdatedAt = service.UpdatedAt
         };
@@ -92,6 +105,10 @@ public class ServiceService
             DurationMinutes = dto.DurationMinutes,
             IsInPerson = dto.IsInPerson,
             RequiresDoctor = dto.RequiresDoctor,
+            IsActive = dto.IsActive,
+            ImageUrl = dto.ImageUrl,
+            ParentServiceId = dto.ParentServiceId,
+            DeliveryType = ParseDeliveryType(dto.DeliveryType),
             CreatedAt = DateTime.UtcNow,
             UpdatedAt = DateTime.UtcNow
         };
@@ -114,6 +131,11 @@ public class ServiceService
             DurationMinutes = service.DurationMinutes,
             IsInPerson = service.IsInPerson,
             RequiresDoctor = service.RequiresDoctor,
+            IsActive = service.IsActive,
+            ImageUrl = service.ImageUrl,
+            ParentServiceId = service.ParentServiceId,
+            ParentServiceName = service.ParentService?.Name,
+            DeliveryType = service.DeliveryType.ToString(),
             CreatedAt = service.CreatedAt,
             UpdatedAt = service.UpdatedAt
         };
@@ -123,6 +145,7 @@ public class ServiceService
     {
         var service = await _context.Services
             .Include(s => s.Category)
+            .Include(s => s.ParentService)
             .FirstOrDefaultAsync(s => s.Id == id);
 
         if (service == null) return null;
@@ -134,6 +157,10 @@ public class ServiceService
         service.DurationMinutes = dto.DurationMinutes;
         service.IsInPerson = dto.IsInPerson;
         service.RequiresDoctor = dto.RequiresDoctor;
+        service.IsActive = dto.IsActive;
+        service.ImageUrl = dto.ImageUrl;
+        service.ParentServiceId = dto.ParentServiceId;
+        service.DeliveryType = ParseDeliveryType(dto.DeliveryType);
         service.UpdatedAt = DateTime.UtcNow;
 
         await _context.SaveChangesAsync();
@@ -149,6 +176,11 @@ public class ServiceService
             DurationMinutes = service.DurationMinutes,
             IsInPerson = service.IsInPerson,
             RequiresDoctor = service.RequiresDoctor,
+            IsActive = service.IsActive,
+            ImageUrl = service.ImageUrl,
+            ParentServiceId = service.ParentServiceId,
+            ParentServiceName = service.ParentService?.Name,
+            DeliveryType = service.DeliveryType.ToString(),
             CreatedAt = service.CreatedAt,
             UpdatedAt = service.UpdatedAt
         };
@@ -163,5 +195,14 @@ public class ServiceService
         await _context.SaveChangesAsync();
         return true;
     }
-}
 
+    private static ServiceDeliveryType ParseDeliveryType(string? deliveryType)
+    {
+        if (!string.IsNullOrWhiteSpace(deliveryType) &&
+            Enum.TryParse<ServiceDeliveryType>(deliveryType, true, out var parsed))
+        {
+            return parsed;
+        }
+        return ServiceDeliveryType.InClinic;
+    }
+}

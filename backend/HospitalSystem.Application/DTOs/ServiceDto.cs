@@ -11,6 +11,11 @@ public class ServiceDto
     public int? DurationMinutes { get; set; }
     public bool IsInPerson { get; set; }
     public bool RequiresDoctor { get; set; }
+    public bool IsActive { get; set; }
+    public string? ImageUrl { get; set; }
+    public long? ParentServiceId { get; set; }
+    public string? ParentServiceName { get; set; }
+    public string? DeliveryType { get; set; }
     public DateTime CreatedAt { get; set; }
     public DateTime UpdatedAt { get; set; }
 }
@@ -24,6 +29,10 @@ public class CreateServiceDto
     public int? DurationMinutes { get; set; }
     public bool IsInPerson { get; set; } = true;
     public bool RequiresDoctor { get; set; } = false;
+    public bool IsActive { get; set; } = true;
+    public string? ImageUrl { get; set; }
+    public long? ParentServiceId { get; set; }
+    public string? DeliveryType { get; set; }
 }
 
 public class UpdateServiceDto
@@ -36,6 +45,10 @@ public class UpdateServiceDto
     public int? DurationMinutes { get; set; }
     public bool IsInPerson { get; set; }
     public bool RequiresDoctor { get; set; }
+    public bool IsActive { get; set; }
+    public string? ImageUrl { get; set; }
+    public long? ParentServiceId { get; set; }
+    public string? DeliveryType { get; set; }
 }
 
 public class ServiceCategoryDto
@@ -80,4 +93,3 @@ public class CreateClinicServiceDto
     public decimal? Price { get; set; }
     public bool Active { get; set; } = true;
 }
-

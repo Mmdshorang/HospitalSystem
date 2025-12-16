@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "react-toastify";
-import { Stethoscope, Search, Plus, Trash } from "lucide-react";
+import { Stethoscope, Search, Plus, Trash, Edit } from "lucide-react";
 import {
   serviceService,
   type Service,
@@ -21,6 +21,7 @@ const ServicesList = () => {
   const [search, setSearch] = useState("");
   const [categoryFilter, setCategoryFilter] = useState<number | null>(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [editingService, setEditingService] = useState<Service | null>(null);
   const queryClient = useQueryClient();
 
   const { data: services = [], isLoading } = useQuery<Service[]>({
@@ -42,7 +43,7 @@ const ServicesList = () => {
       toast.success("خدمت جدید ثبت شد");
     },
     onError: (error: any) => {
-      let errorMessage = "ثبت خدمت با خطا مواجه شد";
+      let errorMessage = "ثبت خدمت با خطا روبه‌رو شد";
 
       if (error?.response?.data?.message) {
         errorMessage = error.response.data.message;
@@ -64,7 +65,17 @@ const ServicesList = () => {
       queryClient.invalidateQueries({ queryKey: ["services"] });
       toast.success("خدمت حذف شد");
     },
-    onError: () => toast.error("حذف خدمت ممکن نشد"),
+    onError: () => toast.error("حذف خدمت انجام نشد"),
+  });
+
+  const updateService = useMutation({
+    mutationFn: ({ id, payload }: { id: number; payload: CreateServiceDto }) =>
+      serviceService.update(id, { ...payload, id }),
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({ queryKey: ["services"] });
+      toast.success("خدمت با موفقیت به‌روزرسانی شد");
+    },
+    onError: () => toast.error("به‌روزرسانی انجام نشد"),
   });
 
   const columns: DataTableColumn<Service>[] = [
@@ -102,15 +113,33 @@ const ServicesList = () => {
       className: "text-sm text-gray-500",
     },
     {
+      key: "parentService",
+      header: "زیرخدمتِ",
+      accessor: (s) => s.parentServiceName || "-",
+      sortable: true,
+      className: "text-sm text-gray-500",
+    },
+    {
+      key: "deliveryType",
+      header: "نوع ارائه",
+      accessor: (s) =>
+        s.deliveryType === "Remote"
+          ? "آنلاین"
+          : s.deliveryType === "OnSite"
+          ? "در محل"
+          : "حضوری",
+      className: "text-sm text-gray-500",
+    },
+    {
       key: "type",
-      header: "نوع",
+      header: "ویژگی",
       accessor: (s) => (
-        <div>
+        <div className="flex flex-wrap gap-2">
           <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800">
-            {s.isInPerson ? "حضوری" : "آنلاین"}
+            {s.isInPerson ? "حضوری" : "غیرحضوری"}
           </span>
           {s.requiresDoctor && (
-            <span className="mr-2 px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-purple-100 text-purple-800">
+            <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-purple-100 text-purple-800">
               نیاز به پزشک
             </span>
           )}
@@ -118,19 +147,45 @@ const ServicesList = () => {
       ),
     },
     {
-      key: "actions",
-      header: "عملیات",
+      key: "active",
+      header: "وضعیت",
       accessor: (s) => (
-        <button
-          onClick={() => {
-            if (confirm("آیا از حذف این خدمت مطمئن هستید؟")) {
-              deleteService.mutate(s.id);
-            }
-          }}
-          className="text-red-600 hover:text-red-900"
+        <span
+          className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
+            s.isActive ? "bg-emerald-100 text-emerald-700" : "bg-rose-100 text-rose-700"
+          }`}
         >
-          <Trash className="w-5" />
-        </button>
+          {s.isActive ? "فعال" : "غیرفعال"}
+        </span>
+      ),
+    },
+    {
+      key: "actions",
+      header: "اقدام",
+      accessor: (s) => (
+        <div className="flex items-center gap-2">
+          <button
+            onClick={() => {
+              setEditingService(s);
+              setIsDialogOpen(true);
+            }}
+            className="text-blue-600 hover:text-blue-900"
+            title="ویرایش"
+          >
+            <Edit className="w-5" />
+          </button>
+          <button
+            onClick={() => {
+              if (confirm("آیا از حذف خدمت مطمئن هستید؟")) {
+                deleteService.mutate(s.id);
+              }
+            }}
+            className="text-red-600 hover:text-red-900"
+            title="حذف"
+          >
+            <Trash className="w-5" />
+          </button>
+        </div>
       ),
       className: "text-sm font-medium",
     },
@@ -143,16 +198,19 @@ const ServicesList = () => {
           <div className="space-y-3">
             <span className="inline-flex items-center gap-2 rounded-full bg-primary/5 px-4 py-1 text-xs font-semibold text-primary-600">
               <Stethoscope className="h-4 w-4" />
-              خدمات درمانی
+              مدیریت خدمات
             </span>
-            <h2 className="text-3xl font-black text-slate-900">مدیریت خدمات</h2>
+            <h2 className="text-3xl font-black text-slate-900">فهرست خدمات</h2>
             <p className="text-sm text-slate-500">
-              تعریف و مدیریت خدمات ارائه شده در کلینیک‌ها.
+              خدمات و زیرخدمات را به همراه وضعیت فعال/غیرفعال مدیریت کنید.
             </p>
           </div>
           <Button
             className="flex h-12 rounded-2xl bg-linear-to-l from-blue-600 to-blue-500 px-8 text-sm font-semibold text-white shadow-lg shadow-blue-500/30 transition hover:shadow-xl hover:shadow-blue-500/40 hover:from-blue-700 hover:to-blue-600"
-            onClick={() => setIsDialogOpen(true)}
+            onClick={() => {
+              setEditingService(null);
+              setIsDialogOpen(true);
+            }}
           >
             <Plus className="ml-2 h-4 w-4" />
             افزودن خدمت
@@ -166,7 +224,7 @@ const ServicesList = () => {
             <Search className="h-5 w-5 text-slate-400" />
             <input
               className="h-12 flex-1 border-0 bg-transparent text-sm outline-none"
-              placeholder="جستجو بر اساس نام..."
+              placeholder="جستجو در نام خدمت..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
             />
@@ -192,7 +250,7 @@ const ServicesList = () => {
         ) : services.length === 0 ? (
           <EmptyState
             title="خدمتی یافت نشد"
-            description="برای افزودن خدمت جدید از دکمه بالا استفاده کنید."
+            description="برای شروع یک خدمت جدید اضافه کنید."
           />
         ) : (
           <DataTable<Service>
@@ -207,8 +265,15 @@ const ServicesList = () => {
       <ServiceFormDialog
         open={isDialogOpen}
         onClose={() => setIsDialogOpen(false)}
+        initialValues={editingService ?? undefined}
+        allServices={services}
         onSubmit={(values) =>
-          createService.mutateAsync(values).then(() => setIsDialogOpen(false))
+          (editingService
+            ? updateService
+                .mutateAsync({ id: editingService.id, payload: values })
+                .then(() => setEditingService(null))
+            : createService.mutateAsync(values)
+          ).then(() => setIsDialogOpen(false))
         }
       />
     </div>

@@ -1,3 +1,5 @@
+using HospitalSystem.Domain.Entities.Enums;
+
 namespace HospitalSystem.Domain.Entities;
 
 public class ServiceCategory
@@ -19,8 +21,14 @@ public class Service
     public ServiceCategory? Category { get; set; }
     public decimal? BasePrice { get; set; }
     public int? DurationMinutes { get; set; }
-    public bool IsInPerson { get; set; } = true;
+    public bool IsInPerson { get; set; } = true; // legacy flag
     public bool RequiresDoctor { get; set; } = false;
+    public bool IsActive { get; set; } = true;
+    public string? ImageUrl { get; set; }
+    public long? ParentServiceId { get; set; }
+    public Service? ParentService { get; set; }
+    public ICollection<Service>? SubServices { get; set; }
+    public ServiceDeliveryType DeliveryType { get; set; } = ServiceDeliveryType.InClinic;
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
     public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
 }

@@ -26,6 +26,8 @@ const defaultValues: CreateClinicDto = {
   name: "",
   phone: "",
   isActive: true,
+  managerId: undefined,
+  logoUrl: "",
 };
 
 export const ClinicFormDialog = ({
@@ -44,7 +46,6 @@ export const ClinicFormDialog = ({
     value: string | number | boolean | undefined
   ) => {
     setValues((prev) => ({ ...prev, [field]: value }));
-    // Clear error when user starts typing
     if (error) setError(null);
   };
 
@@ -56,7 +57,6 @@ export const ClinicFormDialog = ({
   };
 
   const prepareDataForSubmission = (): CreateClinicDto => {
-    // After validation, name is guaranteed to have a non-empty trimmed value
     const trimmedName = values.name?.trim() || "";
     const trimmedPhone = values.phone?.trim();
 
@@ -65,21 +65,13 @@ export const ClinicFormDialog = ({
       isActive: values.isActive ?? true,
     };
 
-    // Only include optional fields if they have values
-    if (trimmedPhone) {
-      data.phone = trimmedPhone;
-    }
-    if (values.managerId) {
-      data.managerId = values.managerId;
-    }
-    if (values.logoUrl) {
-      data.logoUrl = values.logoUrl;
-    }
+    if (trimmedPhone) data.phone = trimmedPhone;
+    if (values.managerId) data.managerId = values.managerId;
+    if (values.logoUrl) data.logoUrl = values.logoUrl;
     if (values.workHours && values.workHours.length > 0) {
       data.workHours = values.workHours;
     }
 
-    // Add address if at least one field is filled
     const hasAddress =
       address.street?.trim() ||
       address.city?.trim() ||
@@ -108,7 +100,6 @@ export const ClinicFormDialog = ({
     event.preventDefault();
     setError(null);
 
-    // Validation
     if (!values.name || !values.name.trim()) {
       setError("نام کلینیک الزامی است");
       return;
@@ -119,13 +110,12 @@ export const ClinicFormDialog = ({
     try {
       const dataToSubmit = prepareDataForSubmission();
       await onSubmit(dataToSubmit);
-      // Reset form and close only on success
       setValues(defaultValues);
       setAddress(defaultAddress);
       setError(null);
       onClose();
     } catch (error: any) {
-      let errorMessage = "خطا در ثبت کلینیک";
+      let errorMessage = "ثبت انجام نشد";
 
       if (error?.response?.data) {
         const data = error.response.data;
@@ -153,7 +143,6 @@ export const ClinicFormDialog = ({
 
   useEffect(() => {
     if (open && initialValues) {
-      // populate form with initial clinic data for editing
       setValues({
         name: initialValues.name || "",
         phone: initialValues.phone || "",
@@ -177,7 +166,6 @@ export const ClinicFormDialog = ({
     }
 
     if (!open) {
-      // reset when dialog closes
       setValues(defaultValues);
       setAddress(defaultAddress);
       setError(null);
@@ -201,9 +189,7 @@ export const ClinicFormDialog = ({
             {initialValues ? "ویرایش کلینیک" : "افزودن کلینیک جدید"}
           </h3>
           <p className="text-xs sm:text-sm text-slate-500">
-            {initialValues
-              ? "تغییرات را اعمال کنید"
-              : "اطلاعات کلینیک را تکمیل کنید"}
+            {initialValues ? "ویرایش اطلاعات" : "اطلاعات کلینیک را وارد کنید"}
           </p>
         </div>
         <form
@@ -233,7 +219,7 @@ export const ClinicFormDialog = ({
             </div>
             <div className="flex flex-col">
               <label className="text-sm font-medium text-slate-600 mb-2">
-                شماره تماس
+                تلفن تماس
               </label>
               <input
                 type="tel"
@@ -242,6 +228,37 @@ export const ClinicFormDialog = ({
                 onChange={(e) => handleChange("phone", e.target.value)}
                 maxLength={11}
                 required
+              />
+            </div>
+          </div>
+
+          <div className="grid gap-4 sm:grid-cols-2">
+            <div className="flex flex-col">
+              <label className="text-sm font-medium text-slate-600 mb-2">
+                شناسه مدیر (کاربر)
+              </label>
+              <input
+                type="number"
+                className="h-12 w-full rounded-2xl border border-slate-200 px-4 text-sm outline-none focus:border-primary"
+                value={values.managerId ?? ""}
+                onChange={(e) =>
+                  handleChange(
+                    "managerId",
+                    e.target.value ? Number(e.target.value) : undefined
+                  )
+                }
+                placeholder="ID مدیر"
+              />
+            </div>
+            <div className="flex flex-col">
+              <label className="text-sm font-medium text-slate-600 mb-2">
+                لوگو (URL)
+              </label>
+              <input
+                className="h-12 w-full rounded-2xl border border-slate-200 px-4 text-sm outline-none focus:border-primary"
+                value={values.logoUrl || ""}
+                onChange={(e) => handleChange("logoUrl", e.target.value)}
+                placeholder="https://..."
               />
             </div>
           </div>
@@ -277,7 +294,7 @@ export const ClinicFormDialog = ({
             </div>
             <div className="flex flex-col">
               <label className="text-sm font-medium text-slate-600 mb-2">
-                خیابان و پلاک
+                آدرس و خیابان
               </label>
               <input
                 className="h-12 w-full rounded-2xl border border-slate-200 px-4 text-sm outline-none focus:border-primary"
@@ -336,7 +353,7 @@ export const ClinicFormDialog = ({
               {isSubmitting
                 ? initialValues
                   ? "در حال ذخیره..."
-                  : "در حال ذخیره..."
+                  : "در حال ثبت..."
                 : initialValues
                 ? "ذخیره تغییرات"
                 : "ثبت کلینیک"}

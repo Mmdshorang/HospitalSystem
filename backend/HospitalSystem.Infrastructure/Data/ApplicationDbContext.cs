@@ -273,6 +273,18 @@ namespace HospitalSystem.Infrastructure.Data
                 entity.Property(e => e.BasePrice).HasColumnType("NUMERIC(10,2)");
                 entity.Property(e => e.IsInPerson).HasDefaultValue(true);
                 entity.Property(e => e.RequiresDoctor).HasDefaultValue(false);
+                entity.Property(e => e.IsActive).HasDefaultValue(true);
+                entity.Property(e => e.ImageUrl).HasMaxLength(255);
+                entity.Property(e => e.DeliveryType)
+                    .HasConversion<string>()
+                    .HasMaxLength(50)
+                    .HasDefaultValue(ServiceDeliveryType.InClinic);
+
+                entity.HasOne(e => e.ParentService)
+                    .WithMany(e => e.SubServices)
+                    .HasForeignKey(e => e.ParentServiceId)
+                    .OnDelete(DeleteBehavior.Restrict);
+
                 entity.Property(e => e.CreatedAt).HasDefaultValueSql("NOW()");
                 entity.Property(e => e.UpdatedAt).HasDefaultValueSql("NOW()");
             });

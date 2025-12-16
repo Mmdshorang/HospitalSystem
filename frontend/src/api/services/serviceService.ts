@@ -10,6 +10,11 @@ export interface Service {
   durationMinutes?: number;
   isInPerson: boolean;
   requiresDoctor: boolean;
+  isActive: boolean;
+  imageUrl?: string;
+  parentServiceId?: number;
+  parentServiceName?: string;
+  deliveryType?: string;
   createdAt: string;
   updatedAt: string;
 }
@@ -22,6 +27,10 @@ export interface CreateServiceDto {
   durationMinutes?: number;
   isInPerson?: boolean;
   requiresDoctor?: boolean;
+  isActive?: boolean;
+  imageUrl?: string;
+  parentServiceId?: number;
+  deliveryType?: string;
 }
 
 export interface UpdateServiceDto {
@@ -33,6 +42,10 @@ export interface UpdateServiceDto {
   durationMinutes?: number;
   isInPerson?: boolean;
   requiresDoctor?: boolean;
+  isActive?: boolean;
+  imageUrl?: string;
+  parentServiceId?: number;
+  deliveryType?: string;
 }
 
 export const serviceService = {
