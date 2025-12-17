@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { toast } from 'react-toastify';
+import JalaliDatePicker from '../components/DatePicker/DatePicker';
+import moment from 'jalali-moment';
 
 const Register: React.FC = () => {
   const [formData, setFormData] = useState({
@@ -54,10 +56,10 @@ const Register: React.FC = () => {
         registerData.gender = formData.gender.trim(); // Backend will parse string to enum
       }
       if (formData.birthDate) {
-        // Convert date string to UTC ISO string
-        // Input type="date" gives us YYYY-MM-DD, we need to convert to UTC
-        const date = new Date(formData.birthDate + 'T00:00:00Z');
-        registerData.birthDate = date.toISOString();
+        const gregorian = moment(formData.birthDate, 'jYYYY/jMM/jDD');
+        registerData.birthDate = gregorian.isValid()
+          ? gregorian.startOf('day').toDate().toISOString()
+          : undefined;
       }
 
       await register(registerData);
@@ -191,13 +193,17 @@ const Register: React.FC = () => {
               <label htmlFor="birthDate" className="block text-sm font-medium text-gray-700">
                 تاریخ تولد
               </label>
-              <input
-                id="birthDate"
-                name="birthDate"
-                type="date"
-                value={formData.birthDate}
-                onChange={handleChange}
-                className="mt-1 appearance-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
+              <JalaliDatePicker
+                value={formData.birthDate || null}
+                onChange={(val) =>
+                  setFormData((prev) => ({
+                    ...prev,
+                    birthDate: val ?? '',
+                  }))
+                }
+                placeholder="انتخاب تاریخ"
+                className="mt-1"
+                inputClassName="appearance-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
               />
             </div>
           </div>

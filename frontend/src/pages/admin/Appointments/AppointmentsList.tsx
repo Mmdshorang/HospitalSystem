@@ -1,6 +1,7 @@
 import { useState, useMemo } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "react-toastify";
+import moment from "jalali-moment";
 import {
   Calendar,
   Search,
@@ -27,6 +28,9 @@ import { ChangeStatusDialog } from "./ChangeStatusDialog";
 import { AppointmentHistoryDialog } from "./AppointmentHistoryDialog";
 import { AppointmentFormDialog } from "./AppointmentFormDialog";
 import { AssignPerformerDialog } from "./AssignPerformerDialog";
+import JalaliDatePicker from "../../../components/DatePicker/DatePicker";
+import { formatPersianDateTime } from "../../../lib/utils";
+
 
 const statusLabels: Record<RequestStatus, string> = {
   pending: "در انتظار",
@@ -42,6 +46,12 @@ const statusColors: Record<RequestStatus, string> = {
   in_progress: "bg-purple-100 text-purple-700",
   done: "bg-emerald-100 text-emerald-700",
   rejected: "bg-rose-100 text-rose-700",
+};
+
+const toGregorianDate = (jalali: string | null) => {
+  if (!jalali) return undefined;
+  const m = moment(jalali, "jYYYY/jMM/jDD");
+  return m.isValid() ? m.format("YYYY-MM-DD") : undefined;
 };
 
 const AppointmentsList = () => {
@@ -81,8 +91,8 @@ const AppointmentsList = () => {
         clinicFilter || undefined,
         undefined,
         undefined,
-        fromDate || undefined,
-        toDate || undefined,
+        toGregorianDate(fromDate) || undefined,
+        toGregorianDate(toDate) || undefined,
         "createdAt",
         "desc"
       ),
@@ -188,23 +198,23 @@ const AppointmentsList = () => {
               </option>
             ))}
           </select>
-          <div className="grid grid-cols-2 gap-2">
-            <input
-              type="date"
-              value={fromDate}
-              onChange={(e) => setFromDate(e.target.value)}
-              className="h-12 rounded-2xl border border-slate-200 bg-white px-4 text-sm outline-none focus:border-primary"
+        </div>
+          <div className="flex gap-2 w-[50%] mb-4">
+            <JalaliDatePicker
+              value={fromDate || null}
+              onChange={(val) => setFromDate(val ?? "")}
               placeholder="از تاریخ"
+              className="w-full"
+              inputClassName="h-12 rounded-2xl border border-slate-200 bg-white px-4 text-sm outline-none focus:border-primary"
             />
-            <input
-              type="date"
-              value={toDate}
-              onChange={(e) => setToDate(e.target.value)}
-              className="h-12 rounded-2xl border border-slate-200 bg-white px-4 text-sm outline-none focus:border-primary"
+            <JalaliDatePicker
+              value={toDate || null}
+              onChange={(val) => setToDate(val ?? "")}
               placeholder="تا تاریخ"
+              className="w-full"
+              inputClassName="h-12 rounded-2xl border border-slate-200 bg-white px-4 text-sm outline-none focus:border-primary"
             />
           </div>
-        </div>
 
         {isLoading ? (
           <PageLoader />
@@ -263,9 +273,7 @@ const AppointmentsList = () => {
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                         {appointment.preferredTime
-                          ? new Date(
-                              appointment.preferredTime
-                            ).toLocaleDateString("fa-IR")
+                          ? formatPersianDateTime(appointment.preferredTime)
                           : "-"}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">

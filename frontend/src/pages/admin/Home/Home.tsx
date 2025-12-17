@@ -18,6 +18,7 @@ import {
   type ServiceRequest,
 } from "../../../api/services/serviceRequestService";
 import { PageLoader } from "../../../components/states/PageLoader";
+import { formatPersianDate, formatTime } from "../../../lib/utils";
 
 const quickActions = [
   { label: "ثبت پزشک", href: "/doctors/new" },
@@ -279,10 +280,8 @@ const Home = () => {
                     </p>
                   </div>
                   <span className="text-xs text-slate-400">
-                    {new Date(item.createdAt).toLocaleTimeString("fa-IR", {
-                      hour: "2-digit",
-                      minute: "2-digit",
-                    })}
+                    {formatPersianDate(item.createdAt)}{" "}
+                    {formatTime(new Date(item.createdAt))}
                   </span>
                 </div>
               ))
@@ -345,17 +344,12 @@ const Home = () => {
                 >
                   <span className="font-semibold text-slate-900">
                     {appt.preferredTime
-                      ? new Date(appt.preferredTime).toLocaleTimeString(
-                          "fa-IR",
-                          {
-                            hour: "2-digit",
-                            minute: "2-digit",
-                          }
-                        )
-                      : new Date(appt.createdAt).toLocaleTimeString("fa-IR", {
-                          hour: "2-digit",
-                          minute: "2-digit",
-                        })}
+                      ? `${formatPersianDate(appt.preferredTime)} ${formatTime(
+                          new Date(appt.preferredTime)
+                        )}`
+                      : `${formatPersianDate(appt.createdAt)} ${formatTime(
+                          new Date(appt.createdAt)
+                        )}`}
                   </span>
                   <div className="text-right">
                     <p className="font-semibold text-slate-800">

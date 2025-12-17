@@ -2,7 +2,7 @@ import { Plus, Edit, Trash2, Search, Users2, Stethoscope } from "lucide-react";
 import { useMemo, useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "react-toastify";
-import AddDoctorDialog, { type AddDoctorFormValues } from "./AddDoctorDialog";
+import AddDoctorDialog, { type AddDoctorFormValues } from "./AddTreatmentStaffDialog";
 import DataTable from "../../../components/DataTable";
 import { providerService, type Provider } from "../../../api/services/providerService";
 import { specialtyService, type Specialty } from "../../../api/services/specialtyService";
@@ -10,7 +10,7 @@ import { clinicService, type Clinic } from "../../../api/services/clinicService"
 import { authService } from "../../../api/services/authService";
 import { Button } from "../../../components/ui/button";
 
-const Doctors = () => {
+const TreatmentStaff = () => {
   const [isAddOpen, setIsAddOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedSpecialtyId, setSelectedSpecialtyId] = useState<number | undefined>();
@@ -131,7 +131,7 @@ const Doctors = () => {
     () => [
       {
         key: "fullName",
-        header: "پزشکان",
+        header: "کادر درمانی",
         sortable: true,
         accessor: (row: Provider) => `${row.userFirstName || ""} ${row.userLastName || ""}`,
         cell: (_: unknown, row: Provider) => (
@@ -228,19 +228,23 @@ const Doctors = () => {
       <section className="rounded-[28px] border border-slate-100 bg-white px-6 py-8 shadow-sm">
         <div className="flex flex-col gap-6 md:flex-row md:items-center md:justify-between">
           <div className="space-y-3">
-            <h1 className="text-3xl font-black text-slate-900">مدیریت پزشکان</h1>
+            <p className="inline-flex items-center gap-2 rounded-full bg-primary/10 px-4 py-1 text-xs font-semibold text-primary-600">
+              <Stethoscope className="h-4 w-4" />
+              شبکه کادر درمانی
+            </p>
+            <h1 className="text-3xl font-black text-slate-900">مدیریت کادر درمانی</h1>
             <p className="text-sm text-slate-500">
-              اطلاعات تخصص، وضعیت و کلینیک مرتبط را به‌روز نگه دارید.
+              اطلاعات کادر درمان، وضعیت و کلینیک مرتبط را به‌روز نگه دارید.
             </p>
             <div className="flex gap-4 text-sm text-slate-500">
               <span className="flex items-center gap-2">
                 <Users2 className="h-4 w-4 text-sky-500" />
-                {providers.length} پزشکان ثبت‌شده
+                {providers.length} کادر درمانی ثبت‌شده
               </span>
-              <span className="flex items-center gap-2">
+              {/* <span className="flex items-center gap-2">
                 <Stethoscope className="h-4 w-4 text-emerald-500" />
                 {specialties.length} تخصص
-              </span>
+              </span> */}
             </div>
           </div>
           <Button
@@ -248,7 +252,7 @@ const Doctors = () => {
             onClick={() => setIsAddOpen(true)}
           >
             <Plus className="ml-2 h-4 w-4" />
-            افزودن پزشک
+            افزودن کادر درمانی
           </Button>
         </div>
       </section>
@@ -325,4 +329,4 @@ const Doctors = () => {
   );
 };
 
-export default Doctors;
+export default TreatmentStaff;

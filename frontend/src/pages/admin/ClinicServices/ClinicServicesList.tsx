@@ -10,6 +10,7 @@ import { Button } from '../../../components/ui/button';
 import { EmptyState } from '../../../components/states/EmptyState';
 import { PageLoader } from '../../../components/states/PageLoader';
 import { AddClinicServiceDialog } from './AddClinicServiceDialog';
+import { formatPersianDate } from '../../../lib/utils';
 
 const ClinicServicesList = () => {
     const { id } = useParams<{ id: string }>();
@@ -173,7 +174,7 @@ const ClinicServicesList = () => {
                                             </span>
                                         </td>
                                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                            {new Date(clinicService.createdAt).toLocaleDateString('fa-IR')}
+                                            {formatPersianDate(clinicService.createdAt)}
                                         </td>
                                         <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                                             <div className="flex items-center gap-2">

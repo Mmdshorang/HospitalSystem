@@ -1,6 +1,7 @@
 import { Plus, Edit, Trash2, Eye } from "lucide-react";
 import { useEffect, useState } from "react";
 import { patientService } from "../api/services/patientService";
+import { formatPersianDate } from "../lib/utils";
 
 interface Patient {
   id: string;
@@ -101,7 +102,7 @@ const Patients = () => {
                     </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                    {patient.dateOfBirth || "-"}
+                    {patient.dateOfBirth ? formatPersianDate(patient.dateOfBirth) : "-"}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                     <div className="flex space-x-2 space-x-reverse">

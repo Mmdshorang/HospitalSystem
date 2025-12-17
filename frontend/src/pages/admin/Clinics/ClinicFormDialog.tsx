@@ -7,6 +7,7 @@ import type {
   Clinic,
 } from "../../../api/services/clinicService";
 import { Button } from "../../../components/ui/button";
+import MultiSelect from "@/components/ui/multiSelect";
 
 interface ClinicFormDialogProps {
   open: boolean;
@@ -176,7 +177,7 @@ export const ClinicFormDialog = ({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 px-2 sm:px-4 backdrop-blur overflow-y-auto py-4">
-      <div className="relative w-full max-w-xl max-h-[95vh] rounded-2xl sm:rounded-[32px] bg-white p-4 sm:p-6 md:p-8 shadow-2xl my-auto">
+      <div className="relative w-full max-w-3xl max-h-[95vh] rounded-2xl sm:rounded-[32px] bg-white p-4 sm:p-6 md:p-8 shadow-2xl my-auto">
         <button
           className="absolute left-3 top-3 sm:left-6 sm:top-6 rounded-full border border-slate-100 p-2 text-slate-500 transition hover:text-slate-900 z-10"
           onClick={onClose}
@@ -201,7 +202,7 @@ export const ClinicFormDialog = ({
               {error}
             </div>
           )}
-          <div className="grid gap-4 sm:grid-cols-2">
+          <div className="grid gap-4 sm:grid-cols-3">
             <div className="flex flex-col">
               <label className="text-sm font-medium text-slate-600 mb-2">
                 نام کلینیک
@@ -230,15 +231,11 @@ export const ClinicFormDialog = ({
                 required
               />
             </div>
-          </div>
-
-          <div className="grid gap-4 sm:grid-cols-2">
             <div className="flex flex-col">
               <label className="text-sm font-medium text-slate-600 mb-2">
-                شناسه مدیر (کاربر)
+                مدیر
               </label>
-              <input
-                type="number"
+              <select
                 className="h-12 w-full rounded-2xl border border-slate-200 px-4 text-sm outline-none focus:border-primary"
                 value={values.managerId ?? ""}
                 onChange={(e) =>
@@ -247,9 +244,11 @@ export const ClinicFormDialog = ({
                     e.target.value ? Number(e.target.value) : undefined
                   )
                 }
-                placeholder="ID مدیر"
               />
             </div>
+          </div>
+
+          <div className="grid gap-4 sm:grid-cols-2">
             <div className="flex flex-col">
               <label className="text-sm font-medium text-slate-600 mb-2">
                 لوگو (URL)
@@ -261,14 +260,19 @@ export const ClinicFormDialog = ({
                 placeholder="https://..."
               />
             </div>
+            <div className="flex flex-col">
+              <label className="text-sm font-medium text-slate-600 mb-2">
+                بیمه‌ها
+              </label>
+              <MultiSelect />
+            </div>
           </div>
-
           {/* Address Section */}
-          <div className="space-y-4 pt-2 border-t border-slate-200">
-            <h4 className="text-base font-semibold text-slate-900">
+          <div className="space-y-4 pt-2 border-slate-200">
+            {/* <h4 className="text-base font-semibold text-slate-900">
               آدرس کلینیک
-            </h4>
-            <div className="grid gap-4 sm:grid-cols-2">
+            </h4> */}
+            <div className="grid gap-4 sm:grid-cols-3">
               <div className="flex flex-col">
                 <label className="text-sm font-medium text-slate-600 mb-2">
                   استان
@@ -291,19 +295,6 @@ export const ClinicFormDialog = ({
                   required
                 />
               </div>
-            </div>
-            <div className="flex flex-col">
-              <label className="text-sm font-medium text-slate-600 mb-2">
-                آدرس و خیابان
-              </label>
-              <input
-                className="h-12 w-full rounded-2xl border border-slate-200 px-4 text-sm outline-none focus:border-primary"
-                value={address.street || ""}
-                onChange={(e) => handleAddressChange("street", e.target.value)}
-                required
-              />
-            </div>
-            <div className="grid gap-4 sm:grid-cols-2">
               <div className="flex flex-col">
                 <label className="text-sm font-medium text-slate-600 mb-2">
                   کد پستی
@@ -318,6 +309,19 @@ export const ClinicFormDialog = ({
                   required
                 />
               </div>
+            </div>
+            <div className="flex flex-col">
+              <label className="text-sm font-medium text-slate-600 mb-2">
+                آدرس و خیابان
+              </label>
+              <input
+                className="h-12 w-full rounded-2xl border border-slate-200 px-4 text-sm outline-none focus:border-primary"
+                value={address.street || ""}
+                onChange={(e) => handleAddressChange("street", e.target.value)}
+                required
+              />
+            </div>
+            <div className="grid gap-4 sm:grid-cols-2">
               <div className="flex items-center gap-2 mt-7">
                 <input
                   type="checkbox"
@@ -333,31 +337,30 @@ export const ClinicFormDialog = ({
                   فعال باشد
                 </label>
               </div>
+              <div className="flex flex-col sm:flex-row justify-end gap-3 pt-4">
+                <Button
+                  type="button"
+                  variant="outline"
+                  className="h-11 w-full sm:w-auto rounded-2xl border-slate-200 text-white px-6 text-sm bg-gradient-to-l from-red-600 to-red-500"
+                  onClick={onClose}
+                >
+                  انصراف
+                </Button>
+                <Button
+                  type="submit"
+                  className="h-11 w-full sm:w-auto rounded-2xl bg-gradient-to-l from-blue-600 to-blue-500 px-6 sm:px-10 text-sm font-semibold text-white shadow-lg shadow-blue-500/30 transition hover:shadow-xl hover:shadow-blue-500/40 hover:from-blue-700 hover:to-blue-600"
+                  disabled={isSubmitting}
+                >
+                  {isSubmitting
+                    ? initialValues
+                      ? "در حال ذخیره..."
+                      : "در حال ثبت..."
+                    : initialValues
+                    ? "ذخیره تغییرات"
+                    : "ثبت کلینیک"}
+                </Button>
+              </div>
             </div>
-          </div>
-
-          <div className="flex flex-col sm:flex-row justify-end gap-3 pt-4">
-            <Button
-              type="button"
-              variant="outline"
-              className="h-11 w-full sm:w-auto rounded-2xl border-slate-200 px-6 text-sm text-slate-600"
-              onClick={onClose}
-            >
-              انصراف
-            </Button>
-            <Button
-              type="submit"
-              className="h-11 w-full sm:w-auto rounded-2xl bg-gradient-to-l from-blue-600 to-blue-500 px-6 sm:px-10 text-sm font-semibold text-white shadow-lg shadow-blue-500/30 transition hover:shadow-xl hover:shadow-blue-500/40 hover:from-blue-700 hover:to-blue-600"
-              disabled={isSubmitting}
-            >
-              {isSubmitting
-                ? initialValues
-                  ? "در حال ذخیره..."
-                  : "در حال ثبت..."
-                : initialValues
-                ? "ذخیره تغییرات"
-                : "ثبت کلینیک"}
-            </Button>
           </div>
         </form>
       </div>

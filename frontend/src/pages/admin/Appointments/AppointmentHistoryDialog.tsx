@@ -2,6 +2,7 @@ import { useQuery } from '@tanstack/react-query';
 import { X, Clock } from 'lucide-react';
 import { serviceRequestService, type ServiceRequestHistory } from '../../../api/services/serviceRequestService';
 import { PageLoader } from '../../../components/states/PageLoader';
+import { formatPersianDateTime } from '../../../lib/utils';
 
 interface AppointmentHistoryDialogProps {
   open: boolean;
@@ -53,7 +54,7 @@ export const AppointmentHistoryDialog = ({ open, onClose, appointmentId }: Appoi
                         {item.fromStatus} → {item.toStatus}
                       </p>
                       <p className="text-xs text-slate-500">
-                        {item.changedBy || 'سیستم'} · {new Date(item.changedAt).toLocaleString('fa-IR')}
+                        {item.changedBy || 'سیستم'} · {formatPersianDateTime(item.changedAt)}
                       </p>
                     </div>
                   </div>

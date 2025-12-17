@@ -1,26 +1,26 @@
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import { ToastContainer } from 'react-toastify';
-import { AuthProvider } from './contexts/AuthContext';
-import ProtectedRoute from './components/ProtectedRoute';
-import Layout from './components/Layout';
-import Dashboard from './pages/admin/Home/Home';
-import Patients from './pages/admin/Patients/PatientsList';
-import Doctors from './pages/admin/Doctors/DoctorsList';
-import Appointments from './pages/Appointments';
-import PatientForm from './pages/PatientForm';
-import DoctorForm from './pages/DoctorForm';
-import Login from './pages/Login';
-import Register from './pages/Register';
-import ClinicsList from './pages/admin/Clinics/ClinicsList';
-import InsurancesList from './pages/admin/Insurances/InsurancesList';
-import ServiceCategoriesList from './pages/admin/ServiceCategories/ServiceCategoriesList';
-import ServicesList from './pages/admin/Services/ServicesList';
-import AppointmentsList from './pages/admin/Appointments/AppointmentsList';
-import ClinicServicesList from './pages/admin/ClinicServices/ClinicServicesList';
-import SpecialtiesList from './pages/admin/Specialties/SpecialtiesList';
-import 'react-toastify/dist/ReactToastify.css';
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { ToastContainer } from "react-toastify";
+import { AuthProvider } from "./contexts/AuthContext";
+import ProtectedRoute from "./components/ProtectedRoute";
+import Layout from "./components/Layout";
+import Dashboard from "./pages/admin/Home/Home";
+import Patients from "./pages/admin/Patients/PatientsList";
+import Doctors from "./pages/admin/Doctors/DoctorsList";
+import PatientForm from "./pages/PatientForm";
+import DoctorForm from "./pages/DoctorForm";
+import Login from "./pages/Login";
+import Register from "./pages/Register";
+import ClinicsList from "./pages/admin/Clinics/ClinicsList";
+import InsurancesList from "./pages/admin/Insurances/InsurancesList";
+import ServiceCategoriesList from "./pages/admin/ServiceCategories/ServiceCategoriesList";
+import ServicesList from "./pages/admin/Services/ServicesList";
+import AppointmentsList from "./pages/admin/Appointments/AppointmentsList";
+import ClinicServicesList from "./pages/admin/ClinicServices/ClinicServicesList";
+import SpecialtiesList from "./pages/admin/Specialties/SpecialtiesList";
+import TreatmentStaff from "./pages/admin/TreatmentStaff/TreatmentStaff";
+import "react-toastify/dist/ReactToastify.css";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -129,6 +129,16 @@ function App() {
                   <ProtectedRoute>
                     <Layout>
                       <Doctors />
+                    </Layout>
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/treatmentStaff"
+                element={
+                  <ProtectedRoute>
+                    <Layout>
+                      <TreatmentStaff />
                     </Layout>
                   </ProtectedRoute>
                 }

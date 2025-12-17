@@ -39,8 +39,7 @@ builder.Services.AddSwaggerGen(c =>
         Description = "A comprehensive hospital management system API with modern features",
         Contact = new OpenApiContact
         {
-            Name = "Hospital System Team",
-            Email = "support@hospitalsystem.com"
+            Name = "Hospital System Team"
         }
     });
 
@@ -82,9 +81,11 @@ builder.Services.AddSwaggerGen(c =>
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
 {
     // Get connection string from configuration (appsettings.json or environment variables)
-    // Falls back to hardcoded value if not found in configuration
+    // Falls back to localhost for development if not found in configuration
     string connectionString = builder.Configuration.GetConnectionString("DefaultConnection") 
-        ?? "Host=eiger.liara.cloud;Port=32125;Database=hospital-system;Username=root;Password=RVDI99mIYKTjdNHbMsNwzr0d;";
+        ?? (builder.Environment.IsDevelopment() 
+            ? "Host=localhost;Port=5432;Database=hospital-system;Username=postgres;Password=postgres;"
+            : throw new InvalidOperationException("Connection string 'DefaultConnection' must be configured in appsettings.json or environment variables"));
     
     Log.Information("Using PostgreSQL connection from configuration: {ConnectionString}", 
         connectionString.Replace("Password=", "Password=***"));
@@ -290,13 +291,15 @@ app.UseAuthorization();
 app.MapHealthChecks("/health");
 
 // List available databases endpoint - connects to postgres first to check databases
-app.MapGet("/health/databases", async (IConfiguration configuration) =>
+app.MapGet("/health/databases", async (IConfiguration configuration, IWebHostEnvironment env) =>
 {
     try
     {
         // Get connection string from configuration
         var defaultConnection = configuration.GetConnectionString("DefaultConnection") 
-            ?? "Host=eiger.liara.cloud;Port=32125;Database=hospital-system;Username=root;Password=RVDI99mIYKTjdNHbMsNwzr0d;";
+            ?? (env.IsDevelopment() 
+                ? "Host=localhost;Port=5432;Database=hospital-system;Username=postgres;Password=postgres;"
+                : throw new InvalidOperationException("Connection string 'DefaultConnection' must be configured"));
         
         // Extract connection details to build postgres connection string
         var postgresUri = configuration.GetConnectionString("PostgreSQL");
@@ -366,13 +369,15 @@ app.MapGet("/health/databases", async (IConfiguration configuration) =>
 }).WithTags("Health");
 
 // Detailed database health check endpoint
-app.MapGet("/health/database", async (ApplicationDbContext context, IConfiguration configuration) =>
+app.MapGet("/health/database", async (ApplicationDbContext context, IConfiguration configuration, IWebHostEnvironment env) =>
 {
     try
     {
         // Get connection string from configuration
         var connectionString = configuration.GetConnectionString("DefaultConnection") 
-            ?? "Host=eiger.liara.cloud;Port=32125;Database=hospital-system;Username=root;Password=RVDI99mIYKTjdNHbMsNwzr0d;";
+            ?? (env.IsDevelopment() 
+                ? "Host=localhost;Port=5432;Database=hospital-system;Username=postgres;Password=postgres;"
+                : throw new InvalidOperationException("Connection string 'DefaultConnection' must be configured"));
         
         // Parse connection string to extract connection info
         var connectionStringBuilder = new Npgsql.NpgsqlConnectionStringBuilder(connectionString);
@@ -480,12 +485,22 @@ try
     
     // Use PORT env var if provided (e.g., by Liara), otherwise use ASPNETCORE_URLS or default
     var port = Environment.GetEnvironmentVariable("PORT") ?? "5000";
-    var urls = builder.Configuration["ASPNETCORE_URLS"] ?? $"http://0.0.0.0:{port}";
+    
+    // In Development, always use localhost:5000
+    var urls = app.Environment.IsDevelopment() 
+        ? $"http://localhost:{port}"
+        : (builder.Configuration["ASPNETCORE_URLS"] ?? $"http://0.0.0.0:{port}");
     
     // Override ASPNETCORE_URLS if PORT is set
     if (!string.IsNullOrEmpty(Environment.GetEnvironmentVariable("PORT")))
     {
         Environment.SetEnvironmentVariable("ASPNETCORE_URLS", urls);
+    }
+    else if (app.Environment.IsDevelopment())
+    {
+        // Ensure Development always uses localhost:5000
+        Environment.SetEnvironmentVariable("ASPNETCORE_URLS", $"http://localhost:5000");
+        urls = "http://localhost:5000";
     }
     
     var environment = app.Environment.EnvironmentName;

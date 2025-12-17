@@ -6,6 +6,7 @@ import AddPatientDialog, {
 import DataTable from "../../../components/DataTable";
 import { Button } from "../../../components/ui/button";
 import { patientService } from "../../../api/services/patientService";
+import { formatPersianDate } from "../../../lib/utils";
 
 type Patient = {
   id: string;
@@ -190,7 +191,9 @@ const Doctors = () => {
         header: "تاریخ تولد",
         accessor: (row: Patient) => row.dateOfBirth,
         cell: (value: unknown) => (
-          <div className="text-sm text-gray-500">{String(value)}</div>
+          <div className="text-sm text-gray-500">
+            {value ? formatPersianDate(String(value)) : "-"}
+          </div>
         ),
       },
       {

@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { X } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
 import type { CreateServiceRequestDto } from '../../../api/services/serviceRequestService';
@@ -7,6 +7,8 @@ import { serviceService } from '../../../api/services/serviceService';
 import { insuranceService } from '../../../api/services/insuranceService';
 import { patientService, type PatientListItem } from '../../../api/services/patientService';
 import { Button } from '../../../components/ui/button';
+import JalaliDatePicker from '../../../components/DatePicker/DatePicker';
+import moment from 'jalali-moment';
 
 interface AppointmentFormDialogProps {
   open: boolean;
@@ -27,6 +29,21 @@ const defaultValues: CreateServiceRequestDto = {
 export const AppointmentFormDialog = ({ open, onClose, onSubmit }: AppointmentFormDialogProps) => {
   const [values, setValues] = useState<CreateServiceRequestDto>(defaultValues);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [preferredDate, setPreferredDate] = useState<string>('');
+  const [preferredTime, setPreferredTime] = useState<string>('');
+
+  const buildPreferredIso = (dateJ: string, time: string) => {
+    if (!dateJ || !time) return undefined;
+    const m = moment(dateJ, 'jYYYY/jMM/jDD').hour(Number(time.split(':')[0] || 0)).minute(Number(time.split(':')[1] || 0)).second(0).millisecond(0);
+    return m.isValid() ? m.toDate().toISOString() : undefined;
+  };
+
+  useEffect(() => {
+    if (open) {
+      setPreferredDate(values.preferredTime ? moment(values.preferredTime).format('jYYYY/jMM/jDD') : '');
+      setPreferredTime(values.preferredTime ? moment(values.preferredTime).format('HH:mm') : '');
+    }
+  }, [open, values.preferredTime]);
 
   const { data: clinics = [] } = useQuery({
     queryKey: ['clinics'],
@@ -58,6 +75,8 @@ export const AppointmentFormDialog = ({ open, onClose, onSubmit }: AppointmentFo
     await onSubmit(values);
     setIsSubmitting(false);
     setValues(defaultValues);
+    setPreferredDate('');
+    setPreferredTime('');
     onClose();
   };
 
@@ -176,20 +195,41 @@ export const AppointmentFormDialog = ({ open, onClose, onSubmit }: AppointmentFo
               </select>
             </label>
           </div>
-          <label className="text-sm font-medium text-slate-600">
-            تاریخ و زمان ترجیحی
-            <input
-              type="datetime-local"
-              className="mt-2 h-12 w-full rounded-2xl border border-slate-200 px-4 text-sm outline-none focus:border-primary"
-              value={values.preferredTime ? new Date(values.preferredTime).toISOString().slice(0, 16) : ''}
-              onChange={(e) =>
-                setValues((prev) => ({
-                  ...prev,
-                  preferredTime: e.target.value ? new Date(e.target.value).toISOString() : undefined,
-                }))
-              }
-            />
-          </label>
+          <div className="grid gap-4 sm:grid-cols-2">
+            <label className="text-sm font-medium text-slate-600">
+              تاریخ ترجیحی
+              <JalaliDatePicker
+                value={preferredDate || null}
+                onChange={(val) => {
+                  const dateVal = val ?? '';
+                  setPreferredDate(dateVal);
+                  setValues((prev) => ({
+                    ...prev,
+                    preferredTime: buildPreferredIso(dateVal, preferredTime),
+                  }));
+                }}
+                placeholder="انتخاب تاریخ"
+                className="mt-2"
+                inputClassName="h-12 w-full rounded-2xl border border-slate-200 px-4 text-sm outline-none focus:border-primary"
+              />
+            </label>
+            <label className="text-sm font-medium text-slate-600">
+              زمان ترجیحی
+              <input
+                type="time"
+                className="mt-2 h-12 w-full rounded-2xl border border-slate-200 px-4 text-sm outline-none focus:border-primary"
+                value={preferredTime}
+                onChange={(e) => {
+                  const timeVal = e.target.value;
+                  setPreferredTime(timeVal);
+                  setValues((prev) => ({
+                    ...prev,
+                    preferredTime: buildPreferredIso(preferredDate, timeVal),
+                  }));
+                }}
+              />
+            </label>
+          </div>
           <label className="text-sm font-medium text-slate-600">
             یادداشت
             <textarea
