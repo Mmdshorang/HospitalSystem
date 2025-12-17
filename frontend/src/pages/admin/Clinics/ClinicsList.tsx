@@ -2,7 +2,7 @@ import { useMemo, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
-import { Building2, Search, Edit, Trash2, Settings, Plus } from "lucide-react";
+import { Shield, Search, Edit, Trash2, Settings, Plus } from "lucide-react";
 import {
   clinicService,
   type Clinic,
@@ -77,14 +77,18 @@ const ClinicsList = () => {
       key: "name",
       header: "نام کلینیک",
       accessor: (clinic) => (
-        <div>
-          <div className="text-sm font-semibold text-slate-900">
-            {clinic.name}
-          </div>
-          <div className="text-xs text-slate-500 flex items-center gap-1">
-            <Building2 className="h-4 w-4 text-primary-500" />
-            {clinic.managerName || "—"}
-          </div>
+        <div className="text-sm font-semibold text-slate-900">
+          {clinic.name}
+        </div>
+      ),
+      sortable: true,
+    },
+    {
+      key: "manager",
+      header: "مدیر کلینیک",
+      accessor: (clinic) => (
+        <div className="text-sm font-semibold text-slate-900">
+          {clinic.managerName}
         </div>
       ),
       sortable: true,
@@ -95,6 +99,16 @@ const ClinicsList = () => {
       accessor: (clinic) =>
         clinic.addresses && clinic.addresses.length > 0
           ? clinic.addresses[0].city
+          : "—",
+      sortable: true,
+      className: "text-sm text-slate-600",
+    },
+    {
+      key: "city",
+      header: "آدرس",
+      accessor: (clinic) =>
+        clinic.addresses && clinic.addresses.length > 0
+          ? clinic.addresses[0].street
           : "—",
       sortable: true,
       className: "text-sm text-slate-600",
@@ -125,6 +139,13 @@ const ClinicsList = () => {
       header: "اقدام",
       accessor: (clinic) => (
         <div className="flex items-center gap-2">
+          <button
+            onClick={() => navigate(`/admin/clinics/${clinic.id}/services`)}
+            className="text-blue-600 hover:text-blue-800"
+            title="مدیریت بیمه ها"
+          >
+            <Shield className="h-4 w-4" />
+          </button>
           <button
             onClick={() => navigate(`/admin/clinics/${clinic.id}/services`)}
             className="text-blue-600 hover:text-blue-800"
@@ -177,7 +198,8 @@ const ClinicsList = () => {
               مدیریت کلینیک‌ها
             </h2>
             <p className="text-sm text-slate-500">
-              کلینیک‌ها را در قالب جدول ببینید، ویرایش کنید و خدمات/اعضا را مدیریت کنید.
+              کلینیک‌ها را در قالب جدول ببینید، ویرایش کنید و خدمات/اعضا را
+              مدیریت کنید.
             </p>
             <div className="flex gap-3">
               {stats.map((item) => (

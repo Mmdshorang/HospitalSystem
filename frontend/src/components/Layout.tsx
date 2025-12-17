@@ -12,8 +12,7 @@ import {
   LogOut,
   Menu,
   X,
-  Sun,
-  Settings2,
+  UserRound,
   ChevronRight,
   ChevronLeft,
   GraduationCap,
@@ -29,7 +28,8 @@ interface LayoutProps {
 
 const navigation = [
   { name: "داشبورد", href: "/", icon: LayoutDashboard },
-  { name: "کادر درمانی", href: "/doctors", icon: Stethoscope },
+  { name: "پزشکان", href: "/doctors", icon: UserRound },
+  { name: "کادر درمانی", href: "/treatmentStaff", icon: Stethoscope },
   { name: "بیماران", href: "/patients", icon: Users2 },
   { name: "تخصص‌ها", href: "/admin/specialties", icon: GraduationCap },
   { name: "کلینیک‌ها", href: "/admin/clinics", icon: Building2 },
@@ -45,7 +45,7 @@ const breadcrumbTranslations: Record<string, string> = {
   insurances: "بیمه‌ها",
   clinics: "کلینیک‌ها",
   patients: "بیماران",
-  doctors: "کادر درمانی",
+  doctors: "پزشکان",
   specialties: "تخصص‌ها",
   appointments: "نوبت‌ها",
   "service-categories": "دسته‌بندی خدمات",
@@ -53,6 +53,7 @@ const breadcrumbTranslations: Record<string, string> = {
   services: "خدمات",
   new: "جدید",
   edit: "ویرایش",
+  treatmentStaff: "کادر درمانی",
 };
 
 const Layout = ({ children }: LayoutProps) => {
@@ -74,7 +75,9 @@ const Layout = ({ children }: LayoutProps) => {
         href: "/" + filteredSegments.slice(0, index + 1).join("/"),
       };
     });
-    return crumbs.length ? crumbs : [{ label: breadcrumbTranslations.home, href: "/" }];
+    return crumbs.length
+      ? crumbs
+      : [{ label: breadcrumbTranslations.home, href: "/" }];
   }, [location.pathname]);
 
   return (
