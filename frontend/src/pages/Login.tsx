@@ -12,7 +12,7 @@ import { useAuth } from "../contexts/AuthContext";
 import { PhoneInput } from "../components/ui/phone-input";
 import { OtpInput } from "../components/ui/otp-input";
 import { Button } from "../components/ui/button";
-
+import OTP from "../assets/OTP.svg";
 type Step = "phone" | "otp";
 
 const Login: React.FC = () => {
@@ -202,7 +202,7 @@ const Login: React.FC = () => {
 
           <section className="relative flex h-full flex-col justify-between text-white">
             <img
-              src="/OTP.svg"
+              src={OTP}
               alt="ورود امن با کد تایید"
               loading="lazy"
               className="h-full w-full object-contain"
