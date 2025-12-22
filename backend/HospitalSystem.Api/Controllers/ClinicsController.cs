@@ -175,6 +175,102 @@ public class ClinicsController : ControllerBase
     }
 
     /// <summary>
+    /// Get all insurances for a clinic
+    /// </summary>
+    [HttpGet("{id}/insurances")]
+    [Authorize]
+    public async Task<IActionResult> GetClinicInsurances(long id)
+    {
+        try
+        {
+            var insurances = await _clinicService.GetClinicInsurancesAsync(id);
+            return Ok(insurances);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error getting clinic insurances for clinic {Id}", id);
+            return StatusCode(500, new { message = "Internal server error" });
+        }
+    }
+
+    /// <summary>
+    /// Get all managers for a clinic
+    /// </summary>
+    [HttpGet("{id}/managers")]
+    [Authorize]
+    public async Task<IActionResult> GetClinicManagers(long id)
+    {
+        try
+        {
+            var managers = await _clinicService.GetClinicManagersAsync(id);
+            return Ok(managers);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error getting clinic managers for clinic {Id}", id);
+            return StatusCode(500, new { message = "Internal server error" });
+        }
+    }
+
+    public class SetClinicInsurancesRequest
+    {
+        public long ClinicId { get; set; }
+        public List<long> InsuranceIds { get; set; } = new();
+    }
+
+    public class SetClinicManagersRequest
+    {
+        public long ClinicId { get; set; }
+        public List<long> ManagerIds { get; set; } = new();
+    }
+
+    /// <summary>
+    /// Set insurances for a clinic (replace current set)
+    /// </summary>
+    [HttpPut("{id}/insurances")]
+    [Authorize(Roles = "admin,manager")]
+    public async Task<IActionResult> SetClinicInsurances(long id, [FromBody] SetClinicInsurancesRequest request)
+    {
+        try
+        {
+            if (id != request.ClinicId)
+                return BadRequest(new { message = "Clinic ID mismatch" });
+
+            var ok = await _clinicService.SetClinicInsurancesAsync(id, request.InsuranceIds);
+            if (!ok) return NotFound(new { message = "Clinic not found" });
+            return NoContent();
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error setting clinic insurances for clinic {Id}", id);
+            return StatusCode(500, new { message = "Internal server error" });
+        }
+    }
+
+    /// <summary>
+    /// Set managers for a clinic (replace current set)
+    /// </summary>
+    [HttpPut("{id}/managers")]
+    [Authorize(Roles = "admin,manager")]
+    public async Task<IActionResult> SetClinicManagers(long id, [FromBody] SetClinicManagersRequest request)
+    {
+        try
+        {
+            if (id != request.ClinicId)
+                return BadRequest(new { message = "Clinic ID mismatch" });
+
+            var ok = await _clinicService.SetClinicManagersAsync(id, request.ManagerIds);
+            if (!ok) return NotFound(new { message = "Clinic not found" });
+            return NoContent();
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error setting clinic managers for clinic {Id}", id);
+            return StatusCode(500, new { message = "Internal server error" });
+        }
+    }
+
+    /// <summary>
     /// Add a service to a clinic
     /// </summary>
     [HttpPost("{id}/services")]

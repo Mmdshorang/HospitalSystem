@@ -94,7 +94,6 @@ export const InsuranceFormDialog = ({
                   description: e.target.value,
                 }))
               }
-              required
             />
           </label>
           <label className="text-sm font-medium text-slate-600">
