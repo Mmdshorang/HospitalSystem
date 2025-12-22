@@ -2,7 +2,15 @@ import { useMemo, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
-import { Shield, Search, Edit, Trash2, Settings, Plus } from "lucide-react";
+import {
+  Shield,
+  Search,
+  Edit,
+  Trash2,
+  Settings,
+  Plus,
+  CircleUserRound,
+} from "lucide-react";
 import {
   clinicService,
   type Clinic,
@@ -87,8 +95,19 @@ const ClinicsList = () => {
       key: "manager",
       header: "مدیر کلینیک",
       accessor: (clinic) => (
-        <div className="text-sm font-semibold text-slate-900">
-          {clinic.managerName}
+        <div className="flex gap-3">
+          <div className="text-sm font-semibold text-slate-900">
+            {clinic.managerName}
+          </div>
+          <div>
+            <button
+              onClick={() => navigate(`/admin/clinics/${clinic.id}/adminManagment`)}
+              className="text-blue-600 hover:text-blue-800"
+              title="مدیریت کلینیک"
+            >
+              <CircleUserRound className="h-4 w-4" />
+            </button>
+          </div>
         </div>
       ),
       sortable: true,
@@ -140,7 +159,7 @@ const ClinicsList = () => {
       accessor: (clinic) => (
         <div className="flex items-center gap-2">
           <button
-            onClick={() => navigate(`/admin/clinics/${clinic.id}/services`)}
+            onClick={() => navigate(`/admin/clinics/${clinic.id}/insurances`)}
             className="text-blue-600 hover:text-blue-800"
             title="مدیریت بیمه ها"
           >

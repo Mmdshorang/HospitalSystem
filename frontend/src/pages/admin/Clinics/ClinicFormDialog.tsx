@@ -202,7 +202,7 @@ export const ClinicFormDialog = ({
               {error}
             </div>
           )}
-          <div className="grid gap-4 sm:grid-cols-3">
+          <div className="grid gap-4 sm:grid-cols-2">
             <div className="flex flex-col">
               <label className="text-sm font-medium text-slate-600 mb-2">
                 نام کلینیک
@@ -231,7 +231,7 @@ export const ClinicFormDialog = ({
                 required
               />
             </div>
-            <div className="flex flex-col">
+            {/* <div className="flex flex-col">
               <label className="text-sm font-medium text-slate-600 mb-2">
                 مدیر
               </label>
@@ -245,7 +245,7 @@ export const ClinicFormDialog = ({
                   )
                 }
               />
-            </div>
+            </div> */}
           </div>
 
           <div className="grid gap-4 sm:grid-cols-2">
@@ -260,12 +260,12 @@ export const ClinicFormDialog = ({
                 placeholder="https://..."
               />
             </div>
-            <div className="flex flex-col">
+            {/* <div className="flex flex-col">
               <label className="text-sm font-medium text-slate-600 mb-2">
                 بیمه‌ها
               </label>
               <MultiSelect />
-            </div>
+            </div> */}
           </div>
           {/* Address Section */}
           <div className="space-y-4 pt-2 border-slate-200">

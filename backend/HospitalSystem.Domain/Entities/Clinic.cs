@@ -17,6 +17,7 @@ public class Clinic
     public ICollection<ClinicAddress>? Addresses { get; set; }
     public ICollection<ClinicInsurance>? ClinicInsurances { get; set; }
     public ICollection<ClinicService>? ClinicServices { get; set; }
+    public ICollection<ClinicManager>? ClinicManagers { get; set; }
 }
 
 public class ClinicWorkHours

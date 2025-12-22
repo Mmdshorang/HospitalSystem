@@ -177,6 +177,132 @@ public class ClinicService
         });
     }
 
+    // Clinic Insurances methods
+    public async Task<IEnumerable<InsuranceDto>> GetClinicInsurancesAsync(long clinicId)
+    {
+        var insurances = await _context.ClinicInsurances
+            .Include(ci => ci.Insurance)
+            .Where(ci => ci.ClinicId == clinicId)
+            .Select(ci => ci.Insurance)
+            .Where(i => i != null)
+            .OrderBy(i => i!.Name)
+            .ToListAsync();
+
+        return insurances.Select(i => new InsuranceDto
+        {
+            Id = i!.Id,
+            Name = i!.Name,
+            Description = i!.Description,
+            CoveragePercent = i!.CoveragePercent,
+            IsActive = i!.IsActive,
+            CreatedAt = i!.CreatedAt,
+            UpdatedAt = i!.UpdatedAt
+        });
+    }
+
+    public async Task<bool> SetClinicInsurancesAsync(long clinicId, List<long> insuranceIds)
+    {
+        var clinic = await _context.Clinics.FirstOrDefaultAsync(c => c.Id == clinicId);
+        if (clinic == null) return false;
+
+        var existing = await _context.ClinicInsurances
+            .Where(ci => ci.ClinicId == clinicId)
+            .ToListAsync();
+
+        var toRemove = existing.Where(ci => !insuranceIds.Contains(ci.InsuranceId)).ToList();
+        if (toRemove.Count > 0)
+        {
+            _context.ClinicInsurances.RemoveRange(toRemove);
+        }
+
+        var existingIds = existing.Select(ci => ci.InsuranceId).ToHashSet();
+        var toAddIds = insuranceIds.Where(id => !existingIds.Contains(id)).ToList();
+
+        if (toAddIds.Count > 0)
+        {
+            var insurances = await _context.Insurances
+                .Where(i => toAddIds.Contains(i.Id))
+                .Select(i => i.Id)
+                .ToListAsync();
+
+            var newRelations = insurances.Select(iid => new ClinicInsurance
+            {
+                ClinicId = clinicId,
+                InsuranceId = iid
+            });
+            await _context.ClinicInsurances.AddRangeAsync(newRelations);
+        }
+
+        await _context.SaveChangesAsync();
+        return true;
+    }
+
+    // Clinic Managers methods
+    public async Task<IEnumerable<UserDto>> GetClinicManagersAsync(long clinicId)
+    {
+        var users = await _context.ClinicManagers
+            .Include(cm => cm.User)
+            .Where(cm => cm.ClinicId == clinicId)
+            .Select(cm => cm.User)
+            .Where(u => u != null)
+            .OrderBy(u => u.FirstName)
+            .ThenBy(u => u.LastName)
+            .ToListAsync();
+
+        return users.Select(u => new UserDto
+        {
+            Id = u.Id,
+            FirstName = u.FirstName,
+            LastName = u.LastName,
+            NationalCode = u.NationalCode,
+            Phone = u.Phone,
+            Role = u.Role,
+            Gender = u.Gender,
+            BirthDate = u.BirthDate,
+            AvatarUrl = u.AvatarUrl,
+            IsActive = u.IsActive,
+            CreatedAt = u.CreatedAt,
+            UpdatedAt = u.UpdatedAt
+        });
+    }
+
+    public async Task<bool> SetClinicManagersAsync(long clinicId, List<long> managerIds)
+    {
+        var clinic = await _context.Clinics.FirstOrDefaultAsync(c => c.Id == clinicId);
+        if (clinic == null) return false;
+
+        var existing = await _context.ClinicManagers
+            .Where(cm => cm.ClinicId == clinicId)
+            .ToListAsync();
+
+        var toRemove = existing.Where(cm => !managerIds.Contains(cm.UserId)).ToList();
+        if (toRemove.Count > 0)
+        {
+            _context.ClinicManagers.RemoveRange(toRemove);
+        }
+
+        var existingIds = existing.Select(cm => cm.UserId).ToHashSet();
+        var toAddIds = managerIds.Where(id => !existingIds.Contains(id)).ToList();
+
+        if (toAddIds.Count > 0)
+        {
+            var users = await _context.Users
+                .Where(u => toAddIds.Contains(u.Id))
+                .Select(u => u.Id)
+                .ToListAsync();
+
+            var newRelations = users.Select(uid => new ClinicManager
+            {
+                ClinicId = clinicId,
+                UserId = uid
+            });
+            await _context.ClinicManagers.AddRangeAsync(newRelations);
+        }
+
+        await _context.SaveChangesAsync();
+        return true;
+    }
+
     public async Task<ClinicServiceDto?> AddClinicServiceAsync(long clinicId, CreateClinicServiceDto dto)
     {
         // Verify clinic exists

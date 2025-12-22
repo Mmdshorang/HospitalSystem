@@ -20,6 +20,8 @@ import AppointmentsList from "./pages/admin/Appointments/AppointmentsList";
 import ClinicServicesList from "./pages/admin/ClinicServices/ClinicServicesList";
 import SpecialtiesList from "./pages/admin/Specialties/SpecialtiesList";
 import TreatmentStaff from "./pages/admin/TreatmentStaff/TreatmentStaff";
+import InsurancesManagment from "./pages/admin/InsurancesManagment/InsurancesManagment";
+import AdminManagment from "./pages/admin/adminClinicManagment/adminClinicManagment"
 import "react-toastify/dist/ReactToastify.css";
 
 const queryClient = new QueryClient({
@@ -189,6 +191,26 @@ function App() {
                   <ProtectedRoute>
                     <Layout>
                       <ClinicServicesList />
+                    </Layout>
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/admin/clinics/:id/insurances"
+                element={
+                  <ProtectedRoute>
+                    <Layout>
+                      <InsurancesManagment />
+                    </Layout>
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/admin/clinics/:id/adminManagment"
+                element={
+                  <ProtectedRoute>
+                    <Layout>
+                      <AdminManagment />
                     </Layout>
                   </ProtectedRoute>
                 }

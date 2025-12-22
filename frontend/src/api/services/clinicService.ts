@@ -1,4 +1,5 @@
 import apiClient from "../client";
+import type { Insurance } from "./insuranceService";
 
 export interface Clinic {
   id: number;
@@ -101,5 +102,34 @@ export const clinicService = {
 
   async remove(id: number): Promise<void> {
     await apiClient.delete(`/api/clinics/${id}`);
+  },
+
+  async getClinicInsurances(clinicId: number): Promise<Insurance[]> {
+    const { data } = await apiClient.get<Insurance[]>(
+      `/api/clinics/${clinicId}/insurances`
+    );
+    return data;
+  },
+
+  async getClinicManagers(clinicId: number): Promise<any[]> {
+    const { data } = await apiClient.get<any[]>(`/api/clinics/${clinicId}/managers`);
+    return data;
+  },
+
+  async setClinicInsurances(
+    clinicId: number,
+    insuranceIds: number[]
+  ): Promise<void> {
+    await apiClient.put(`/api/clinics/${clinicId}/insurances`, {
+      clinicId,
+      insuranceIds,
+    });
+  },
+
+  async setClinicManagers(clinicId: number, managerIds: number[]): Promise<void> {
+    await apiClient.put(`/api/clinics/${clinicId}/managers`, {
+      clinicId,
+      managerIds,
+    });
   },
 };

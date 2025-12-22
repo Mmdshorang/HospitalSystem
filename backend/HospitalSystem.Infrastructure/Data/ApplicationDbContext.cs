@@ -22,6 +22,7 @@ namespace HospitalSystem.Infrastructure.Data
         public DbSet<Clinic> Clinics { get; set; } = null!;
         public DbSet<ClinicWorkHours> ClinicWorkHours { get; set; } = null!;
         public DbSet<ClinicAddress> ClinicAddresses { get; set; } = null!;
+        public DbSet<ClinicManager> ClinicManagers { get; set; } = null!;
 
         // Services
         public DbSet<ServiceCategory> ServiceCategories { get; set; } = null!;
@@ -73,13 +74,13 @@ namespace HospitalSystem.Infrastructure.Data
                         v => DateTime.SpecifyKind(v, DateTimeKind.Utc));
                 entity.Property(e => e.BirthDate)
                     .HasConversion(
-                        v => v.HasValue 
-                            ? (v.Value.Kind == DateTimeKind.Unspecified 
-                                ? DateTime.SpecifyKind(v.Value, DateTimeKind.Utc) 
+                        v => v.HasValue
+                            ? (v.Value.Kind == DateTimeKind.Unspecified
+                                ? DateTime.SpecifyKind(v.Value, DateTimeKind.Utc)
                                 : v.Value.ToUniversalTime())
                             : (DateTime?)null,
                         v => v.HasValue ? DateTime.SpecifyKind(v.Value, DateTimeKind.Utc) : (DateTime?)null);
-                
+
                 // ENUM mappings - Convert to string (no PostgreSQL enum types)
                 entity.Property(e => e.Role)
                     .HasConversion<string>()
@@ -89,16 +90,16 @@ namespace HospitalSystem.Infrastructure.Data
                     .HasConversion<string>()
                     .HasMaxLength(20);
 
-                
+
                 // Indexes
                 entity.HasIndex(e => e.NationalCode);
-                
+
                 // Relationships
                 entity.HasOne(u => u.ProviderProfile)
                     .WithOne(p => p.User)
                     .HasForeignKey<ProviderProfile>(p => p.UserId)
                     .OnDelete(DeleteBehavior.Cascade);
-                    
+
                 entity.HasOne(u => u.PatientProfile)
                     .WithOne(p => p.User)
                     .HasForeignKey<PatientProfile>(p => p.UserId)
@@ -139,22 +140,22 @@ namespace HospitalSystem.Infrastructure.Data
                 entity.Property(e => e.IsActive).HasDefaultValue(true);
                 entity.Property(e => e.CreatedAt).HasDefaultValueSql("NOW()");
                 entity.Property(e => e.UpdatedAt).HasDefaultValueSql("NOW()");
-                
+
                 entity.HasOne(p => p.User)
                     .WithOne(u => u.ProviderProfile)
                     .HasForeignKey<ProviderProfile>(p => p.UserId)
                     .OnDelete(DeleteBehavior.Cascade);
-                    
+
                 entity.HasOne(p => p.Clinic)
                     .WithMany()
                     .HasForeignKey(p => p.ClinicId)
                     .OnDelete(DeleteBehavior.SetNull);
-                    
+
                 entity.HasOne(p => p.Specialty)
                     .WithMany()
                     .HasForeignKey(p => p.SpecialtyId)
                     .OnDelete(DeleteBehavior.SetNull);
-                    
+
                 entity.HasMany(p => p.WorkSchedules)
                     .WithOne(w => w.Provider)
                     .HasForeignKey(w => w.ProviderId)
@@ -185,12 +186,12 @@ namespace HospitalSystem.Infrastructure.Data
                 entity.Property(e => e.EmergencyPhone).HasMaxLength(20);
                 entity.Property(e => e.CreatedAt).HasDefaultValueSql("NOW()");
                 entity.Property(e => e.UpdatedAt).HasDefaultValueSql("NOW()");
-                
+
                 entity.HasOne(p => p.User)
                     .WithOne(u => u.PatientProfile)
                     .HasForeignKey<PatientProfile>(p => p.UserId)
                     .OnDelete(DeleteBehavior.Cascade);
-                    
+
                 entity.HasMany(p => p.Insurances)
                     .WithOne(pi => pi.PatientProfile)
                     .HasForeignKey(pi => pi.PatientProfileId)
@@ -208,17 +209,17 @@ namespace HospitalSystem.Infrastructure.Data
                 entity.Property(e => e.IsActive).HasDefaultValue(true);
                 entity.Property(e => e.CreatedAt).HasDefaultValueSql("NOW()");
                 entity.Property(e => e.UpdatedAt).HasDefaultValueSql("NOW()");
-                
+
                 entity.HasOne(c => c.Manager)
                     .WithMany()
                     .HasForeignKey(c => c.ManagerId)
                     .OnDelete(DeleteBehavior.SetNull);
-                    
+
                 entity.HasMany(c => c.WorkHours)
                     .WithOne(w => w.Clinic)
                     .HasForeignKey(w => w.ClinicId)
                     .OnDelete(DeleteBehavior.Cascade);
-                    
+
                 entity.HasMany(c => c.Addresses)
                     .WithOne(a => a.Clinic)
                     .HasForeignKey(a => a.ClinicId)
@@ -318,6 +319,23 @@ namespace HospitalSystem.Infrastructure.Data
                 entity.Property(e => e.Id).ValueGeneratedOnAdd();
             });
 
+            // ClinicManager Configuration
+            modelBuilder.Entity<ClinicManager>(entity =>
+            {
+                entity.HasKey(e => e.Id);
+                entity.Property(e => e.Id).ValueGeneratedOnAdd();
+
+                entity.HasOne(cm => cm.Clinic)
+                    .WithMany(c => c.ClinicManagers)
+                    .HasForeignKey(cm => cm.ClinicId)
+                    .OnDelete(DeleteBehavior.Cascade);
+
+                entity.HasOne(cm => cm.User)
+                    .WithMany()
+                    .HasForeignKey(cm => cm.UserId)
+                    .OnDelete(DeleteBehavior.Cascade);
+            });
+
             // ClinicService Configuration
             modelBuilder.Entity<ClinicService>(entity =>
             {
@@ -346,42 +364,42 @@ namespace HospitalSystem.Infrastructure.Data
                 entity.Property(e => e.AppointmentType)
                     .HasConversion<string>()
                     .HasMaxLength(50);
-                
+
                 entity.HasOne(sr => sr.Patient)
                     .WithMany(u => u.ServiceRequests)
                     .HasForeignKey(sr => sr.PatientId)
                     .OnDelete(DeleteBehavior.Cascade);
-                    
+
                 entity.HasOne(sr => sr.Clinic)
                     .WithMany()
                     .HasForeignKey(sr => sr.ClinicId)
                     .OnDelete(DeleteBehavior.SetNull);
-                    
+
                 entity.HasOne(sr => sr.Service)
                     .WithMany()
                     .HasForeignKey(sr => sr.ServiceId)
                     .OnDelete(DeleteBehavior.SetNull);
-                    
+
                 entity.HasOne(sr => sr.Insurance)
                     .WithMany()
                     .HasForeignKey(sr => sr.InsuranceId)
                     .OnDelete(DeleteBehavior.SetNull);
-                    
+
                 entity.HasOne(sr => sr.PerformedByUser)
                     .WithMany()
                     .HasForeignKey(sr => sr.PerformedByUserId)
                     .OnDelete(DeleteBehavior.SetNull);
-                    
+
                 entity.HasMany(sr => sr.ServiceResults)
                     .WithOne(sr => sr.Request)
                     .HasForeignKey(sr => sr.RequestId)
                     .OnDelete(DeleteBehavior.Cascade);
-                    
+
                 entity.HasMany(sr => sr.Payments)
                     .WithOne(p => p.Request)
                     .HasForeignKey(p => p.RequestId)
                     .OnDelete(DeleteBehavior.Cascade);
-                
+
                 // Indexes
                 entity.HasIndex(e => e.PatientId);
                 entity.HasIndex(e => e.Status);
@@ -423,7 +441,7 @@ namespace HospitalSystem.Infrastructure.Data
                 entity.Property(e => e.Type)
                     .HasConversion<string>()
                     .HasMaxLength(50);
-                    
+
                 entity.HasIndex(e => e.UserId);
                 entity.HasIndex(e => e.IsRead);
             });
@@ -436,7 +454,7 @@ namespace HospitalSystem.Infrastructure.Data
                 entity.Property(e => e.Action).HasMaxLength(100);
                 entity.Property(e => e.Entity).HasMaxLength(50);
                 entity.Property(e => e.CreatedAt).HasDefaultValueSql("NOW()");
-                
+
                 entity.HasIndex(e => e.UserId);
             });
 
