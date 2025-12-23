@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 import { Button } from '../../components/common/Button';
@@ -9,46 +9,81 @@ export const Login = () => {
     const [otpCode, setOtpCode] = useState('');
     const [isOtpSent, setIsOtpSent] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
+    const [isRequesting, setIsRequesting] = useState(false);
+    const [countdown, setCountdown] = useState(0);
     const [error, setError] = useState('');
     const { loginWithOtp, requestOtp } = useAuth();
     const navigate = useNavigate();
 
-    const handleOtpRequest = async (e: React.FormEvent) => {
-        e.preventDefault();
+    useEffect(() => {
+        if (isOtpSent && countdown > 0) {
+            const timer = setInterval(() => {
+                setCountdown((prev) => Math.max(prev - 1, 0));
+            }, 1000);
+            return () => clearInterval(timer);
+        }
+    }, [countdown, isOtpSent]);
 
+    const validatePhone = (): boolean => {
         if (!phone) {
-            setError('لطفا شماره موبایل را وارد کنید');
-            return;
+            setError('شماره موبایل الزامی است');
+            return false;
+        }
+        if (!/^09\d{9}$/.test(phone)) {
+            setError('شماره را با فرمت 09xxxxxxxxx وارد کنید');
+            return false;
+        }
+        setError('');
+        return true;
+    };
+
+    const handleOtpRequest = async (e?: React.FormEvent) => {
+        if (e) {
+            e.preventDefault();
         }
 
-        if (phone.length !== 11 || !phone.startsWith('09')) {
-            setError('شماره موبایل باید 11 رقم و با 09 شروع شود');
+        if (!validatePhone()) {
             return;
         }
 
         setError('');
-        setIsLoading(true);
+        setIsRequesting(true);
 
         try {
             await requestOtp(phone);
             setIsOtpSent(true);
+            setOtpCode('');
+            setCountdown(60);
         } catch (err: any) {
-            setError(err.response?.data?.message || 'خطا در ارسال کد. لطفا دوباره تلاش کنید.');
+            console.error('OTP request error:', err);
+            const errorMessage = err.response?.data?.message || err.message || 'خطا در ارسال کد';
+            setError(errorMessage);
         } finally {
-            setIsLoading(false);
+            setIsRequesting(false);
         }
     };
 
     const handleOtpLogin = async (e: React.FormEvent) => {
         e.preventDefault();
         setError('');
+
+        if (!phone) {
+            setError('شماره موبایل الزامی است');
+            return;
+        }
+
+        if (otpCode.length < 4) {
+            setError('کد تایید باید حداقل ۴ رقم باشد');
+            return;
+        }
+
         setIsLoading(true);
 
         try {
             await loginWithOtp(phone, otpCode);
             navigate('/patient/profile');
         } catch (err: any) {
-            setError(err.response?.data?.message || 'کد وارد شده صحیح نیست.');
+            setError(err.response?.data?.message || 'کد تایید نامعتبر است');
         } finally {
             setIsLoading(false);
         }
@@ -59,7 +94,7 @@ export const Login = () => {
             <div className="max-w-md w-full space-y-8">
                 <div className="text-center">
                     <h2 className="text-3xl font-bold text-gray-900">ورود به حساب کاربری</h2>
-                    <p className="mt-2 text-gray-600">به بیمارستان امام علی خوش آمدید</p>
+                    <p className="mt-2 text-gray-600">به درمانگاه امام علی خوش آمدید</p>
                 </div>
 
                 <div className="card">
@@ -80,8 +115,8 @@ export const Login = () => {
                                 required
                             />
 
-                            <Button type="submit" className="w-full" isLoading={isLoading}>
-                                ارسال کد یکبار مصرف
+                            <Button type="submit" className="w-full" isLoading={isRequesting}>
+                                {isRequesting ? 'در حال ارسال...' : 'ارسال کد یکبار مصرف'}
                             </Button>
                         </form>
                     ) : (
@@ -106,23 +141,35 @@ export const Login = () => {
                             </Button>
 
                             <div className="text-center space-y-2">
+                                <div className="flex items-center justify-between text-sm mb-2">
+                                    <button
+                                        type="button"
+                                        onClick={() => {
+                                            setIsOtpSent(false);
+                                            setOtpCode('');
+                                            setPhone('');
+                                            setCountdown(0);
+                                        }}
+                                        className="text-primary-600 hover:text-primary-700"
+                                    >
+                                        ← ویرایش شماره
+                                    </button>
+                                    <span className="text-gray-500">
+                                        {countdown > 0
+                                            ? `ارسال مجدد تا ${countdown} ثانیه`
+                                            : 'امکان ارسال مجدد'}
+                                    </span>
+                                </div>
                                 <button
                                     type="button"
-                                    onClick={handleOtpRequest}
-                                    className="text-primary-600 hover:text-primary-700 text-sm block"
+                                    onClick={() => handleOtpRequest()}
+                                    disabled={countdown > 0 || isRequesting}
+                                    className={`text-sm block w-full ${countdown > 0 || isRequesting
+                                            ? 'text-gray-400 cursor-not-allowed'
+                                            : 'text-primary-600 hover:text-primary-700'
+                                        }`}
                                 >
                                     ارسال مجدد کد
-                                </button>
-                                <button
-                                    type="button"
-                                    onClick={() => {
-                                        setIsOtpSent(false);
-                                        setOtpCode('');
-                                        setPhone('');
-                                    }}
-                                    className="text-gray-600 hover:text-gray-700 text-sm block"
-                                >
-                                    تغییر شماره موبایل
                                 </button>
                             </div>
                         </form>

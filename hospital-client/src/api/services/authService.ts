@@ -10,7 +10,8 @@ export interface RegisterRequest {
   nationalCode: string;
   firstName: string;
   lastName: string;
-  password: string;
+  password?: string;
+  confirmPassword?: string;
   dateOfBirth?: string;
   gender?: string;
 }
@@ -71,7 +72,8 @@ export const authService = {
 
   // Send OTP code to phone
   sendOtp: async (payload: SendOtpRequest): Promise<void> => {
-    await apiClient.post("/api/auth/send-otp", payload);
+    const response = await apiClient.post("/api/auth/send-otp", payload);
+    return response.data;
   },
 
   // Verify OTP code (without login)

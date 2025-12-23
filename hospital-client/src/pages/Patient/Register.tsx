@@ -1,8 +1,5 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import DatePicker from 'react-modern-calendar-datepicker';
-import type { DayValue } from 'react-modern-calendar-datepicker';
-import 'react-modern-calendar-datepicker/lib/DatePicker.css';
 import { useAuth } from '../../contexts/AuthContext';
 import { Button } from '../../components/common/Button';
 import { Input } from '../../components/common/Input';
@@ -13,14 +10,14 @@ export const Register = () => {
         nationalCode: '',
         firstName: '',
         lastName: '',
-        dateOfBirth: null as DayValue,
+        dateOfBirth: '',
         gender: '',
     });
     const [otpCode, setOtpCode] = useState('');
     const [step, setStep] = useState<'form' | 'otp'>('form');
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState('');
-    const { register, requestOtp, verifyOtp } = useAuth();
+    const { register, requestOtp, verifyOtp, loginWithOtp } = useAuth();
     const navigate = useNavigate();
 
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
@@ -58,10 +55,49 @@ export const Register = () => {
         setIsLoading(true);
 
         try {
+            // First, try to register the user with a temporary password
+            // This creates the user in database, then we can send OTP
+            // Generate a secure temporary password
+            const tempPassword = `Temp${Math.random().toString(36).slice(-8)}A1!`;
+            const registerData: any = {
+                phone: formData.phone,
+                nationalCode: formData.nationalCode,
+                firstName: formData.firstName,
+                lastName: formData.lastName,
+                password: tempPassword,
+                confirmPassword: tempPassword,
+                dateOfBirth: formData.dateOfBirth || undefined,
+                gender: formData.gender || undefined,
+            };
+
+            try {
+                // Try to register first (this creates the user)
+                await register(registerData);
+            } catch (regErr: any) {
+                // If user already exists, that's okay - we'll just send OTP
+                // Check for common "user exists" error codes
+                const errorMessage = regErr.response?.data?.message || '';
+                const isUserExistsError =
+                    regErr.response?.status === 409 ||
+                    regErr.response?.status === 400 ||
+                    errorMessage.includes('موجود') ||
+                    errorMessage.includes('exists') ||
+                    errorMessage.includes('قبلا');
+
+                if (!isUserExistsError) {
+                    // If it's a different error, throw it
+                    throw regErr;
+                }
+                // User might already exist, continue to send OTP
+            }
+
+            // Now send OTP (user exists now, either newly created or already existed)
             await requestOtp(formData.phone);
             setStep('otp');
         } catch (err: any) {
-            setError(err.response?.data?.message || 'خطا در ارسال کد. لطفا دوباره تلاش کنید.');
+            console.error('Registration/OTP error:', err);
+            const errorMessage = err.response?.data?.message || err.message || 'خطا در ثبت‌نام یا ارسال کد';
+            setError(errorMessage);
         } finally {
             setIsLoading(false);
         }
@@ -79,20 +115,15 @@ export const Register = () => {
         setIsLoading(true);
 
         try {
+            // Verify OTP first
             await verifyOtp(formData.phone, otpCode);
 
-            // After OTP verification, register the user
-            // Convert Persian date to ISO string if exists
-            const registerData: any = {
-                ...formData,
-                dateOfBirth: formData.dateOfBirth && typeof formData.dateOfBirth === 'object'
-                    ? `${formData.dateOfBirth.year}-${String(formData.dateOfBirth.month).padStart(2, '0')}-${String(formData.dateOfBirth.day).padStart(2, '0')}`
-                    : undefined,
-            };
-            await register(registerData);
+            // After OTP verification, login with OTP to get the token
+            await loginWithOtp(formData.phone, otpCode);
+
             navigate('/patient/profile');
         } catch (err: any) {
-            setError(err.response?.data?.message || 'کد وارد شده صحیح نیست یا خطا در ثبت‌نام.');
+            setError(err.response?.data?.message || 'کد وارد شده صحیح نیست.');
         } finally {
             setIsLoading(false);
         }
@@ -223,20 +254,13 @@ export const Register = () => {
                         </div>
 
                         <div className="grid grid-cols-2 gap-4">
-                            <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-2">
-                                    تاریخ تولد
-                                </label>
-                                <DatePicker
-                                    value={formData.dateOfBirth}
-                                    onChange={(date) => setFormData({ ...formData, dateOfBirth: date })}
-                                    inputPlaceholder="انتخاب تاریخ تولد"
-                                    shouldHighlightWeekends
-                                    locale="fa"
-                                    calendarClassName="responsive-calendar"
-                                    inputClassName="input-field"
-                                />
-                            </div>
+                            <Input
+                                label="تاریخ تولد (اختیاری)"
+                                type="date"
+                                name="dateOfBirth"
+                                value={formData.dateOfBirth}
+                                onChange={handleInputChange}
+                            />
 
                             <div>
                                 <label className="block text-sm font-medium text-gray-700 mb-2">
