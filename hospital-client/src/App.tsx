@@ -1,35 +1,91 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { AuthProvider, useAuth } from './contexts/AuthContext';
+import { Layout } from './components/layout/Layout';
+import { Loading } from './components/common/Loading';
 
-function App() {
-  const [count, setCount] = useState(0)
+// Pages
+import { Home } from './pages/Home';
+import { ServicesList } from './pages/Services/ServicesList';
+import { ServiceDetail } from './pages/Services/ServiceDetail';
+import { BookService } from './pages/Services/BookService';
+import { BookLab } from './pages/Laboratory/BookLab';
+import { TrackResult } from './pages/Laboratory/TrackResult';
+import { Login } from './pages/Patient/Login';
+import { Register } from './pages/Patient/Register';
+import { Profile } from './pages/Patient/Profile';
+import { Requests } from './pages/Patient/Requests';
+import { SelectClinic } from './pages/Clinics/SelectClinic';
 
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      refetchOnWindowFocus: false,
+      retry: 1,
+    },
+  },
+});
+
+// Protected Route Component
+const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
+  const { isAuthenticated, isLoading } = useAuth();
+
+  if (isLoading) {
+    return <Loading />;
+  }
+
+  if (!isAuthenticated) {
+    return <Navigate to="/patient/login" replace />;
+  }
+
+  return <>{children}</>;
+};
+
+function AppRoutes() {
   return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
+    <Layout>
+      <Routes>
+        <Route path="/" element={<Home />} />
+        <Route path="/services" element={<ServicesList />} />
+        <Route path="/services/:id" element={<ServiceDetail />} />
+        <Route path="/book/:serviceId" element={<BookService />} />
+        <Route path="/laboratory" element={<BookLab />} />
+        <Route path="/laboratory/track" element={<TrackResult />} />
+        <Route path="/patient/login" element={<Login />} />
+        <Route path="/patient/register" element={<Register />} />
+        <Route
+          path="/patient/profile"
+          element={
+            <ProtectedRoute>
+              <Profile />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/patient/requests"
+          element={
+            <ProtectedRoute>
+              <Requests />
+            </ProtectedRoute>
+          }
+        />
+        <Route path="/clinics/select" element={<SelectClinic />} />
+        <Route path="*" element={<Navigate to="/" replace />} />
+      </Routes>
+    </Layout>
+  );
 }
 
-export default App
+function App() {
+  return (
+    <QueryClientProvider client={queryClient}>
+      <BrowserRouter>
+        <AuthProvider>
+          <AppRoutes />
+        </AuthProvider>
+      </BrowserRouter>
+    </QueryClientProvider>
+  );
+}
+
+export default App;
