@@ -51,9 +51,9 @@ export const Home = () => {
       <section className="bg-gradient-to-l from-primary-600 to-primary-800 text-white py-20">
         <div className="container mx-auto px-4">
           <div className="text-center">
-            <h1 className="text-5xl font-bold mb-6">به بیمارستان امام علی خوش آمدید</h1>
+            <h1 className="text-5xl font-bold mb-6">به درمانگاه امام علی خوش آمدید</h1>
             <p className="text-xl mb-8 text-primary-100">
-              ارائه خدمات درمانی با کیفیت و استانداردهای بین‌المللی
+              درمانگاه شبانه‌روزی امام علی (ع) دزفول - ارائه خدمات جامع سلامت
             </p>
             <div className="flex gap-4 justify-center">
               <Link to="/services">
@@ -105,11 +105,12 @@ export const Home = () => {
       <section className="py-16 bg-white">
         <div className="container mx-auto px-4">
           <div className="max-w-3xl mx-auto text-center">
-            <h2 className="text-3xl font-bold mb-6 text-gray-800">درباره بیمارستان امام علی</h2>
+            <h2 className="text-3xl font-bold mb-6 text-gray-800">درباره درمانگاه امام علی</h2>
             <p className="text-lg text-gray-600 leading-relaxed">
-              بیمارستان امام علی با بیش از 20 سال سابقه در ارائه خدمات درمانی، یکی از معتبرترین
-              مراکز درمانی کشور است. ما با بهره‌گیری از کادر مجرب و تجهیزات پیشرفته، بهترین
-              خدمات را به بیماران ارائه می‌دهیم.
+              درمانگاه امام علی (ع) دزفول از سال ۱۳۸۵ با هدف ارائه خدمات جامع سلامت فعالیت خود را آغاز کرد. این مرکز با برخورداری از تیمی چندتخصصی، خدمات متنوعی از جمله اورژانس، آزمایشگاه، رادیولوژی و سونوگرافی، دندانپزشکی، پوست و مو، طب کار و کلینیک‌های تخصصی را به‌صورت شبانه‌روزی ارائه می‌دهد.
+            </p>
+            <p className="text-lg text-gray-600 leading-relaxed mt-4">
+              تعهد به کیفیت، احترام به بیماران و همکاری با اکثر بیمه‌های درمانی، درمانگاه امام علی (ع) را به یکی از مراکز معتبر و قابل اعتماد منطقه تبدیل کرده است.
             </p>
           </div>
         </div>

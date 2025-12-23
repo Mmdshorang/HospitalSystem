@@ -19,8 +19,8 @@ export const Header = () => {
               <span className="text-white text-xl font-bold">ع</span>
             </div>
             <div>
-              <h1 className="text-2xl font-bold text-gray-800">بیمارستان امام علی</h1>
-              <p className="text-sm text-gray-600">سیستم مدیریت خدمات درمانی</p>
+              <h1 className="text-2xl font-bold text-gray-800">درمانگاه امام علی</h1>
+              <p className="text-sm text-gray-600">شبانه‌روزی دزفول</p>
             </div>
           </Link>
 

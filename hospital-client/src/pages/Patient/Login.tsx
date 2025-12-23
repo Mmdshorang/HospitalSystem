@@ -6,32 +6,23 @@ import { Input } from '../../components/common/Input';
 
 export const Login = () => {
     const [phone, setPhone] = useState('');
-    const [password, setPassword] = useState('');
     const [otpCode, setOtpCode] = useState('');
-    const [isOtpMode, setIsOtpMode] = useState(false);
+    const [isOtpSent, setIsOtpSent] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState('');
-    const { login, loginWithOtp, requestOtp } = useAuth();
+    const { loginWithOtp, requestOtp } = useAuth();
     const navigate = useNavigate();
 
-    const handleLogin = async (e: React.FormEvent) => {
+    const handleOtpRequest = async (e: React.FormEvent) => {
         e.preventDefault();
-        setError('');
-        setIsLoading(true);
 
-        try {
-            await login(phone, password);
-            navigate('/patient/profile');
-        } catch (err: any) {
-            setError(err.response?.data?.message || 'خطا در ورود. لطفا دوباره تلاش کنید.');
-        } finally {
-            setIsLoading(false);
-        }
-    };
-
-    const handleOtpRequest = async () => {
         if (!phone) {
             setError('لطفا شماره موبایل را وارد کنید');
+            return;
+        }
+
+        if (phone.length !== 11 || !phone.startsWith('09')) {
+            setError('شماره موبایل باید 11 رقم و با 09 شروع شود');
             return;
         }
 
@@ -40,7 +31,7 @@ export const Login = () => {
 
         try {
             await requestOtp(phone);
-            setIsOtpMode(true);
+            setIsOtpSent(true);
         } catch (err: any) {
             setError(err.response?.data?.message || 'خطا در ارسال کد. لطفا دوباره تلاش کنید.');
         } finally {
@@ -78,8 +69,8 @@ export const Login = () => {
                         </div>
                     )}
 
-                    {!isOtpMode ? (
-                        <form onSubmit={handleLogin} className="space-y-6">
+                    {!isOtpSent ? (
+                        <form onSubmit={handleOtpRequest} className="space-y-6">
                             <Input
                                 label="شماره موبایل"
                                 type="tel"
@@ -89,28 +80,9 @@ export const Login = () => {
                                 required
                             />
 
-                            <Input
-                                label="رمز عبور"
-                                type="password"
-                                value={password}
-                                onChange={(e) => setPassword(e.target.value)}
-                                placeholder="رمز عبور خود را وارد کنید"
-                                required
-                            />
-
                             <Button type="submit" className="w-full" isLoading={isLoading}>
-                                ورود
+                                ارسال کد یکبار مصرف
                             </Button>
-
-                            <div className="text-center">
-                                <button
-                                    type="button"
-                                    onClick={handleOtpRequest}
-                                    className="text-primary-600 hover:text-primary-700 text-sm"
-                                >
-                                    ورود با کد یکبار مصرف
-                                </button>
-                            </div>
                         </form>
                     ) : (
                         <form onSubmit={handleOtpLogin} className="space-y-6">
@@ -123,7 +95,7 @@ export const Login = () => {
                                     type="text"
                                     value={otpCode}
                                     onChange={(e) => setOtpCode(e.target.value)}
-                                    placeholder="کد را وارد کنید"
+                                    placeholder="کد 6 رقمی را وارد کنید"
                                     required
                                     maxLength={6}
                                 />
@@ -144,12 +116,13 @@ export const Login = () => {
                                 <button
                                     type="button"
                                     onClick={() => {
-                                        setIsOtpMode(false);
+                                        setIsOtpSent(false);
                                         setOtpCode('');
+                                        setPhone('');
                                     }}
                                     className="text-gray-600 hover:text-gray-700 text-sm block"
                                 >
-                                    بازگشت به ورود با رمز عبور
+                                    تغییر شماره موبایل
                                 </button>
                             </div>
                         </form>

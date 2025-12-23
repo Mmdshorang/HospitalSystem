@@ -1,5 +1,8 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import DatePicker from 'react-modern-calendar-datepicker';
+import type { DayValue } from 'react-modern-calendar-datepicker';
+import 'react-modern-calendar-datepicker/lib/DatePicker.css';
 import { useAuth } from '../../contexts/AuthContext';
 import { Button } from '../../components/common/Button';
 import { Input } from '../../components/common/Input';
@@ -10,9 +13,7 @@ export const Register = () => {
         nationalCode: '',
         firstName: '',
         lastName: '',
-        password: '',
-        confirmPassword: '',
-        dateOfBirth: '',
+        dateOfBirth: null as DayValue,
         gender: '',
     });
     const [otpCode, setOtpCode] = useState('');
@@ -40,16 +41,6 @@ export const Register = () => {
 
         if (formData.nationalCode.length !== 10) {
             setError('کد ملی باید 10 رقم باشد');
-            return false;
-        }
-
-        if (formData.password.length < 6) {
-            setError('رمز عبور باید حداقل 6 کاراکتر باشد');
-            return false;
-        }
-
-        if (formData.password !== formData.confirmPassword) {
-            setError('رمز عبور و تایید رمز عبور مطابقت ندارند');
             return false;
         }
 
@@ -91,7 +82,13 @@ export const Register = () => {
             await verifyOtp(formData.phone, otpCode);
 
             // After OTP verification, register the user
-            const { confirmPassword, ...registerData } = formData;
+            // Convert Persian date to ISO string if exists
+            const registerData: any = {
+                ...formData,
+                dateOfBirth: formData.dateOfBirth && typeof formData.dateOfBirth === 'object'
+                    ? `${formData.dateOfBirth.year}-${String(formData.dateOfBirth.month).padStart(2, '0')}-${String(formData.dateOfBirth.day).padStart(2, '0')}`
+                    : undefined,
+            };
             await register(registerData);
             navigate('/patient/profile');
         } catch (err: any) {
@@ -225,37 +222,19 @@ export const Register = () => {
                             />
                         </div>
 
-                        <Input
-                            label="رمز عبور *"
-                            type="password"
-                            name="password"
-                            value={formData.password}
-                            onChange={handleInputChange}
-                            placeholder="حداقل 6 کاراکتر"
-                            required
-                        />
-
-                        <Input
-                            label="تایید رمز عبور *"
-                            type="password"
-                            name="confirmPassword"
-                            value={formData.confirmPassword}
-                            onChange={handleInputChange}
-                            placeholder="رمز عبور را دوباره وارد کنید"
-                            required
-                        />
-
                         <div className="grid grid-cols-2 gap-4">
                             <div>
                                 <label className="block text-sm font-medium text-gray-700 mb-2">
                                     تاریخ تولد
                                 </label>
-                                <input
-                                    type="date"
-                                    name="dateOfBirth"
+                                <DatePicker
                                     value={formData.dateOfBirth}
-                                    onChange={handleInputChange}
-                                    className="input-field"
+                                    onChange={(date) => setFormData({ ...formData, dateOfBirth: date })}
+                                    inputPlaceholder="انتخاب تاریخ تولد"
+                                    shouldHighlightWeekends
+                                    locale="fa"
+                                    calendarClassName="responsive-calendar"
+                                    inputClassName="input-field"
                                 />
                             </div>
 
