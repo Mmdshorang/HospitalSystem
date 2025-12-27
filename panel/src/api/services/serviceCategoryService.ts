@@ -25,21 +25,21 @@ export const serviceCategoryService = {
     if (searchTerm) params.append("searchTerm", searchTerm);
 
     const { data } = await apiClient.get<ServiceCategory[]>(
-      `/api/service-categories?${params.toString()}`
+      `/service-categories?${params.toString()}`
     );
     return data;
   },
 
   async getById(id: number): Promise<ServiceCategory> {
     const { data } = await apiClient.get<ServiceCategory>(
-      `/api/service-categories/${id}`
+      `/service-categories/${id}`
     );
     return data;
   },
 
   async create(payload: CreateServiceCategoryDto): Promise<ServiceCategory> {
     const { data } = await apiClient.post<ServiceCategory>(
-      "/api/service-categories",
+      "/service-categories",
       payload
     );
     return data;
@@ -50,13 +50,13 @@ export const serviceCategoryService = {
     payload: UpdateServiceCategoryDto
   ): Promise<ServiceCategory> {
     const { data } = await apiClient.put<ServiceCategory>(
-      `/api/service-categories/${id}`,
+      `/service-categories/${id}`,
       payload
     );
     return data;
   },
 
   async remove(id: number): Promise<void> {
-    await apiClient.delete(`/api/service-categories/${id}`);
+    await apiClient.delete(`/service-categories/${id}`);
   },
 };

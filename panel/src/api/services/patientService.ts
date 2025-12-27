@@ -17,7 +17,7 @@ export interface PatientListItem {
 export const patientService = {
   // Get all patients
   getAll: async (): Promise<PatientListItem[]> => {
-    const response = await apiClient.get<any[]>("/api/patients");
+    const response = await apiClient.get<any[]>("/patients");
     return (response.data || []).map((p: any) => ({
       id: p.id || Number(p.id),
       firstName: p.firstName || "",
@@ -34,17 +34,17 @@ export const patientService = {
 
   // Create new patient
   create: async (patient: CreatePatient): Promise<Patient> => {
-    const response = await apiClient.post<Patient>("/api/patients", patient);
+    const response = await apiClient.post<Patient>("/patients", patient);
     return response.data;
   },
 
   // Update patient
   update: async (id: string, patient: UpdatePatient): Promise<void> => {
-    await apiClient.put(`/api/patients/${id}`, patient);
+    await apiClient.put(`/patients/${id}`, patient);
   },
 
   // Delete patient
   delete: async (id: string): Promise<void> => {
-    await apiClient.delete(`/api/patients/${id}`);
+    await apiClient.delete(`/patients/${id}`);
   },
 };

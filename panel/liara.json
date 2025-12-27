@@ -4,8 +4,11 @@
   "build": {
     "location": "iran",
     "args": {
-      "VITE_API_BASE_URL": "https://hospital-system-backend.liara.run"
+      "VITE_API_BASE_URL": "https://hospital-system-backend.liara.run/api"
     }
   },
-  "disks": []
+  "disks": [],
+  "env": {
+    "VITE_API_BASE_URL": "https://hospital-system-backend.liara.run/api"
+  }
 }

@@ -55,30 +55,27 @@ export const serviceService = {
     if (categoryId) params.append("categoryId", categoryId.toString());
 
     const { data } = await apiClient.get<Service[]>(
-      `/api/services?${params.toString()}`
+      `/services?${params.toString()}`
     );
     return data;
   },
 
   async getById(id: number): Promise<Service> {
-    const { data } = await apiClient.get<Service>(`/api/services/${id}`);
+    const { data } = await apiClient.get<Service>(`/services/${id}`);
     return data;
   },
 
   async create(payload: CreateServiceDto): Promise<Service> {
-    const { data } = await apiClient.post<Service>("/api/services", payload);
+    const { data } = await apiClient.post<Service>("/services", payload);
     return data;
   },
 
   async update(id: number, payload: UpdateServiceDto): Promise<Service> {
-    const { data } = await apiClient.put<Service>(
-      `/api/services/${id}`,
-      payload
-    );
+    const { data } = await apiClient.put<Service>(`/services/${id}`, payload);
     return data;
   },
 
   async remove(id: number): Promise<void> {
-    await apiClient.delete(`/api/services/${id}`);
+    await apiClient.delete(`/services/${id}`);
   },
 };

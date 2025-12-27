@@ -17,13 +17,13 @@ export const insuranceService = {
     if (isActive !== undefined) params.append("isActive", isActive.toString());
 
     const { data } = await apiClient.get<Insurance[]>(
-      `/api/insurances?${params.toString()}`
+      `/insurances?${params.toString()}`
     );
     return data;
   },
 
   async getById(id: number): Promise<Insurance> {
-    const { data } = await apiClient.get<Insurance>(`/api/insurances/${id}`);
+    const { data } = await apiClient.get<Insurance>(`/insurances/${id}`);
     return data;
   },
 };

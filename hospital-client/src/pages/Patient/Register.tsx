@@ -107,8 +107,8 @@ export const Register = () => {
         e.preventDefault();
         setError('');
 
-        if (!otpCode || otpCode.length !== 6) {
-            setError('لطفا کد 6 رقمی را وارد کنید');
+        if (!otpCode || otpCode.length !== 4) {
+            setError('لطفا کد 4 رقمی را وارد کنید');
             return;
         }
 
@@ -153,9 +153,9 @@ export const Register = () => {
                                 type="text"
                                 value={otpCode}
                                 onChange={(e) => setOtpCode(e.target.value)}
-                                placeholder="کد 6 رقمی را وارد کنید"
+                                placeholder="کد 4 رقمی را وارد کنید"
                                 required
-                                maxLength={6}
+                                maxLength={4}
                             />
 
                             <Button type="submit" className="w-full" isLoading={isLoading}>

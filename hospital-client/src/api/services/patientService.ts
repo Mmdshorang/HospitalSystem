@@ -28,7 +28,7 @@ export const patientService = {
   async getProfile(userId: number): Promise<PatientProfile | null> {
     try {
       const { data } = await apiClient.get<PatientProfile>(
-        `/api/patients/${userId}/profile`
+        `/patients/${userId}/profile`
       );
       return data;
     } catch {
@@ -41,7 +41,7 @@ export const patientService = {
     payload: UpdatePatientProfileDto
   ): Promise<PatientProfile> {
     const { data } = await apiClient.put<PatientProfile>(
-      `/api/patients/${userId}/profile`,
+      `/patients/${userId}/profile`,
       payload
     );
     return data;

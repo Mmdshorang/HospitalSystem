@@ -49,7 +49,7 @@ export interface CreateServiceRequestDto {
 export const serviceRequestService = {
   async create(payload: CreateServiceRequestDto): Promise<ServiceRequest> {
     const { data } = await apiClient.post<ServiceRequest>(
-      "/api/service-requests",
+      "/service-requests",
       payload
     );
     return data;
@@ -57,21 +57,21 @@ export const serviceRequestService = {
 
   async getByTrackingCode(trackingCode: string): Promise<ServiceRequest> {
     const { data } = await apiClient.get<ServiceRequest>(
-      `/api/service-requests/track/${trackingCode}`
+      `/service-requests/track/${trackingCode}`
     );
     return data;
   },
 
   async getByPatientId(patientId: number): Promise<ServiceRequest[]> {
     const { data } = await apiClient.get<ServiceRequest[]>(
-      `/api/service-requests/patient/${patientId}`
+      `/service-requests/patient/${patientId}`
     );
     return data;
   },
 
   async getById(id: number): Promise<ServiceRequest> {
     const { data } = await apiClient.get<ServiceRequest>(
-      `/api/service-requests/${id}`
+      `/service-requests/${id}`
     );
     return data;
   },

@@ -109,21 +109,21 @@ export const serviceRequestService = {
     params.append("sortDirection", sortDirection);
 
     const { data } = await apiClient.get<PagedResult<ServiceRequest>>(
-      `/api/service-requests?${params.toString()}`
+      `/service-requests?${params.toString()}`
     );
     return data;
   },
 
   async getById(id: number): Promise<ServiceRequest> {
     const { data } = await apiClient.get<ServiceRequest>(
-      `/api/service-requests/${id}`
+      `/service-requests/${id}`
     );
     return data;
   },
 
   async create(payload: CreateServiceRequestDto): Promise<ServiceRequest> {
     const { data } = await apiClient.post<ServiceRequest>(
-      "/api/service-requests",
+      "/service-requests",
       payload
     );
     return data;
@@ -134,14 +134,14 @@ export const serviceRequestService = {
     payload: UpdateServiceRequestDto
   ): Promise<ServiceRequest> {
     const { data } = await apiClient.put<ServiceRequest>(
-      `/api/service-requests/${id}`,
+      `/service-requests/${id}`,
       payload
     );
     return data;
   },
 
   async remove(id: number): Promise<void> {
-    await apiClient.delete(`/api/service-requests/${id}`);
+    await apiClient.delete(`/service-requests/${id}`);
   },
 
   async changeStatus(
@@ -149,7 +149,7 @@ export const serviceRequestService = {
     payload: ChangeStatusDto
   ): Promise<ServiceRequest> {
     const { data } = await apiClient.patch<ServiceRequest>(
-      `/api/service-requests/${id}/status`,
+      `/service-requests/${id}/status`,
       payload
     );
     return data;
@@ -160,7 +160,7 @@ export const serviceRequestService = {
     payload: AssignPerformerDto
   ): Promise<ServiceRequest> {
     const { data } = await apiClient.post<ServiceRequest>(
-      `/api/service-requests/${id}/performer`,
+      `/service-requests/${id}/performer`,
       payload
     );
     return data;
@@ -168,7 +168,7 @@ export const serviceRequestService = {
 
   async getHistory(id: number): Promise<ServiceRequestHistory[]> {
     const { data } = await apiClient.get<ServiceRequestHistory[]>(
-      `/api/service-requests/${id}/history`
+      `/service-requests/${id}/history`
     );
     return data;
   },

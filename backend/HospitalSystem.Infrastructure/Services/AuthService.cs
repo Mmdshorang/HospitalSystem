@@ -193,8 +193,16 @@ public class AuthService : IAuthService
         try
         {
             var tokenHandler = new JwtSecurityTokenHandler();
-            var jwtSettings = _configuration.GetSection("JwtSettings");
-            var secretKey = jwtSettings["SecretKey"] ?? "YourSuperSecretKeyThatIsAtLeast32CharactersLong!";
+            // Priority: Environment variables > appsettings
+            var secretKey = Environment.GetEnvironmentVariable("JWT_SECRET") 
+                ?? _configuration["JwtSettings:SecretKey"] 
+                ?? "YourSuperSecretKeyThatIsAtLeast32CharactersLong!";
+            var issuer = Environment.GetEnvironmentVariable("JWT_ISSUER") 
+                ?? _configuration["JwtSettings:Issuer"] 
+                ?? "HospitalSystem";
+            var audience = Environment.GetEnvironmentVariable("JWT_AUDIENCE") 
+                ?? _configuration["JwtSettings:Audience"] 
+                ?? "HospitalSystemUsers";
             var key = Encoding.UTF8.GetBytes(secretKey);
 
             tokenHandler.ValidateToken(token, new TokenValidationParameters
@@ -202,9 +210,9 @@ public class AuthService : IAuthService
                 ValidateIssuerSigningKey = true,
                 IssuerSigningKey = new SymmetricSecurityKey(key),
                 ValidateIssuer = true,
-                ValidIssuer = jwtSettings["Issuer"] ?? "HospitalSystem",
+                ValidIssuer = issuer,
                 ValidateAudience = true,
-                ValidAudience = jwtSettings["Audience"] ?? "HospitalSystemUsers",
+                ValidAudience = audience,
                 ValidateLifetime = true,
                 ClockSkew = TimeSpan.Zero
             }, out SecurityToken validatedToken);
@@ -368,10 +376,22 @@ public class AuthService : IAuthService
 
     private string GenerateJwtToken(User user)
     {
-        var jwtSettings = _configuration.GetSection("JwtSettings");
-        var secretKey = jwtSettings["SecretKey"] ?? "YourSuperSecretKeyThatIsAtLeast32CharactersLong!";
-        var issuer = jwtSettings["Issuer"] ?? "HospitalSystem";
-        var audience = jwtSettings["Audience"] ?? "HospitalSystemUsers";
+        // Priority: Environment variables > appsettings
+        var secretKey = Environment.GetEnvironmentVariable("JWT_SECRET") 
+            ?? _configuration["JwtSettings:SecretKey"] 
+            ?? "YourSuperSecretKeyThatIsAtLeast32CharactersLong!";
+        var issuer = Environment.GetEnvironmentVariable("JWT_ISSUER") 
+            ?? _configuration["JwtSettings:Issuer"] 
+            ?? "HospitalSystem";
+        var audience = Environment.GetEnvironmentVariable("JWT_AUDIENCE") 
+            ?? _configuration["JwtSettings:Audience"] 
+            ?? "HospitalSystemUsers";
+        
+        var expireMinutes = int.TryParse(Environment.GetEnvironmentVariable("JWT_EXPIRE_MINUTES"), out var expMin) 
+            ? expMin 
+            : int.TryParse(_configuration["JwtSettings:ExpiryInMinutes"], out var configExpMin) 
+                ? configExpMin 
+                : 60;
 
         var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secretKey));
         var credentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
@@ -381,14 +401,14 @@ public class AuthService : IAuthService
             new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
             new Claim(ClaimTypes.MobilePhone, user.Phone ?? string.Empty),
             new Claim(ClaimTypes.Role, user.Role.ToString()),
-            new Claim("exp", DateTimeOffset.UtcNow.AddMinutes(60).ToUnixTimeSeconds().ToString(), ClaimValueTypes.Integer64)
+            new Claim("exp", DateTimeOffset.UtcNow.AddMinutes(expireMinutes).ToUnixTimeSeconds().ToString(), ClaimValueTypes.Integer64)
         };
 
         var token = new JwtSecurityToken(
             issuer: issuer,
             audience: audience,
             claims: claims,
-            expires: DateTime.UtcNow.AddMinutes(60),
+            expires: DateTime.UtcNow.AddMinutes(expireMinutes),
             signingCredentials: credentials
         );
 

@@ -22,7 +22,7 @@ export interface CreateClinicServiceDto {
 export const clinicServiceService = {
   async getClinicServices(clinicId: number): Promise<ClinicService[]> {
     const { data } = await apiClient.get<ClinicService[]>(
-      `/api/clinics/${clinicId}/services`
+      `/clinics/${clinicId}/services`
     );
     return data;
   },
@@ -32,7 +32,7 @@ export const clinicServiceService = {
     payload: CreateClinicServiceDto
   ): Promise<ClinicService> {
     const { data } = await apiClient.post<ClinicService>(
-      `/api/clinics/${clinicId}/services`,
+      `/clinics/${clinicId}/services`,
       payload
     );
     return data;
@@ -44,7 +44,7 @@ export const clinicServiceService = {
     payload: CreateClinicServiceDto
   ): Promise<ClinicService> {
     const { data } = await apiClient.put<ClinicService>(
-      `/api/clinics/${clinicId}/services/${serviceId}`,
+      `/clinics/${clinicId}/services/${serviceId}`,
       payload
     );
     return data;
@@ -54,6 +54,6 @@ export const clinicServiceService = {
     clinicId: number,
     serviceId: number
   ): Promise<void> {
-    await apiClient.delete(`/api/clinics/${clinicId}/services/${serviceId}`);
+    await apiClient.delete(`/clinics/${clinicId}/services/${serviceId}`);
   },
 };

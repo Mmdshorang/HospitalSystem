@@ -30,30 +30,30 @@ export const specialtyService = {
     if (searchTerm) params.append('searchTerm', searchTerm);
     if (categoryId) params.append('categoryId', categoryId.toString());
 
-    const response = await apiClient.get(`/api/specialties?${params.toString()}`);
+    const response = await apiClient.get(`/specialties?${params.toString()}`);
     return response.data;
   },
 
   // Get specialty by ID
   getById: async (id: number): Promise<Specialty> => {
-    const response = await apiClient.get(`/api/specialties/${id}`);
+    const response = await apiClient.get(`/specialties/${id}`);
     return response.data;
   },
 
   // Create new specialty
   create: async (data: CreateSpecialtyDto): Promise<Specialty> => {
-    const response = await apiClient.post('/api/specialties', data);
+    const response = await apiClient.post('/specialties', data);
     return response.data;
   },
 
   // Update existing specialty
   update: async (id: number, data: UpdateSpecialtyDto): Promise<Specialty> => {
-    const response = await apiClient.put(`/api/specialties/${id}`, { ...data, id });
+    const response = await apiClient.put(`/specialties/${id}`, { ...data, id });
     return response.data;
   },
 
   // Delete specialty
   delete: async (id: number): Promise<void> => {
-    await apiClient.delete(`/api/specialties/${id}`);
+    await apiClient.delete(`/specialties/${id}`);
   },
 };
