@@ -13,6 +13,39 @@ using HospitalSystem.Domain.Entities.Enums;
 using HospitalSystem.Domain.Common.Interfaces;
 using Npgsql;
 using Microsoft.AspNetCore.DataProtection;
+using DotNetEnv;
+
+// Load .env file if it exists (for local development)
+// Try multiple paths: current directory, parent directory (backend folder), and project root
+var possiblePaths = new[]
+{
+    Path.Combine(Directory.GetCurrentDirectory(), ".env"),
+    Path.Combine(Directory.GetCurrentDirectory(), "..", ".env"),
+    Path.Combine(Directory.GetCurrentDirectory(), "..", "..", ".env"),
+    Path.Combine(AppContext.BaseDirectory, ".env"),
+    Path.Combine(AppContext.BaseDirectory, "..", ".env")
+};
+
+string? envPath = null;
+foreach (var path in possiblePaths)
+{
+    var fullPath = Path.GetFullPath(path);
+    if (File.Exists(fullPath))
+    {
+        envPath = fullPath;
+        break;
+    }
+}
+
+if (envPath != null)
+{
+    Env.Load(envPath);
+    Console.WriteLine($"[INFO] Loaded environment variables from: {envPath}");
+}
+else
+{
+    Console.WriteLine("[WARN] .env file not found. Using system environment variables and appsettings.json");
+}
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -25,6 +58,7 @@ builder.Services.AddControllers()
     {
         options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore;
         options.SerializerSettings.Converters.Add(new Newtonsoft.Json.Converters.StringEnumConverter());
+        options.SerializerSettings.ContractResolver = new Newtonsoft.Json.Serialization.CamelCasePropertyNamesContractResolver();
     });
 
 builder.Services.AddEndpointsApiExplorer();
@@ -80,12 +114,61 @@ builder.Services.AddSwaggerGen(c =>
 // Database Configuration
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
 {
-    // Get connection string from configuration (appsettings.json or environment variables)
-    // Falls back to localhost for development if not found in configuration
-    string connectionString = builder.Configuration.GetConnectionString("DefaultConnection") 
-        ?? (builder.Environment.IsDevelopment() 
-            ? "Host=localhost;Port=5432;Database=hospital-system;Username=postgres;Password=postgres;"
-            : throw new InvalidOperationException("Connection string 'DefaultConnection' must be configured in appsettings.json or environment variables"));
+    // Priority: Environment variables > appsettings.{Environment}.json > appsettings.json
+    string connectionString = null;
+    
+    // Try to build connection string from individual environment variables first
+    var dbHost = Environment.GetEnvironmentVariable("DB_HOST");
+    var dbPort = Environment.GetEnvironmentVariable("DB_PORT");
+    var dbName = Environment.GetEnvironmentVariable("DB_NAME");
+    var dbUser = Environment.GetEnvironmentVariable("DB_USER");
+    var dbPassword = Environment.GetEnvironmentVariable("DB_PASSWORD");
+    
+    if (!string.IsNullOrEmpty(dbHost) && !string.IsNullOrEmpty(dbName) && !string.IsNullOrEmpty(dbUser))
+    {
+        connectionString = $"Host={dbHost};Port={dbPort ?? "5432"};Database={dbName};Username={dbUser};Password={dbPassword ?? ""};";
+    }
+    // Try DATABASE_URL environment variable
+    else if (!string.IsNullOrEmpty(Environment.GetEnvironmentVariable("DATABASE_URL")))
+    {
+        var databaseUrl = Environment.GetEnvironmentVariable("DATABASE_URL");
+        // Parse PostgreSQL connection string from URL format
+        if (databaseUrl.StartsWith("postgresql://"))
+        {
+            var uri = new Uri(databaseUrl);
+            var userInfo = uri.UserInfo.Split(':');
+            var username = userInfo[0];
+            var password = userInfo.Length > 1 ? userInfo[1] : "";
+            connectionString = $"Host={uri.Host};Port={uri.Port};Database={uri.LocalPath.TrimStart('/')};Username={username};Password={password};";
+        }
+        else
+        {
+            connectionString = databaseUrl;
+        }
+    }
+    // Try ConnectionStrings__DefaultConnection (ASP.NET Core environment variable format)
+    else if (!string.IsNullOrEmpty(Environment.GetEnvironmentVariable("ConnectionStrings__DefaultConnection")))
+    {
+        connectionString = Environment.GetEnvironmentVariable("ConnectionStrings__DefaultConnection");
+    }
+    // Try from configuration (appsettings.json)
+    else
+    {
+        connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+    }
+    
+    // Fallback to localhost for development if not found
+    if (string.IsNullOrEmpty(connectionString))
+    {
+        if (builder.Environment.IsDevelopment())
+        {
+            connectionString = "Host=localhost;Port=5432;Database=hospital-system;Username=postgres;Password=postgres;";
+        }
+        else
+        {
+            throw new InvalidOperationException("Connection string 'DefaultConnection' must be configured in environment variables or appsettings.json");
+        }
+    }
     
     Log.Information("Using PostgreSQL connection from configuration: {ConnectionString}", 
         connectionString.Replace("Password=", "Password=***"));
@@ -199,7 +282,9 @@ builder.Services.AddHealthChecks()
 builder.Services.AddMemoryCache();
 
 // Distributed Cache - Redis if available, otherwise use MemoryDistributedCache
-var redisConnectionString = builder.Configuration.GetConnectionString("Redis");
+// Priority: Environment variables > appsettings
+var redisConnectionString = Environment.GetEnvironmentVariable("REDIS_CONNECTION_STRING") 
+    ?? builder.Configuration.GetConnectionString("Redis");
 if (!string.IsNullOrEmpty(redisConnectionString) && redisConnectionString != "localhost:6379")
 {
     builder.Services.AddStackExchangeRedisCache(options =>
@@ -219,23 +304,50 @@ builder.Services.AddResponseCompression(options =>
     options.EnableForHttps = true;
 });
 
-// CORS - Allow all origins for flexibility
+// CORS - Configure from environment variables or allow all origins
+var corsOrigins = Environment.GetEnvironmentVariable("CORS_ORIGINS");
 builder.Services.AddCors(options =>
 {
     options.AddDefaultPolicy(policy =>
     {
-        policy.AllowAnyOrigin()
-              .AllowAnyHeader()
-              .AllowAnyMethod()
-              .WithExposedHeaders("*");
+        if (!string.IsNullOrEmpty(corsOrigins) && corsOrigins != "*")
+        {
+            // Use specific origins from environment variable (comma-separated)
+            var origins = corsOrigins.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+            policy.WithOrigins(origins)
+                  .AllowAnyHeader()
+                  .AllowAnyMethod()
+                  .AllowCredentials()
+                  .WithExposedHeaders("*");
+        }
+        else
+        {
+            // Allow all origins (for development or when CORS_ORIGINS is "*")
+            policy.AllowAnyOrigin()
+                  .AllowAnyHeader()
+                  .AllowAnyMethod()
+                  .WithExposedHeaders("*");
+        }
     });
     
     options.AddPolicy("AllowFrontend", policy =>
     {
-        policy.AllowAnyOrigin()
-              .AllowAnyHeader()
-              .AllowAnyMethod()
-              .WithExposedHeaders("*");
+        if (!string.IsNullOrEmpty(corsOrigins) && corsOrigins != "*")
+        {
+            var origins = corsOrigins.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+            policy.WithOrigins(origins)
+                  .AllowAnyHeader()
+                  .AllowAnyMethod()
+                  .AllowCredentials()
+                  .WithExposedHeaders("*");
+        }
+        else
+        {
+            policy.AllowAnyOrigin()
+                  .AllowAnyHeader()
+                  .AllowAnyMethod()
+                  .WithExposedHeaders("*");
+        }
     });
 });
 

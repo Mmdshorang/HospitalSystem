@@ -34,19 +34,19 @@ export const serviceService = {
     if (categoryId) params.append("categoryId", categoryId.toString());
 
     const { data } = await apiClient.get<Service[]>(
-      `/api/services?${params.toString()}`
+      `/services?${params.toString()}`
     );
     return data;
   },
 
   async getById(id: number): Promise<Service> {
-    const { data } = await apiClient.get<Service>(`/api/services/${id}`);
+    const { data } = await apiClient.get<Service>(`/services/${id}`);
     return data;
   },
 
   async getCategories(): Promise<ServiceCategory[]> {
     const { data } = await apiClient.get<ServiceCategory[]>(
-      "/api/service-categories"
+      "/service-categories"
     );
     return data;
   },

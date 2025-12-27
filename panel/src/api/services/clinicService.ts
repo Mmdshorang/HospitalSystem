@@ -80,39 +80,41 @@ export const clinicService = {
     if (isActive !== undefined) params.append("isActive", isActive.toString());
 
     const { data } = await apiClient.get<Clinic[]>(
-      `/api/clinics?${params.toString()}`
+      `/clinics?${params.toString()}`
     );
     return data;
   },
 
   async getById(id: number): Promise<Clinic> {
-    const { data } = await apiClient.get<Clinic>(`/api/clinics/${id}`);
+    const { data } = await apiClient.get<Clinic>(`/clinics/${id}`);
     return data;
   },
 
   async create(payload: CreateClinicDto): Promise<Clinic> {
-    const { data } = await apiClient.post<Clinic>("/api/clinics", payload);
+    const { data } = await apiClient.post<Clinic>("/clinics", payload);
     return data;
   },
 
   async update(id: number, payload: UpdateClinicDto): Promise<Clinic> {
-    const { data } = await apiClient.put<Clinic>(`/api/clinics/${id}`, payload);
+    const { data } = await apiClient.put<Clinic>(`/clinics/${id}`, payload);
     return data;
   },
 
   async remove(id: number): Promise<void> {
-    await apiClient.delete(`/api/clinics/${id}`);
+    await apiClient.delete(`/clinics/${id}`);
   },
 
   async getClinicInsurances(clinicId: number): Promise<Insurance[]> {
     const { data } = await apiClient.get<Insurance[]>(
-      `/api/clinics/${clinicId}/insurances`
+      `/clinics/${clinicId}/insurances`
     );
     return data;
   },
 
   async getClinicManagers(clinicId: number): Promise<any[]> {
-    const { data } = await apiClient.get<any[]>(`/api/clinics/${clinicId}/managers`);
+    const { data } = await apiClient.get<any[]>(
+      `/clinics/${clinicId}/managers`
+    );
     return data;
   },
 
@@ -120,14 +122,17 @@ export const clinicService = {
     clinicId: number,
     insuranceIds: number[]
   ): Promise<void> {
-    await apiClient.put(`/api/clinics/${clinicId}/insurances`, {
+    await apiClient.put(`/clinics/${clinicId}/insurances`, {
       clinicId,
       insuranceIds,
     });
   },
 
-  async setClinicManagers(clinicId: number, managerIds: number[]): Promise<void> {
-    await apiClient.put(`/api/clinics/${clinicId}/managers`, {
+  async setClinicManagers(
+    clinicId: number,
+    managerIds: number[]
+  ): Promise<void> {
+    await apiClient.put(`/clinics/${clinicId}/managers`, {
       clinicId,
       managerIds,
     });

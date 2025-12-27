@@ -32,19 +32,19 @@ export const insuranceService = {
     if (isActive !== undefined) params.append("isActive", isActive.toString());
 
     const { data } = await apiClient.get<Insurance[]>(
-      `/api/insurances?${params.toString()}`
+      `/insurances?${params.toString()}`
     );
     return data;
   },
 
   async getById(id: number): Promise<Insurance> {
-    const { data } = await apiClient.get<Insurance>(`/api/insurances/${id}`);
+    const { data } = await apiClient.get<Insurance>(`/insurances/${id}`);
     return data;
   },
 
   async create(payload: CreateInsuranceDto): Promise<Insurance> {
     const { data } = await apiClient.post<Insurance>(
-      "/api/insurances",
+      "/insurances",
       payload
     );
     return data;
@@ -52,13 +52,13 @@ export const insuranceService = {
 
   async update(id: number, payload: UpdateInsuranceDto): Promise<Insurance> {
     const { data } = await apiClient.put<Insurance>(
-      `/api/insurances/${id}`,
+      `/insurances/${id}`,
       payload
     );
     return data;
   },
 
   async remove(id: number): Promise<void> {
-    await apiClient.delete(`/api/insurances/${id}`);
+    await apiClient.delete(`/insurances/${id}`);
   },
 };

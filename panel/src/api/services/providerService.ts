@@ -61,7 +61,7 @@ export const providerService = {
     if (clinicId) params.append('clinicId', clinicId.toString());
     if (isActive !== undefined) params.append('isActive', isActive.toString());
 
-    const response = await apiClient.get(`/api/providers?${params.toString()}`);
+    const response = await apiClient.get(`/providers?${params.toString()}`);
     console.log("Provider service response:", response.data);
     console.log("Is array?", Array.isArray(response.data));
     
@@ -76,24 +76,24 @@ export const providerService = {
 
   // Get provider by ID
   getById: async (id: number): Promise<Provider> => {
-    const response = await apiClient.get(`/api/providers/${id}`);
+    const response = await apiClient.get(`/providers/${id}`);
     return response.data;
   },
 
   // Create new provider
   create: async (data: CreateProviderDto): Promise<Provider> => {
-    const response = await apiClient.post('/api/providers', data);
+    const response = await apiClient.post('/providers', data);
     return response.data;
   },
 
   // Update existing provider
   update: async (id: number, data: UpdateProviderDto): Promise<Provider> => {
-    const response = await apiClient.put(`/api/providers/${id}`, { ...data, id });
+    const response = await apiClient.put(`/providers/${id}`, { ...data, id });
     return response.data;
   },
 
   // Delete provider
   delete: async (id: number): Promise<void> => {
-    await apiClient.delete(`/api/providers/${id}`);
+    await apiClient.delete(`/providers/${id}`);
   },
 };

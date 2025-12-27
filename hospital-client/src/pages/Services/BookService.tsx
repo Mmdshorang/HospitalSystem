@@ -84,6 +84,18 @@ export const BookService = () => {
         }
     }, [isAuthenticated, currentStep, navigate]);
 
+    // Update patientInfo when user data becomes available
+    useEffect(() => {
+        if (user) {
+            setPatientInfo(prev => ({
+                firstName: prev.firstName || user.firstName || '',
+                lastName: prev.lastName || user.lastName || '',
+                nationalCode: prev.nationalCode || user.nationalCode || '',
+                phone: prev.phone || user.phone || '',
+            }));
+        }
+    }, [user]);
+
     if (serviceLoading) {
         return <Loading />;
     }

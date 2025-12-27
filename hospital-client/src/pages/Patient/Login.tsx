@@ -72,8 +72,8 @@ export const Login = () => {
             return;
         }
 
-        if (otpCode.length < 4) {
-            setError('کد تایید باید حداقل ۴ رقم باشد');
+        if (otpCode.length !== 4) {
+            setError('کد تایید باید ۴ رقم باشد');
             return;
         }
 
@@ -130,9 +130,9 @@ export const Login = () => {
                                     type="text"
                                     value={otpCode}
                                     onChange={(e) => setOtpCode(e.target.value)}
-                                    placeholder="کد 6 رقمی را وارد کنید"
+                                    placeholder="کد 4 رقمی را وارد کنید"
                                     required
-                                    maxLength={6}
+                                    maxLength={4}
                                 />
                             </div>
 
@@ -165,8 +165,8 @@ export const Login = () => {
                                     onClick={() => handleOtpRequest()}
                                     disabled={countdown > 0 || isRequesting}
                                     className={`text-sm block w-full ${countdown > 0 || isRequesting
-                                            ? 'text-gray-400 cursor-not-allowed'
-                                            : 'text-primary-600 hover:text-primary-700'
+                                        ? 'text-gray-400 cursor-not-allowed'
+                                        : 'text-primary-600 hover:text-primary-700'
                                         }`}
                                 >
                                     ارسال مجدد کد

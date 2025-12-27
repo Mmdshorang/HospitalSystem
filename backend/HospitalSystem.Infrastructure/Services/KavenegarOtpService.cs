@@ -30,9 +30,14 @@ public class KavenegarOtpService : IOtpService
 
     public async Task SendOtpAsync(string phone, string code, CancellationToken cancellationToken = default)
     {
-        var apiKey = _configuration["Kavenegar:ApiKey"];
-        var template = _configuration["Kavenegar:Template"];
-        var type = _configuration["Kavenegar:Type"] ?? "sms";
+        // Priority: Environment variables > appsettings
+        var apiKey = Environment.GetEnvironmentVariable("KAVENEGAR_API_KEY") 
+            ?? _configuration["Kavenegar:ApiKey"];
+        var template = Environment.GetEnvironmentVariable("KAVENEGAR_TEMPLATE") 
+            ?? _configuration["Kavenegar:Template"];
+        var type = Environment.GetEnvironmentVariable("KAVENEGAR_TYPE") 
+            ?? _configuration["Kavenegar:Type"] 
+            ?? "sms";
 
         if (string.IsNullOrWhiteSpace(apiKey) || string.IsNullOrWhiteSpace(template))
         {

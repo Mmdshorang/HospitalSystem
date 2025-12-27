@@ -13,8 +13,14 @@
         "DB_USER": "root",
         "DB_PASSWORD": "RVDI99mIYKTjdNHbMsNwzr0d",
         "JWT_SECRET": "hospital_system_super_secret_jwt_key_2025",
-        "JWT_EXPIRE": "7d",
+        "JWT_ISSUER": "HospitalSystem",
+        "JWT_AUDIENCE": "HospitalSystemUsers",
+        "JWT_EXPIRE_MINUTES": "60",
+        "KAVENEGAR_API_KEY": "694A787A667A38326858303244707147527776314F413D3D",
+        "KAVENEGAR_TEMPLATE": "verify",
+        "KAVENEGAR_TYPE": "sms",
+        "REDIS_CONNECTION_STRING": "",
         "ASPNETCORE_ENVIRONMENT": "Production",
-        "CORS_ORIGIN": "*"
+        "CORS_ORIGINS": "*"
     }
 }

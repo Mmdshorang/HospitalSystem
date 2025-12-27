@@ -63,19 +63,19 @@ export const clinicService = {
     if (serviceId) params.append("serviceId", serviceId.toString());
 
     const { data } = await apiClient.get<Clinic[]>(
-      `/api/clinics?${params.toString()}`
+      `/clinics?${params.toString()}`
     );
     return data;
   },
 
   async getById(id: number): Promise<Clinic> {
-    const { data } = await apiClient.get<Clinic>(`/api/clinics/${id}`);
+    const { data } = await apiClient.get<Clinic>(`/clinics/${id}`);
     return data;
   },
 
   async getClinicServices(clinicId: number): Promise<ClinicService[]> {
     const { data } = await apiClient.get<ClinicService[]>(
-      `/api/clinics/${clinicId}/services`
+      `/clinics/${clinicId}/services`
     );
     return data;
   },
