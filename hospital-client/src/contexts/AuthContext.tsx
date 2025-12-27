@@ -31,7 +31,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [user, setUser] = useState<UserInfo | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
-  const isAuthenticated = !!user;
+  const isAuthenticated = !user;
 
   useEffect(() => {
     const initializeAuth = async () => {
@@ -55,12 +55,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   };
 
   const verifyOtp = async (phone: string, code: string) => {
-    try {
-      await authService.verifyOtp({ phone, code });
-      return true;
-    } catch (error) {
-      throw error;
-    }
+    await authService.verifyOtp({ phone, code });
+    return true;
   };
 
   const loginWithOtp = async (phone: string, code: string) => {
