@@ -95,10 +95,10 @@ export const BookLab = () => {
     return (
         <div className="container mx-auto px-4 py-8">
             <div className="max-w-4xl mx-auto">
-                <h1 className="text-3xl font-bold mb-8 text-gray-800">ثبت درخواست آزمایش</h1>
+                <h1 className="text-xl font-bold mb-8 text-gray-800">ثبت درخواست آزمایش</h1>
 
                 {/* Mode Selection */}
-                <div className="card mb-6">
+                <div className="card border-2 mb-6">
                     <h2 className="text-xl font-semibold mb-4 text-gray-800">نوع درخواست</h2>
                     <div className="grid grid-cols-2 gap-4">
                         <button
@@ -150,7 +150,7 @@ export const BookLab = () => {
                 )}
 
                 {/* Service Selection */}
-                <div className="card mb-6">
+                <div className="card border-2 mb-6">
                     <h2 className="text-xl font-semibold mb-4 text-gray-800">انتخاب آزمایش‌ها</h2>
                     <div className="space-y-2 max-h-96 overflow-y-auto">
                         {labServicesList.length === 0 ? (
